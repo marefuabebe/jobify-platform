@@ -1698,3 +1698,100 @@ a {
     align-items: center;
     justify-content: center;
 }
+
+/* ==========================================================================
+   Advanced Public Sections & Component Enhancements
+   ========================================================================== */
+
+/* FAQ Accordion */
+.faq-card {
+    transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.faq-card:hover {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 8px 24px rgba(75, 108, 183, 0.08) !important;
+}
+
+.faq-header {
+    user-select: none;
+}
+
+.faq-icon {
+    transition: transform 0.25s ease;
+}
+
+/* Hiring Models Grid */
+.hiring-model-card {
+    background: #ffffff;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.hiring-model-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Journey Roadmap Cards */
+.journey-card {
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.journey-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 30px rgba(75, 108, 183, 0.12) !important;
+    border-color: var(--primary-color) !important;
+}
+
+/* Trust Shield & Earnings Feature Cards */
+.trust-shield-card,
+.earnings-feature-card,
+.editorial-track-card,
+.press-quote-card,
+.brand-asset-card,
+.dept-card,
+.hub-card {
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.trust-shield-card:hover,
+.earnings-feature-card:hover,
+.editorial-track-card:hover,
+.press-quote-card:hover,
+.brand-asset-card:hover,
+.dept-card:hover,
+.hub-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Mobile 2-column refinements for the new sections */
+@media (max-width: 767.98px) {
+    .journey-card,
+    .trust-shield-card,
+    .earnings-feature-card,
+    .editorial-track-card,
+    .press-quote-card,
+    .dept-card {
+        padding: 14px 10px !important;
+        border-radius: 12px !important;
+    }
+
+    .journey-year {
+        font-size: 1.1rem !important;
+    }
+
+    .faq-card {
+        padding: 16px 14px !important;
+    }
+
+    .faq-header h4 {
+        font-size: 0.9rem !important;
+    }
+
+    .brand-asset-card,
+    .hub-card {
+        padding: 18px 14px !important;
+        border-radius: 14px !important;
+    }
+}

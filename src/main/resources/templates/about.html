@@ -93,96 +93,28 @@
     </section>
 
     <!-- Stats Section -->
-    <section class="stats-section">
+    <section class="stats-section py-5">
         <div class="container">
             <div class="row g-4">
                 <div class="col-md-3 col-6 text-center reveal delay-100">
-                    <span class="stat-number counter" th:text="${totalUsers}" data-target="${totalUsers}">0</span>
-                    <span class="stat-label">Happy Users</span>
+                    <div class="stat-number"><span class="counter" data-target="120">120</span>+</div>
+                    <span class="stat-label">Countries Supported</span>
                 </div>
                 <div class="col-md-3 col-6 text-center reveal delay-200">
-                    <span class="stat-number counter" th:text="${totalCountries}"
-                        data-target="${totalCountries}">0</span>
-                    <span class="stat-label">Countries</span>
+                    <div class="stat-number"><span class="counter" data-target="99.8">99.8</span>%</div>
+                    <span class="stat-label">Escrow Reliability</span>
                 </div>
                 <div class="col-md-3 col-6 text-center reveal delay-300">
-                    <span class="stat-number counter" th:text="${totalCompanies}"
-                        data-target="${totalCompanies}">0</span>
-                    <span class="stat-label">Companies</span>
+                    <div class="stat-number">$<span class="counter" data-target="15">15</span>M+</div>
+                    <span class="stat-label">Contracts Delivered</span>
                 </div>
                 <div class="col-md-3 col-6 text-center reveal delay-300">
-                    <span class="stat-number"><span class="counter" th:text="${globalRating}"
-                            data-target="${globalRating}">0</span>%</span>
-                    <span class="stat-label">Success Rate</span>
+                    <div class="stat-number">24/7</div>
+                    <span class="stat-label">Enterprise Support</span>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- ... (Rest of content) ... -->
-
-    <!-- Scripts -->
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Scroll Animation Observer
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.1
-            };
-
-            const observer = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('active');
-
-                        // Check if this is the Stats Section to trigger counters
-                        if (entry.target.querySelector('.counter')) {
-                            startCounters();
-                        }
-
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, observerOptions);
-
-            const revealElements = document.querySelectorAll('.reveal');
-            revealElements.forEach(el => observer.observe(el));
-
-            // Counter Animation
-            function startCounters() {
-                const counters = document.querySelectorAll('.counter');
-                const speed = 200; // The lower the slower
-
-                counters.forEach(counter => {
-                    const updateCount = () => {
-                        const target = +counter.innerText; // Get target from Thymeleaf rendered text
-                        const count = +counter.getAttribute('data-count') || 0;
-
-                        // Initial setup to clear text and start from 0 if not already running
-                        if (count === 0 && counter.innerText !== '0') {
-                            counter.setAttribute('data-target', counter.innerText);
-                            counter.innerText = 0;
-                        }
-
-                        const targetNum = +counter.getAttribute('data-target');
-                        const inc = targetNum / speed;
-
-                        if (count < targetNum) {
-                            counter.innerText = Math.ceil(count + inc);
-                            counter.setAttribute('data-count', count + inc);
-                            setTimeout(updateCount, 20);
-                        } else {
-                            counter.innerText = targetNum;
-                            // Add 'M+' or 'K+' suffix logic if needed, but for now exact numbers
-                        }
-                    };
-                    updateCount();
-                });
-            }
-        });
-    </script>
 
     <!-- Our Story Section -->
     <section id="our-story" class="section-padding bg-white">
@@ -223,8 +155,53 @@
         </div>
     </section>
 
+    <!-- Company Journey & Innovation Roadmap -->
+    <section class="section-padding bg-light position-relative overflow-hidden">
+        <div class="container position-relative z-1">
+            <div class="text-center mb-5 reveal">
+                <span class="text-primary fw-bold text-uppercase ls-1 small">Our Evolution</span>
+                <h2 class="section-title">The Jobify Innovation Journey</h2>
+                <p class="text-muted mx-auto" style="max-width: 650px;">From a grassroots network connecting independent creators to an enterprise-grade global talent infrastructure.</p>
+            </div>
+            <div class="row g-3 g-md-4 justify-content-center">
+                <div class="col-6 col-lg-3 reveal delay-100">
+                    <div class="journey-card h-100 p-3 p-md-4 bg-white rounded-4 shadow-sm border border-light text-center">
+                        <div class="journey-year text-primary fw-bold fs-4 mb-1">2024</div>
+                        <span class="badge bg-primary-subtle text-primary mb-2">The Genesis</span>
+                        <h4 class="h6 fw-bold mb-2">Borderless Vision</h4>
+                        <p class="text-muted small mb-0">Eliminating geographical barriers between top freelancers and ambitious startups worldwide.</p>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3 reveal delay-200">
+                    <div class="journey-card h-100 p-3 p-md-4 bg-white rounded-4 shadow-sm border border-light text-center">
+                        <div class="journey-year text-primary fw-bold fs-4 mb-1">2025</div>
+                        <span class="badge bg-info-subtle text-info mb-2">AI Engine</span>
+                        <h4 class="h6 fw-bold mb-2">Smart Work Match</h4>
+                        <p class="text-muted small mb-0">Algorithmic skill matching and automated proposal scoring, cutting hiring to 48 hours.</p>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3 reveal delay-300">
+                    <div class="journey-card h-100 p-3 p-md-4 bg-white rounded-4 shadow-sm border border-light text-center">
+                        <div class="journey-year text-primary fw-bold fs-4 mb-1">2026</div>
+                        <span class="badge bg-success-subtle text-success mb-2">Global Escrow</span>
+                        <h4 class="h6 fw-bold mb-2">Enterprise Scale</h4>
+                        <p class="text-muted small mb-0">Automated multi-currency escrow vaults, real-time collaboration, and Verified Pro standards.</p>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3 reveal delay-300">
+                    <div class="journey-card h-100 p-3 p-md-4 bg-white rounded-4 shadow-sm border border-light text-center">
+                        <div class="journey-year text-primary fw-bold fs-4 mb-1">Beyond</div>
+                        <span class="badge bg-warning-subtle text-warning mb-2">Future Tech</span>
+                        <h4 class="h6 fw-bold mb-2">Decentralized Trust</h4>
+                        <p class="text-muted small mb-0">Portable career identities, smart-contract milestone arbitration, and autonomous teams.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Core Values -->
-    <section class="section-padding bg-light">
+    <section class="section-padding bg-white">
         <div class="container">
             <div class="text-center mb-5 reveal">
                 <h5 class="section-subtitle mb-2 text-uppercase fw-bold text-primary small ls-1">Our Culture</h5>
@@ -260,6 +237,55 @@
                         <h3>Innovation</h3>
                         <p class="text-muted">We assume nothing. We constantly challenge the status quo to provide the
                             best tools for the modern workforce.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security, Compliance & Trust Center -->
+    <section class="section-padding bg-light position-relative">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <span class="text-primary fw-bold text-uppercase ls-1 small">Enterprise Protection</span>
+                <h2 class="section-title">Built on Uncompromising Trust & Compliance</h2>
+                <p class="text-muted mx-auto" style="max-width: 650px;">Every contract, communication, and disbursement on Jobify is backed by bank-grade encryption and institutional escrow safeguards.</p>
+            </div>
+            <div class="row g-3 g-md-4">
+                <div class="col-6 col-lg-3 reveal delay-100">
+                    <div class="trust-shield-card p-3 p-md-4 rounded-4 h-100 bg-white shadow-sm border border-light">
+                        <div class="icon-circle bg-primary text-white mb-3 d-inline-flex align-items-center justify-content-center rounded-3" style="width: 44px; height: 44px;">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <h4 class="h6 fw-bold mb-2">Automated Escrow</h4>
+                        <p class="text-muted small mb-0">Funds are safely locked before work begins and released only upon explicit milestone approval.</p>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3 reveal delay-200">
+                    <div class="trust-shield-card p-3 p-md-4 rounded-4 h-100 bg-white shadow-sm border border-light">
+                        <div class="icon-circle bg-primary text-white mb-3 d-inline-flex align-items-center justify-content-center rounded-3" style="width: 44px; height: 44px;">
+                            <i class="fas fa-file-contract"></i>
+                        </div>
+                        <h4 class="h6 fw-bold mb-2">Automated IP Transfer</h4>
+                        <p class="text-muted small mb-0">Legal intellectual property transfer and NDAs execute automatically with each payment release.</p>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3 reveal delay-300">
+                    <div class="trust-shield-card p-3 p-md-4 rounded-4 h-100 bg-white shadow-sm border border-light">
+                        <div class="icon-circle bg-primary text-white mb-3 d-inline-flex align-items-center justify-content-center rounded-3" style="width: 44px; height: 44px;">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h4 class="h6 fw-bold mb-2">Rigorous Pro Vetting</h4>
+                        <p class="text-muted small mb-0">Multi-tier identity verification, technical portfolio reviews, and proven feedback requirements.</p>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3 reveal delay-300">
+                    <div class="trust-shield-card p-3 p-md-4 rounded-4 h-100 bg-white shadow-sm border border-light">
+                        <div class="icon-circle bg-primary text-white mb-3 d-inline-flex align-items-center justify-content-center rounded-3" style="width: 44px; height: 44px;">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <h4 class="h6 fw-bold mb-2">Dispute Mediation</h4>
+                        <p class="text-muted small mb-0">Dedicated neutral arbiters guarantee evidence-based, transparent project resolution.</p>
                     </div>
                 </div>
             </div>
@@ -379,6 +405,70 @@
     <th:block th:replace="fragments/footer :: footer"></th:block>
 
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            let countersStarted = false;
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+
+                        if (!countersStarted && entry.target.querySelector('.counter')) {
+                            countersStarted = true;
+                            startCounters();
+                        }
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            const revealElements = document.querySelectorAll('.reveal');
+            revealElements.forEach(el => observer.observe(el));
+
+            // Fallback to ensure reveal items are visible
+            setTimeout(() => {
+                document.querySelectorAll('.reveal:not(.active)').forEach(el => {
+                    el.classList.add('active');
+                });
+                if (!countersStarted) {
+                    countersStarted = true;
+                    startCounters();
+                }
+            }, 800);
+
+            function startCounters() {
+                const counters = document.querySelectorAll('.counter');
+                counters.forEach(counter => {
+                    const targetStr = counter.getAttribute('data-target') || counter.innerText;
+                    const targetNum = parseFloat(targetStr);
+                    if (isNaN(targetNum)) return;
+                    const isDecimal = targetStr.includes('.');
+                    const duration = 1500;
+                    const startTime = performance.now();
+                    
+                    function animate(currentTime) {
+                        const elapsed = currentTime - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        const easeProgress = 1 - Math.pow(1 - progress, 3);
+                        const currentVal = easeProgress * targetNum;
+                        counter.innerText = isDecimal ? currentVal.toFixed(1) : Math.floor(currentVal);
+                        if (progress < 1) {
+                            requestAnimationFrame(animate);
+                        } else {
+                            counter.innerText = isDecimal ? targetNum.toFixed(1) : targetNum;
+                        }
+                    }
+                    requestAnimationFrame(animate);
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

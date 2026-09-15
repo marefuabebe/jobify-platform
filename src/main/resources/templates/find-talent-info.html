@@ -701,25 +701,92 @@
         </div>
     </section>
 
-    <!-- Talent Stats -->
-    <section class="py-5">
+    <!-- Enterprise Quality & Vetting Assurance Bar -->
+    <section class="py-5 bg-light-subtle">
         <div class="container">
             <div class="talent-stats">
                 <div class="stat-item reveal">
-                    <div class="stat-number" th:text="${verifiedFreelancersCount} + '+'">50,000+</div>
-                    <div class="stat-label">Verified Freelancers</div>
+                    <div class="stat-number">Top 3%</div>
+                    <div class="stat-label">Vetted Global Talent</div>
                 </div>
                 <div class="stat-item reveal delay-100">
-                    <div class="stat-number" th:text="${skillsCount} + '+'">150+</div>
-                    <div class="stat-label">Skills Categories</div>
+                    <div class="stat-number">&lt; 48h</div>
+                    <div class="stat-label">Avg. Match Time</div>
                 </div>
                 <div class="stat-item reveal delay-200">
-                    <div class="stat-number" th:text="${successRate} + '%'">98%</div>
-                    <div class="stat-label">Success Rate</div>
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">IP &amp; Code Ownership</div>
                 </div>
                 <div class="stat-item reveal delay-300">
-                    <div class="stat-number">24/7</div>
-                    <div class="stat-label">Support Available</div>
+                    <div class="stat-number">Zero-Risk</div>
+                    <div class="stat-label">Escrow Guarantee</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Flexible Hiring Models Grid -->
+    <section class="py-5 bg-white">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <span class="text-primary fw-bold text-uppercase ls-1 small">Engagement Options</span>
+                <h2 class="display-6 fw-bold mb-3">Flexible Hiring Models Built for Scale</h2>
+                <p class="text-muted fs-5 mx-auto" style="max-width: 680px;">Choose how you want to work with top-tier professionals—from fixed-scope projects to dedicated long-term remote squads.</p>
+            </div>
+            <div class="row g-4">
+                <!-- Model 1: Fixed Price -->
+                <div class="col-lg-4 col-md-6 reveal delay-100">
+                    <div class="hiring-model-card p-4 rounded-4 h-100 border shadow-sm d-flex flex-column">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-semibold">Milestone-Based</span>
+                            <i class="fas fa-flag-checkered text-primary fs-4"></i>
+                        </div>
+                        <h3 class="h4 fw-bold mb-2">Fixed-Price Contracts</h3>
+                        <p class="text-muted small mb-4">Ideal for well-defined deliverables, MVPs, and projects with clear specifications and timelines.</p>
+                        <ul class="list-unstyled mb-4 flex-grow-1">
+                            <li class="mb-2 small"><i class="fas fa-check-circle text-primary me-2"></i> Lock milestones with upfront escrow</li>
+                            <li class="mb-2 small"><i class="fas fa-check-circle text-primary me-2"></i> Pay only after reviewing deliverables</li>
+                            <li class="mb-2 small"><i class="fas fa-check-circle text-primary me-2"></i> Predictable budget with zero cost creep</li>
+                        </ul>
+                        <a href="/post-job" class="btn btn-outline-primary rounded-pill w-100 fw-semibold">Post Fixed Project</a>
+                    </div>
+                </div>
+
+                <!-- Model 2: Hourly -->
+                <div class="col-lg-4 col-md-6 reveal delay-200">
+                    <div class="hiring-model-card p-4 rounded-4 h-100 border shadow-sm d-flex flex-column border-primary position-relative" style="background: #fcfdff;">
+                        <span class="position-absolute top-0 end-0 translate-middle-y me-4 badge bg-primary text-white px-3 py-1 rounded-pill">Most Popular</span>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-semibold">Agile &amp; Ongoing</span>
+                            <i class="fas fa-clock text-primary fs-4"></i>
+                        </div>
+                        <h3 class="h4 fw-bold mb-2">Hourly Engagements</h3>
+                        <p class="text-muted small mb-4">Perfect for iterative sprints, ongoing feature development, and dynamic business needs.</p>
+                        <ul class="list-unstyled mb-4 flex-grow-1">
+                            <li class="mb-2 small"><i class="fas fa-check-circle text-primary me-2"></i> Transparent automated time-tracking</li>
+                            <li class="mb-2 small"><i class="fas fa-check-circle text-primary me-2"></i> Set weekly hour limits to cap spend</li>
+                            <li class="mb-2 small"><i class="fas fa-check-circle text-primary me-2"></i> Scale hours up or down seamlessly</li>
+                        </ul>
+                        <a href="/post-job" class="btn btn-primary rounded-pill w-100 fw-semibold">Hire Hourly Talent</a>
+                    </div>
+                </div>
+
+                <!-- Model 3: Dedicated Squads -->
+                <div class="col-lg-4 col-md-12 reveal delay-300">
+                    <div class="hiring-model-card p-4 rounded-4 h-100 border shadow-sm d-flex flex-column">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="badge bg-warning-subtle text-dark px-3 py-2 rounded-pill fw-semibold">Enterprise</span>
+                            <i class="fas fa-users-cog text-primary fs-4"></i>
+                        </div>
+                        <h3 class="h4 fw-bold mb-2">Dedicated Remote Squads</h3>
+                        <p class="text-muted small mb-4">Pre-assembled pods of architects, designers, and engineers ready to integrate into your stack.</p>
+                        <ul class="list-unstyled mb-4 flex-grow-1">
+                            <li class="mb-2 small"><i class="fas fa-check-circle text-primary me-2"></i> Hand-matched senior engineering leads</li>
+                            <li class="mb-2 small"><i class="fas fa-check-circle text-primary me-2"></i> Dedicated account manager &amp; SLAs</li>
+                            <li class="mb-2 small"><i class="fas fa-check-circle text-primary me-2"></i> Consolidated single-invoice billing</li>
+                        </ul>
+                        <a href="/info/contact" class="btn btn-outline-primary rounded-pill w-100 fw-semibold">Talk to Enterprise Team</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -865,6 +932,77 @@
         </div>
     </section>
 
+    <!-- Client Hiring & IP Security FAQ -->
+    <section class="py-5 bg-white">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <span class="text-primary fw-bold text-uppercase ls-1 small">Got Questions?</span>
+                <h2 class="display-6 fw-bold mb-3">Client Hiring &amp; Security FAQ</h2>
+                <p class="text-muted fs-5 mx-auto" style="max-width: 650px;">Clear answers to common questions about vetting, escrow protection, and legal IP ownership.</p>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-9">
+                    <div class="faq-accordion reveal delay-100">
+                        <!-- FAQ Item 1 -->
+                        <div class="faq-card mb-3 p-4 rounded-4 border bg-white shadow-sm">
+                            <div class="faq-header d-flex justify-content-between align-items-center" style="cursor: pointer;">
+                                <h4 class="h6 fw-bold mb-0 text-dark">How does Jobify vet and verify freelancers?</h4>
+                                <i class="fas fa-chevron-down text-primary faq-icon transition"></i>
+                            </div>
+                            <div class="faq-body mt-3 text-muted small" style="display: none; line-height: 1.6;">
+                                Every candidate undergoes automated ID verification, portfolio authentication, and past performance scoring. Verified Pro profiles have additionally passed technical peer assessments and verified client satisfaction records.
+                            </div>
+                        </div>
+
+                        <!-- FAQ Item 2 -->
+                        <div class="faq-card mb-3 p-4 rounded-4 border bg-white shadow-sm">
+                            <div class="faq-header d-flex justify-content-between align-items-center" style="cursor: pointer;">
+                                <h4 class="h6 fw-bold mb-0 text-dark">Who owns the intellectual property (IP) and source code created?</h4>
+                                <i class="fas fa-chevron-down text-primary faq-icon transition"></i>
+                            </div>
+                            <div class="faq-body mt-3 text-muted small" style="display: none; line-height: 1.6;">
+                                You own 100% of all intellectual property, source code, designs, and deliverables. Our platform user agreement enforces an automatic, legally binding IP transfer and assignment to the client the moment a milestone payment is released.
+                            </div>
+                        </div>
+
+                        <!-- FAQ Item 3 -->
+                        <div class="faq-card mb-3 p-4 rounded-4 border bg-white shadow-sm">
+                            <div class="faq-header d-flex justify-content-between align-items-center" style="cursor: pointer;">
+                                <h4 class="h6 fw-bold mb-0 text-dark">How does the escrow payment protection work?</h4>
+                                <i class="fas fa-chevron-down text-primary faq-icon transition"></i>
+                            </div>
+                            <div class="faq-body mt-3 text-muted small" style="display: none; line-height: 1.6;">
+                                When you hire a talent, project funds are safely deposited into Jobify's secure escrow vault. Funds are not sent to the freelancer until you review and explicitly approve the submitted work or milestone.
+                            </div>
+                        </div>
+
+                        <!-- FAQ Item 4 -->
+                        <div class="faq-card mb-3 p-4 rounded-4 border bg-white shadow-sm">
+                            <div class="faq-header d-flex justify-content-between align-items-center" style="cursor: pointer;">
+                                <h4 class="h6 fw-bold mb-0 text-dark">Can we sign custom Enterprise Non-Disclosure Agreements (NDAs)?</h4>
+                                <i class="fas fa-chevron-down text-primary faq-icon transition"></i>
+                            </div>
+                            <div class="faq-body mt-3 text-muted small" style="display: none; line-height: 1.6;">
+                                Yes! Standard NDAs are built into every contract on Jobify by default. For Enterprise clients requiring custom company-specific NDAs or IP assignment addendums, our contract flow supports custom electronic signature attachments before project kick-off.
+                            </div>
+                        </div>
+
+                        <!-- FAQ Item 5 -->
+                        <div class="faq-card mb-3 p-4 rounded-4 border bg-white shadow-sm">
+                            <div class="faq-header d-flex justify-content-between align-items-center" style="cursor: pointer;">
+                                <h4 class="h6 fw-bold mb-0 text-dark">What happens if a freelancer fails to deliver or misses a deadline?</h4>
+                                <i class="fas fa-chevron-down text-primary faq-icon transition"></i>
+                            </div>
+                            <div class="faq-body mt-3 text-muted small" style="display: none; line-height: 1.6;">
+                                If deliverables fail to meet agreed requirements, you can request revisions or initiate a dispute. Our dedicated resolution team examines work logs and milestones; unapproved escrow funds can be refunded directly to your original payment method.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- CTA Section -->
     <section class="cta-section">
         <div class="container cta-content reveal">
@@ -918,6 +1056,29 @@
                     el.classList.add('active');
                 });
             }, 1000);
+
+            // FAQ Accordion Interaction
+            document.querySelectorAll('.faq-header').forEach(header => {
+                header.addEventListener('click', function () {
+                    const card = this.closest('.faq-card');
+                    const body = card.querySelector('.faq-body');
+                    const icon = this.querySelector('.faq-icon');
+                    const isOpen = body.style.display === 'block';
+
+                    // Close sibling FAQs in the same accordion
+                    card.parentElement.querySelectorAll('.faq-body').forEach(b => b.style.display = 'none');
+                    card.parentElement.querySelectorAll('.faq-icon').forEach(i => {
+                        i.classList.remove('fa-chevron-up');
+                        i.classList.add('fa-chevron-down');
+                    });
+
+                    if (!isOpen) {
+                        body.style.display = 'block';
+                        icon.classList.remove('fa-chevron-down');
+                        icon.classList.add('fa-chevron-up');
+                    }
+                });
+            });
         });
     </script>
 </body>
