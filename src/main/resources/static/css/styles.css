@@ -409,7 +409,8 @@ a {
     color: var(--secondary-color);
     margin-bottom: 10px;
     position: relative;
-    display: inline-block;
+    display: block;
+    text-align: center;
 }
 
 .section-title::after {
@@ -420,6 +421,14 @@ a {
     background: var(--primary-color);
     margin: 10px auto 0;
     border-radius: 2px;
+}
+
+.section-eyebrow,
+.section-subtitle-sm,
+.text-center > span.text-primary.text-uppercase,
+.text-center > span.ls-1 {
+    display: block !important;
+    margin-bottom: 8px !important;
 }
 
 .section-subtitle {
