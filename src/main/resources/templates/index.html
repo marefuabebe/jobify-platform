@@ -300,66 +300,133 @@
         </div>
     </section>
 
-    <!-- How It Works Section -->
-    <section class="section-padding bg-light border-top">
+    <!-- Unique How It Works (Vertical Timeline) -->
+    <section class="section-padding bg-light border-top overflow-hidden">
         <div class="container">
             <div class="section-header text-center mb-5 reveal">
-                <span class="section-tag-pill">PROCESS</span>
-                <h2 class="section-title">How Jobify Works</h2>
-                <p class="section-subtitle text-muted">Your journey to a new career in 3 simple steps</p>
+                <span class="section-tag-pill" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary-color);">THE PROCESS</span>
+                <h2 class="section-title fw-bold">Your Path to Success</h2>
+                <p class="section-subtitle text-muted">A streamlined experience designed exclusively for modern professionals.</p>
             </div>
-            <div class="row text-center position-relative">
-                <!-- Connecting Line (hidden on mobile) -->
-                <div class="d-none d-lg-block position-absolute" style="top: 40px; left: 15%; right: 15%; height: 2px; background: repeating-linear-gradient(90deg, var(--primary-color) 0, var(--primary-color) 10px, transparent 10px, transparent 20px); z-index: 1;"></div>
-                
-                <div class="col-lg-4 mb-5 mb-lg-0 reveal delay-100 position-relative z-2">
-                    <div class="how-it-works-icon mx-auto mb-4 bg-white shadow-sm d-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; border: 3px solid var(--primary-color);">
-                        <i class="fas fa-user-plus fa-2x text-primary"></i>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="timeline-container position-relative py-4">
+                        <!-- Vertical Line -->
+                        <div class="position-absolute h-100" style="left: 50%; top: 0; width: 4px; background: linear-gradient(180deg, var(--primary-color) 0%, rgba(var(--primary-rgb),0) 100%); transform: translateX(-50%); border-radius: 4px;"></div>
+                        
+                        <!-- Step 1 (Left) -->
+                        <div class="row align-items-center mb-5 reveal delay-100">
+                            <div class="col-md-5 text-md-end text-center pe-md-5">
+                                <h4 class="fw-bold mb-3">Craft Your Identity</h4>
+                                <p class="text-muted mb-0">Build a standout profile. Showcase your portfolio, skills, and experience to instantly attract top-tier clients and employers globally.</p>
+                            </div>
+                            <div class="col-md-2 text-center position-relative my-4 my-md-0">
+                                <div class="bg-white rounded-circle shadow-lg d-flex align-items-center justify-content-center mx-auto position-relative z-2" style="width: 70px; height: 70px; border: 4px solid var(--primary-color);">
+                                    <span class="fs-4 fw-bold text-primary">1</span>
+                                </div>
+                            </div>
+                            <div class="col-md-5 text-center text-md-start ps-md-5">
+                                <div class="p-4 bg-white rounded-4 shadow-sm border border-light">
+                                    <i class="fas fa-id-badge fa-3x text-primary opacity-50 mb-3"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2 (Right) -->
+                        <div class="row align-items-center mb-5 reveal delay-200">
+                            <div class="col-md-5 text-center text-md-end pe-md-5 order-3 order-md-1">
+                                <div class="p-4 bg-white rounded-4 shadow-sm border border-light">
+                                    <i class="fas fa-search-dollar fa-3x text-primary opacity-50 mb-3"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-2 text-center position-relative my-4 my-md-0 order-2">
+                                <div class="bg-white rounded-circle shadow-lg d-flex align-items-center justify-content-center mx-auto position-relative z-2" style="width: 70px; height: 70px; border: 4px solid var(--primary-color);">
+                                    <span class="fs-4 fw-bold text-primary">2</span>
+                                </div>
+                            </div>
+                            <div class="col-md-5 text-md-start text-center ps-md-5 order-1 order-md-3">
+                                <h4 class="fw-bold mb-3">Discover Opportunities</h4>
+                                <p class="text-muted mb-0">Our AI-driven matching algorithm connects you with high-paying projects and full-time roles that perfectly align with your unique skill set.</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 3 (Left) -->
+                        <div class="row align-items-center reveal delay-300">
+                            <div class="col-md-5 text-md-end text-center pe-md-5">
+                                <h4 class="fw-bold mb-3">Collaborate & Earn</h4>
+                                <p class="text-muted mb-0">Communicate effortlessly through our integrated workspace. Deliver outstanding results and get paid securely with zero friction.</p>
+                            </div>
+                            <div class="col-md-2 text-center position-relative my-4 my-md-0">
+                                <div class="bg-white rounded-circle shadow-lg d-flex align-items-center justify-content-center mx-auto position-relative z-2" style="width: 70px; height: 70px; border: 4px solid var(--primary-color);">
+                                    <span class="fs-4 fw-bold text-primary">3</span>
+                                </div>
+                            </div>
+                            <div class="col-md-5 text-center text-md-start ps-md-5">
+                                <div class="p-4 bg-white rounded-4 shadow-sm border border-light">
+                                    <i class="fas fa-rocket fa-3x text-primary opacity-50 mb-3"></i>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <h5 class="fw-bold">1. Create an Account</h5>
-                    <p class="text-muted">Sign up as a freelancer or a client. Complete your profile to stand out to potential matches.</p>
-                </div>
-                <div class="col-lg-4 mb-5 mb-lg-0 reveal delay-200 position-relative z-2">
-                    <div class="how-it-works-icon mx-auto mb-4 bg-white shadow-sm d-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; border: 3px solid var(--primary-color);">
-                        <i class="fas fa-search fa-2x text-primary"></i>
-                    </div>
-                    <h5 class="fw-bold">2. Search & Apply</h5>
-                    <p class="text-muted">Browse thousands of job postings or search for the perfect candidate using our advanced filters.</p>
-                </div>
-                <div class="col-lg-4 reveal delay-300 position-relative z-2">
-                    <div class="how-it-works-icon mx-auto mb-4 bg-white shadow-sm d-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; border: 3px solid var(--primary-color);">
-                        <i class="fas fa-handshake fa-2x text-primary"></i>
-                    </div>
-                    <h5 class="fw-bold">3. Get Hired & Paid</h5>
-                    <p class="text-muted">Connect, interview, and collaborate. Enjoy secure payments through our trusted escrow system.</p>
                 </div>
             </div>
         </div>
+        <style>
+            @media (max-width: 768px) {
+                .timeline-container > .position-absolute {
+                    left: 50% !important;
+                }
+            }
+        </style>
     </section>
 
-    <!-- Platform Stats / Why Choose Us -->
-    <section class="section-padding bg-primary text-white text-center">
-        <div class="container">
-            <div class="row g-4">
-                <div class="col-6 col-md-3 reveal delay-100">
-                    <i class="fas fa-users fa-3x mb-3" style="color: rgba(255,255,255,0.7);"></i>
-                    <h2 class="display-5 fw-bold mb-0">500k+</h2>
-                    <p class="mb-0" style="color: rgba(255,255,255,0.7);">Active Users</p>
+    <!-- Unique Platform Stats (Bento Grid) -->
+    <section class="py-5 bg-white position-relative">
+        <div class="container py-5">
+            <div class="row g-4 align-items-center">
+                <div class="col-lg-5 reveal delay-100">
+                    <h2 class="display-5 fw-bold mb-4">Empowering the global workforce.</h2>
+                    <p class="lead text-muted mb-4">We are more than just a job board. Jobify is a thriving ecosystem of talent and visionaries building the future together.</p>
+                    <a href="/find-work/" class="btn btn-outline-primary rounded-pill px-4 py-2 fw-bold">Join the Movement <i class="fas fa-arrow-right ms-2"></i></a>
                 </div>
-                <div class="col-6 col-md-3 reveal delay-200">
-                    <i class="fas fa-briefcase fa-3x mb-3" style="color: rgba(255,255,255,0.7);"></i>
-                    <h2 class="display-5 fw-bold mb-0">12k+</h2>
-                    <p class="mb-0" style="color: rgba(255,255,255,0.7);">Jobs Posted</p>
-                </div>
-                <div class="col-6 col-md-3 reveal delay-300">
-                    <i class="fas fa-hand-holding-usd fa-3x mb-3" style="color: rgba(255,255,255,0.7);"></i>
-                    <h2 class="display-5 fw-bold mb-0">$50M+</h2>
-                    <p class="mb-0" style="color: rgba(255,255,255,0.7);">Paid to Freelancers</p>
-                </div>
-                <div class="col-6 col-md-3 reveal delay-100">
-                    <i class="fas fa-star fa-3x mb-3" style="color: rgba(255,255,255,0.7);"></i>
-                    <h2 class="display-5 fw-bold mb-0">4.9/5</h2>
-                    <p class="mb-0" style="color: rgba(255,255,255,0.7);">Client Satisfaction</p>
+                
+                <div class="col-lg-7">
+                    <div class="row g-4">
+                        <div class="col-sm-6 reveal delay-200">
+                            <div class="p-5 rounded-4 shadow-sm h-100 d-flex flex-column justify-content-center" style="background: linear-gradient(135deg, var(--primary-color) 0%, #1a237e 100%); color: white; min-height: 220px;">
+                                <h3 class="display-4 fw-bold mb-0">500k<span class="text-warning">+</span></h3>
+                                <p class="fs-5 opacity-75 mb-0">Active Professionals</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 reveal delay-300">
+                            <div class="p-5 rounded-4 shadow-sm h-100 d-flex flex-column justify-content-center bg-light border border-2 border-white" style="min-height: 220px;">
+                                <i class="fas fa-briefcase fa-2x text-primary mb-3"></i>
+                                <h3 class="display-5 fw-bold text-dark mb-0">12,000+</h3>
+                                <p class="text-muted mb-0">Daily Job Postings</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 reveal delay-100">
+                            <div class="p-5 rounded-4 shadow-sm h-100 d-flex flex-column justify-content-center bg-light border border-2 border-white" style="min-height: 220px;">
+                                <i class="fas fa-shield-alt fa-2x text-primary mb-3"></i>
+                                <h3 class="display-5 fw-bold text-dark mb-0">$50M+</h3>
+                                <p class="text-muted mb-0">Securely Processed</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 reveal delay-200">
+                            <div class="p-5 rounded-4 shadow-sm h-100 d-flex flex-column justify-content-center" style="background: var(--bs-warning); color: #fff; min-height: 220px;">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-star text-white me-1"></i>
+                                    <i class="fas fa-star text-white me-1"></i>
+                                    <i class="fas fa-star text-white me-1"></i>
+                                    <i class="fas fa-star text-white me-1"></i>
+                                    <i class="fas fa-star-half-alt text-white"></i>
+                                </div>
+                                <h3 class="display-4 fw-bold mb-0 text-dark">4.9<span class="fs-4">/5</span></h3>
+                                <p class="fs-6 text-dark opacity-75 fw-bold mb-0">Average Satisfaction</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
