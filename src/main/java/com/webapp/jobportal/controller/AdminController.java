@@ -707,6 +707,43 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
+    @PostMapping("/users/verify")
+    public String verifyUser(@RequestParam("userId") int userId, RedirectAttributes redirectAttributes) {
+        try {
+            Users user = usersService.getUserById(userId);
+            if (user.getUserTypeId() != null) {
+                if (user.getUserTypeId().getUserTypeId() == 1) {
+                    recruiterProfileRepository.findById(userId).ifPresent(p -> {
+                        p.setIsVerified(true);
+                        recruiterProfileRepository.save(p);
+                    });
+                } else if (user.getUserTypeId().getUserTypeId() == 2) {
+                    jobSeekerProfileRepository.findById(userId).ifPresent(p -> {
+                        p.setIsVerified(true);
+                        jobSeekerProfileRepository.save(p);
+                    });
+                }
+            }
+            redirectAttributes.addFlashAttribute("success", "User verified successfully");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error verifying user: " + e.getMessage());
+        }
+        return "redirect:/admin/users";
+    }
+
+    @PostMapping("/users/activate")
+    public String activateUser(@RequestParam("userId") int userId, RedirectAttributes redirectAttributes) {
+        try {
+            Users user = usersService.getUserById(userId);
+            user.setActive(true);
+            usersRepository.save(user);
+            redirectAttributes.addFlashAttribute("success", "User email verified and account activated successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error activating user: " + e.getMessage());
+        }
+        return "redirect:/admin/users";
+    }
+
     @GetMapping("/jobs")
     public String jobs(@RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,

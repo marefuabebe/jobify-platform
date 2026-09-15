@@ -28,8 +28,17 @@ public class VerificationToken {
     public VerificationToken(Users user) {
         this.user = user;
         this.token = UUID.randomUUID().toString();
-        // 5 minutes expiration
-        this.expiryDate = new Date(System.currentTimeMillis() + (1000 * 60 * 5));
+        // 24 hours expiration
+        this.expiryDate = new Date(System.currentTimeMillis() + (1000L * 60 * 60 * 24));
+    }
+
+    public boolean isExpired() {
+        return this.expiryDate == null || this.expiryDate.before(new Date());
+    }
+
+    public void refresh() {
+        this.token = UUID.randomUUID().toString();
+        this.expiryDate = new Date(System.currentTimeMillis() + (1000L * 60 * 60 * 24));
     }
 
     public Long getId() {

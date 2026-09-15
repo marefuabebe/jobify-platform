@@ -423,8 +423,21 @@
                     style="background-color: #fee2e2; color: #b91c1c;">
                     <i class="fas fa-ban mt-1"></i>
                     <div>
-                        <strong>Account Banned</strong><br>
-                        Your account has been banned by the administrator.
+                        <strong>Account Inactive or Suspended</strong><br>
+                        Your account is currently disabled. If you have not verified your email yet, please <a th:href="@{/resend-verification}" class="text-danger fw-bold text-decoration-underline">request a verification link</a>.
+                    </div>
+                </div>
+
+                <div th:if="${accountUnverified or param.unverified != null}" class="error-message"
+                    style="background-color: #fef3c7; color: #92400e; border: 1px solid #fcd34d;">
+                    <i class="fas fa-envelope-open-text mt-1" style="color: #d97706;"></i>
+                    <div>
+                        <strong>Email Not Verified</strong><br>
+                        Please verify your email address before signing in.<br>
+                        <a th:href="@{/resend-verification(email=${unverifiedEmail != null and !unverifiedEmail.isEmpty() ? unverifiedEmail : param.email})}"
+                           class="fw-bold text-decoration-underline" style="color: #b45309;">
+                            Resend verification email &rarr;
+                        </a>
                     </div>
                 </div>
 

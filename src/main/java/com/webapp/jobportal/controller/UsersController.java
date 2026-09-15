@@ -53,7 +53,8 @@ public class UsersController {
     }
 
     @PostMapping("/register/new")
-    public String userRegistration(@Valid Users users, @RequestParam("userTypeId") Integer userTypeId, Model model) {
+    public String userRegistration(@Valid Users users, @RequestParam("userTypeId") Integer userTypeId,
+                                   HttpServletRequest request, Model model) {
         // Validate userTypeId to prevent admin role assignment
         if (userTypeId == null || userTypeId < 1 || userTypeId > 2) {
             model.addAttribute("error", "Invalid user type selected. Please select Client or Freelancer.");
@@ -65,7 +66,7 @@ public class UsersController {
 
         Optional<Users> optionalUsers = usersService.getUserByEmail(users.getEmail());
         if (optionalUsers.isPresent()) {
-            model.addAttribute("error", "Email already registered,try to login or register with other email.");
+            model.addAttribute("error", "Email already registered, try to login or register with other email.");
             List<UsersType> usersTypes = usersTypeService.getAll();
             model.addAttribute("getAllTypes", usersTypes);
             model.addAttribute("user", new Users());
@@ -75,16 +76,30 @@ public class UsersController {
         // Use a reference to the existing UsersType instead of creating a new one
         UsersType userType = usersTypeService.getById(userTypeId);
         users.setUserTypeId(userType);
-        usersService.addNew(users);
 
-        // Redirect to login page after successful registration
-        return "redirect:/login";
+        String appUrl = getAppUrl(request);
+        usersService.addNew(users, appUrl);
+
+        // Redirect to pending verification page with email
+        String encodedEmail = "";
+        try {
+            encodedEmail = java.net.URLEncoder.encode(users.getEmail(), java.nio.charset.StandardCharsets.UTF_8);
+        } catch (Exception ignored) {}
+        return "redirect:/register/pending-verification?email=" + encodedEmail;
+    }
+
+    @GetMapping("/register/pending-verification")
+    public String pendingVerification(@RequestParam(value = "email", required = false) String email, Model model) {
+        model.addAttribute("email", email != null ? email : "");
+        return "pending-verification";
     }
 
     @GetMapping("/login")
     public String login(@RequestParam(value = "error", required = false) String error,
             @RequestParam(value = "logout", required = false) String logout,
             @RequestParam(value = "disabled", required = false) String disabled,
+            @RequestParam(value = "unverified", required = false) String unverified,
+            @RequestParam(value = "email", required = false) String email,
             Model model) {
         if (error != null) {
             model.addAttribute("loginError", true);
@@ -95,7 +110,44 @@ public class UsersController {
         if (disabled != null) {
             model.addAttribute("accountDisabled", true);
         }
+        if (unverified != null) {
+            model.addAttribute("accountUnverified", true);
+            model.addAttribute("unverifiedEmail", email != null ? email : "");
+        }
         return "login";
+    }
+
+    private String getAppUrl(HttpServletRequest request) {
+        String scheme = request.getScheme();
+        String serverName = request.getServerName();
+        int serverPort = request.getServerPort();
+
+        String forwardedProto = request.getHeader("X-Forwarded-Proto");
+        if (forwardedProto != null && !forwardedProto.isEmpty()) {
+            scheme = forwardedProto;
+        }
+
+        String forwardedHost = request.getHeader("X-Forwarded-Host");
+        if (forwardedHost != null && !forwardedHost.isEmpty()) {
+            serverName = forwardedHost;
+            if (serverName.contains(":")) {
+                String[] parts = serverName.split(":");
+                serverName = parts[0];
+                try {
+                    serverPort = Integer.parseInt(parts[1]);
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+
+        StringBuilder url = new StringBuilder();
+        url.append(scheme).append("://").append(serverName);
+
+        if ((scheme.equalsIgnoreCase("http") && serverPort != 80)
+                || (scheme.equalsIgnoreCase("https") && serverPort != 443)) {
+            url.append(":").append(serverPort);
+        }
+
+        return url.toString();
     }
 
     @GetMapping("/logout")

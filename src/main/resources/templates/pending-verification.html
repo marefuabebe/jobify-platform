@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email - Jobify</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="/css/login-style.css" />
+</head>
+
+<body class="auth-page">
+
+    <div class="auth-container">
+        <!-- Left Side: Graphic / Branding -->
+        <div class="auth-left position-relative">
+            <div class="brand-header">
+                <div class="logo-box">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <h2>Jobify</h2>
+            </div>
+            <div class="left-content">
+                <h1 class="fw-bold mb-3">Almost There!</h1>
+                <p class="mb-4">One final step to start your journey on Jobify.</p>
+            </div>
+        </div>
+
+        <!-- Right Side: Email Sent Card -->
+        <div class="auth-right">
+            <div class="auth-form-container text-center py-4">
+                
+                <div class="mb-4 text-primary" style="font-size: 68px;">
+                    <i class="fas fa-envelope-open-text"></i>
+                </div>
+
+                <h2 class="fw-bold mb-2">Check Your Email</h2>
+                
+                <p class="text-muted mb-3" style="font-size: 15px;">
+                    We have dispatched a verification link to:
+                </p>
+                
+                <div class="p-2 px-3 mb-4 rounded bg-light border d-inline-block text-dark fw-bold" style="font-size: 16px;">
+                    <i class="fas fa-at text-primary me-2"></i><span th:text="${email}">your.email@example.com</span>
+                </div>
+
+                <div class="alert alert-info text-start p-3 mb-4" style="border-radius: 10px; font-size: 14px; background-color: #f0f7ff; border-color: #cce3fd; color: #1e429f;">
+                    <div class="d-flex">
+                        <i class="fas fa-info-circle mt-1 me-2 flex-shrink-0"></i>
+                        <div>
+                            <strong>What to do next:</strong>
+                            <ul class="mb-0 ps-3 mt-1">
+                                <li>Open your inbox and click <strong>Verify Email Address</strong> (valid for 24 hours).</li>
+                                <li>Don't see the email? Please check your <strong>Spam / Junk</strong> folder.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a th:href="@{/resend-verification(email=${email})}" class="btn btn-outline-primary py-2 fw-semibold" style="border-radius: 8px;">
+                        <i class="fas fa-paper-plane me-2"></i>Didn't receive email? Resend Link
+                    </a>
+                    <a href="/login" class="btn btn-link text-muted text-decoration-none py-1" style="font-size: 14px;">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Sign In
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

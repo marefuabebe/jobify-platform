@@ -1,50 +1,124 @@
 package com.webapp.jobportal.services;
 
 import com.webapp.jobportal.entity.JobPostActivity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.Map;
+import jakarta.mail.internet.MimeMessage;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class EmailService {
 
+        private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
+
+        @Autowired(required = false)
+        private JavaMailSender mailSender;
+
+        @Value("${spring.mail.username:}")
+        private String smtpUsername;
+
         @Value("${jobify.email.proxy.url:}")
         private String proxyUrl;
-
-        private final RestTemplate restTemplate = new RestTemplate();
 
         public void sendEmail(String to, String subject, String text) {
                 sendEmail(to, subject, text, false);
         }
 
         public void sendEmail(String to, String subject, String text, boolean isHtml) {
-                if (proxyUrl == null || proxyUrl.isEmpty() || proxyUrl.equals("YOUR_GAS_WEBAPP_URL")) {
-                        System.err.println("Email proxy URL is not configured. Email to " + to + " was not sent.");
-                        return;
+                boolean sent = false;
+
+                // 1. First Priority: Direct SMTP sending (if credentials configured)
+                if (mailSender != null && smtpUsername != null && !smtpUsername.trim().isEmpty() && !smtpUsername.contains("YOUR_")) {
+                        try {
+                                MimeMessage message = mailSender.createMimeMessage();
+                                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+                                helper.setFrom(smtpUsername.trim(), "Jobify Platform");
+                                helper.setTo(to.trim());
+                                helper.setSubject(subject);
+                                helper.setText(text, isHtml);
+                                mailSender.send(message);
+                                logger.info("Email successfully sent via SMTP to: {}", to);
+                                sent = true;
+                        } catch (Exception e) {
+                                logger.warn("SMTP email delivery to {} failed: {}. Falling back to proxy/backup.", to, e.getMessage());
+                        }
                 }
 
-                try {
-                        HttpHeaders headers = new HttpHeaders();
-                        headers.setContentType(MediaType.APPLICATION_JSON);
+                // 2. Second Priority: Google Apps Script or HTTP Proxy (with auto-redirect handling)
+                if (!sent && proxyUrl != null && !proxyUrl.trim().isEmpty() && !proxyUrl.contains("YOUR_GAS_WEBAPP_URL")) {
+                        try {
+                                HttpClient client = HttpClient.newBuilder()
+                                                .followRedirects(HttpClient.Redirect.ALWAYS)
+                                                .connectTimeout(Duration.ofSeconds(10))
+                                                .build();
 
-                        Map<String, String> payload = new HashMap<>();
-                        payload.put("to", to);
-                        payload.put("subject", subject);
-                        payload.put("html", text); // GAS script expects 'html' key for HTML content, or we can just send it as 'html' and the GAS script sets htmlBody
+                                String escapedTo = escapeJson(to);
+                                String escapedSubject = escapeJson(subject);
+                                String escapedHtml = escapeJson(text);
+                                String jsonPayload = "{\"to\":\"" + escapedTo + "\",\"subject\":\"" + escapedSubject + "\",\"html\":\"" + escapedHtml + "\"}";
 
-                        HttpEntity<Map<String, String>> request = new HttpEntity<>(payload, headers);
-                        
-                        String response = restTemplate.postForObject(proxyUrl, request, String.class);
-                        System.out.println("Email sent via Proxy. Response: " + response);
-                } catch (Exception e) {
-                        System.err.println("Error sending email via Proxy: " + e.getMessage());
+                                HttpRequest request = HttpRequest.newBuilder()
+                                                .uri(URI.create(proxyUrl.trim()))
+                                                .header("Content-Type", "application/json")
+                                                .POST(HttpRequest.BodyPublishers.ofString(jsonPayload, StandardCharsets.UTF_8))
+                                                .timeout(Duration.ofSeconds(15))
+                                                .build();
+
+                                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                                if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                                        logger.info("Email sent via Proxy. Status: {}, Response: {}", response.statusCode(), response.body());
+                                        sent = true;
+                                } else {
+                                        logger.warn("Proxy returned status {}: {}", response.statusCode(), response.body());
+                                }
+                        } catch (Exception e) {
+                                logger.warn("Error sending email via Proxy: {}", e.getMessage());
+                        }
                 }
+
+                // 3. Fallback / Simulation Log: Always log critical action links so tokens are NEVER lost
+                String actionLink = extractActionLink(text);
+                System.out.println("\n================================================================================");
+                System.out.println(" [JOBIFY EMAIL NOTIFICATION" + (sent ? " - DISPATCHED" : " - CONSOLE LOGGED") + "]");
+                System.out.println(" To: " + to);
+                System.out.println(" Subject: " + subject);
+                if (actionLink != null) {
+                        System.out.println(" Action Link: " + actionLink);
+                }
+                System.out.println("================================================================================\n");
+        }
+
+        private String escapeJson(String raw) {
+                if (raw == null) return "";
+                return raw.replace("\\", "\\\\")
+                          .replace("\"", "\\\"")
+                          .replace("\b", "\\b")
+                          .replace("\f", "\\f")
+                          .replace("\n", "\\n")
+                          .replace("\r", "\\r")
+                          .replace("\t", "\\t");
+        }
+
+        private String extractActionLink(String content) {
+                if (content == null) return null;
+                Matcher matcher = Pattern.compile("href=['\"](https?://[^'\"]+)['\"]").matcher(content);
+                if (matcher.find()) {
+                        return matcher.group(1);
+                }
+                return null;
         }
 
         private String buildHtmlEmail(String title, String recipientName, String content, String callToAction,

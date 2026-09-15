@@ -171,14 +171,24 @@
                                         </button>
                                     </form>
 
-                                    <!-- Verification Button -->
+                                    <!-- Verification Button for Profiles -->
                                     <form
-                                        th:if="${user.userTypeId?.userTypeId == 1 and recruiterProfiles[user.userId] != null and recruiterProfiles[user.userId].isVerified != true}"
+                                        th:if="${(user.userTypeId?.userTypeId == 1 and recruiterProfiles[user.userId] != null and recruiterProfiles[user.userId].isVerified != true) or (user.userTypeId?.userTypeId == 2 and jobSeekerProfiles[user.userId] != null and jobSeekerProfiles[user.userId].isVerified != true)}"
                                         th:action="@{/admin/users/verify}" method="post" style="display: inline;">
                                         <input type="hidden" name="userId" th:value="${user.userId}" />
                                         <button type="submit" class="btn btn-sm btn-icon btn-outline-primary"
-                                            title="Verify User">
+                                            title="Verify User Profile">
                                             <i class="fas fa-shield-alt"></i>
+                                        </button>
+                                    </form>
+
+                                    <!-- Activate / Verify Email directly -->
+                                    <form th:if="${user.active == false}" th:action="@{/admin/users/activate}" method="post" style="display: inline;"
+                                        onsubmit="return confirm('Manually verify and activate this user account?');">
+                                        <input type="hidden" name="userId" th:value="${user.userId}" />
+                                        <button type="submit" class="btn btn-sm btn-icon btn-outline-info"
+                                            title="Activate Account & Verify Email">
+                                            <i class="fas fa-user-check"></i>
                                         </button>
                                     </form>
 

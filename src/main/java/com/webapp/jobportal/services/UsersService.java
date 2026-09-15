@@ -3,6 +3,7 @@ package com.webapp.jobportal.services;
 import com.webapp.jobportal.entity.*;
 import com.webapp.jobportal.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,6 +20,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class UsersService {
+
+    @Value("${jobify.app.base-url:https://jobify-platform.onrender.com}")
+    private String appBaseUrl;
 
     private final UsersRepository usersRepository;
     private final JobSeekerProfileRepository jobSeekerProfileRepository;
@@ -65,6 +69,10 @@ public class UsersService {
     }
 
     public Users addNew(Users users) {
+        return addNew(users, null);
+    }
+
+    public Users addNew(Users users, String appUrl) {
         users.setActive(false);
         // Admin users are auto-approved, others need admin approval
         int userTypeId = users.getUserTypeId().getUserTypeId();
@@ -79,39 +87,47 @@ public class UsersService {
         } else if (userTypeId == 2) {
             jobSeekerProfileRepository.save(new JobSeekerProfile(savedUser));
         }
-        // Admin users don't need profiles
 
-        // Send Welcome Email
-        String name = "User"; // Default if name not set
-        if (users.getUserTypeId().getUserTypeId() == 1) { // Client
-            // For new users, profile might be empty, but let's try
-            // RecruiterProfile profile =
-            // recruiterProfileRepository.findById(savedUser.getUserId()).orElse(null);
-            // name = (profile != null && profile.getFirstName() != null) ?
-            // profile.getFirstName() : "Client";
-            // ACTUALLY, at this point, the profile is just created with defaults.
-            // We might not have the name yet if it wasn't passed in Users object or
-            // secondary flow.
-            // But usually registration form has names.
-            // Let's assume generic "User" or we'd need to fetch from where it was set.
-            // In the Controller, we bind Users object. Does it have name fields? No, Users
-            // entity is just
-            // email/password.
-            // The Profile inputs are separate.
-            // Ideally, we should pass the name to this method or fetch it.
-        }
+        // Clean up any old tokens for this user first
+        verificationTokenRepository.findByUser(savedUser).ifPresent(verificationTokenRepository::delete);
 
-        // Generate Verification Token
+        // Generate Verification Token (24h validity)
         VerificationToken verificationToken = new VerificationToken(savedUser);
         verificationTokenRepository.save(verificationToken);
 
-        // Build verification link (defaulting to localhost:8080 for this scope)
-        String verificationLink = "http://localhost:8080/verify-email?token=" + verificationToken.getToken();
+        // Build verification link dynamically using provided appUrl or fallback to configured base URL
+        String baseUrl = (appUrl != null && !appUrl.trim().isEmpty()) ? appUrl.trim() : appBaseUrl;
+        if (baseUrl.endsWith("/")) {
+            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+        }
+        String verificationLink = baseUrl + "/verify-email?token=" + verificationToken.getToken();
 
-        // Send Verification Email instead of Welcome Email
+        // Send Verification Email
+        String name = "User";
         emailService.sendVerificationEmail(savedUser.getEmail(), name, verificationLink);
 
         return savedUser;
+    }
+
+    public void sendVerificationToken(Users user, String appUrl) {
+        // Clean up existing token
+        verificationTokenRepository.findByUser(user).ifPresent(verificationTokenRepository::delete);
+
+        VerificationToken verificationToken = new VerificationToken(user);
+        verificationTokenRepository.save(verificationToken);
+
+        String baseUrl = (appUrl != null && !appUrl.trim().isEmpty()) ? appUrl.trim() : appBaseUrl;
+        if (baseUrl.endsWith("/")) {
+            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+        }
+        String verificationLink = baseUrl + "/verify-email?token=" + verificationToken.getToken();
+
+        String name = getUserFullName(user);
+        if (name == null || name.trim().isEmpty()) {
+            name = "User";
+        }
+
+        emailService.sendVerificationEmail(user.getEmail(), name, verificationLink);
     }
 
     public Object getCurrentUserProfile() {

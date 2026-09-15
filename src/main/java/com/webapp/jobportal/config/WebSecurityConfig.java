@@ -40,6 +40,7 @@ public class WebSecurityConfig {
                         "/forgot-password",
                         "/reset-password",
                         "/verify-email",
+                        "/resend-verification",
                         "/webjars/**",
                         "/resources/**",
                         "/assets/**",

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resend Verification Email - Jobify</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="/css/login-style.css" />
+</head>
+
+<body class="auth-page">
+
+    <div class="auth-container">
+        <!-- Left Side: Graphic / Branding -->
+        <div class="auth-left position-relative">
+            <div class="brand-header">
+                <div class="logo-box">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <h2>Jobify</h2>
+            </div>
+            <div class="left-content">
+                <h1 class="fw-bold mb-3">Email Verification</h1>
+                <p class="mb-4">Need a new link? We'll send one right to your inbox.</p>
+            </div>
+        </div>
+
+        <!-- Right Side: Resend Form -->
+        <div class="auth-right">
+            <div class="auth-form-container py-3">
+                
+                <div class="text-center mb-4">
+                    <div class="mb-3 text-primary" style="font-size: 52px;">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h2 class="fw-bold mb-1">Resend Link</h2>
+                    <p class="text-muted" style="font-size: 14px;">Enter your registered email address to receive a fresh verification link.</p>
+                </div>
+
+                <!-- Success Alert -->
+                <div th:if="${success}" class="alert alert-success d-flex align-items-center mb-4" role="alert" style="border-radius: 8px;">
+                    <i class="fas fa-check-circle me-2 fs-5 flex-shrink-0"></i>
+                    <div th:text="${success}">Verification email sent successfully!</div>
+                </div>
+
+                <!-- Error Alert -->
+                <div th:if="${error}" class="alert alert-danger d-flex align-items-center mb-4" role="alert" style="border-radius: 8px;">
+                    <i class="fas fa-exclamation-triangle me-2 fs-5 flex-shrink-0"></i>
+                    <div th:text="${error}">An error occurred.</div>
+                </div>
+
+                <!-- Already Active Action -->
+                <div th:if="${alreadyActive}" class="text-center mb-4">
+                    <a href="/login" class="btn btn-primary w-100 py-3 fw-semibold" style="border-radius: 8px;">
+                        <i class="fas fa-sign-in-alt me-2"></i>Sign In Now
+                    </a>
+                </div>
+
+                <!-- Form -->
+                <form th:unless="${alreadyActive and sent != true}" th:action="@{/resend-verification}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                    <div class="form-group mb-4">
+                        <label for="email" class="form-label fw-semibold text-secondary">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-envelope text-muted"></i></span>
+                            <input type="email" id="email" name="email" class="form-control border-start-0"
+                                   th:value="${email}" placeholder="name@example.com" required autofocus />
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-3 fw-semibold mb-3" style="border-radius: 8px;">
+                        <i class="fas fa-paper-plane me-2"></i>Send Verification Link
+                    </button>
+                </form>
+
+                <div class="text-center mt-3" style="font-size: 14px;">
+                    <a href="/login" class="text-muted text-decoration-none me-3">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Sign In
+                    </a>
+                    <span class="text-muted">·</span>
+                    <a href="/register" class="text-primary text-decoration-none ms-3 fw-semibold">
+                        Create Account
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
