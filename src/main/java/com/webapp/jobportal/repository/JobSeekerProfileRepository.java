@@ -26,6 +26,6 @@ public interface JobSeekerProfileRepository extends JpaRepository<JobSeekerProfi
 
     long countByIsVerifiedTrue();
 
-    @Query(value = "SELECT p.* FROM job_seeker_profile p JOIN users u ON p.user_account_id = u.user_id WHERE u.is_active = true AND u.is_approved = true ORDER BY p.user_account_id DESC LIMIT 4", nativeQuery = true)
+    @Query(value = "SELECT p.* FROM job_seeker_profile p JOIN users u ON p.user_account_id = u.user_id WHERE u.is_active = true AND u.is_approved = true AND p.is_verified = true ORDER BY p.user_account_id DESC LIMIT 4", nativeQuery = true)
     java.util.List<JobSeekerProfile> getRecentProfiles();
 }

@@ -636,7 +636,7 @@
 
             <div class="talent-grid">
                 <!-- Freelancer Card Loop -->
-                <div class="reveal" th:each="freelancer, iterStat : ${recentFreelancers}" th:if="${iterStat.index < 3}"
+                <div class="reveal" th:each="freelancer, iterStat : ${recentFreelancers}" th:if="${freelancer.isVerified and iterStat.index < 3}"
                     th:classappend="${'delay-' + (iterStat.index + 1) * 100}">
                     <div class="talent-card">
                         <!-- Header with Avatar and Name -->

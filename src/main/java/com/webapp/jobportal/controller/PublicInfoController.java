@@ -50,9 +50,11 @@ public class PublicInfoController {
         List<com.webapp.jobportal.dto.FreelancerCardDTO> freelancers = new java.util.ArrayList<>();
 
         for (com.webapp.jobportal.entity.JobSeekerProfile profile : profiles) {
-            Double rating = ratingService.getAverageRating(profile);
-            Long count = ratingService.getRatingCount(profile);
-            freelancers.add(new com.webapp.jobportal.dto.FreelancerCardDTO(profile, rating, count));
+            if (Boolean.TRUE.equals(profile.getIsVerified())) {
+                Double rating = ratingService.getAverageRating(profile);
+                Long count = ratingService.getRatingCount(profile);
+                freelancers.add(new com.webapp.jobportal.dto.FreelancerCardDTO(profile, rating, count));
+            }
         }
 
         model.addAttribute("recentFreelancers", freelancers);
