@@ -14,7 +14,7 @@
         rel="stylesheet">
 </head>
 
-<body class="light-theme">
+<body th:classappend="${session.theme == 'dark' ? 'dark-theme' : 'light-theme'}">
     <!-- Sidebar -->
     <aside class="admin-sidebar" id="sidebar"
         th:replace="~{admin/fragments/sidebar :: sidebar(activeLink='dashboard')}">
@@ -47,7 +47,13 @@
                         style="box-shadow: none;">
                 </div>
 
-                <!-- Theme Toggle Removed -->
+                <form th:action="@{/admin/theme/toggle}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas me-1"
+                            th:classappend="${session.theme == 'dark' ? 'fa-sun' : 'fa-moon'}"></i>
+                        <span th:text="${session.theme == 'dark' ? 'Light' : 'Dark'}">Dark</span>
+                    </button>
+                </form>
 
 
 
@@ -334,9 +340,9 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         document.addEventListener('DOMContentLoaded', function () {
-            // Force light mode colors
-            const gridColor = '#e3e8f0';
-            const textColor = '#64748b';
+            const isDark = document.body.classList.contains('dark-theme');
+            const gridColor = isDark ? 'rgba(148, 163, 184, 0.22)' : '#e3e8f0';
+            const textColor = isDark ? '#cbd5e1' : '#64748b';
 
             // ---------- Activity Chart (Area/Line) with live animation ----------
             const activityCtx = document.getElementById('activityChart').getContext('2d');

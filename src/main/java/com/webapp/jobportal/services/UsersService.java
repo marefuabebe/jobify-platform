@@ -35,6 +35,7 @@ public class UsersService {
     private final WithdrawalRepository withdrawalRepository;
     private final RatingRepository ratingRepository;
     private final EmailService emailService;
+    private final VerificationTokenRepository verificationTokenRepository;
 
     @Autowired
     public UsersService(UsersRepository usersRepository, JobSeekerProfileRepository jobSeekerProfileRepository,
@@ -43,7 +44,8 @@ public class UsersService {
             JobSeekerSaveRepository jobSeekerSaveRepository, JobModerationLogRepository jobModerationLogRepository,
             NotificationRepository notificationRepository, ChatMessageRepository chatMessageRepository,
             DisputeRepository disputeRepository, PaymentRepository paymentRepository,
-            WithdrawalRepository withdrawalRepository, RatingRepository ratingRepository, EmailService emailService) {
+            WithdrawalRepository withdrawalRepository, RatingRepository ratingRepository, EmailService emailService,
+            VerificationTokenRepository verificationTokenRepository) {
         this.usersRepository = usersRepository;
         this.jobSeekerProfileRepository = jobSeekerProfileRepository;
         this.recruiterProfileRepository = recruiterProfileRepository;
@@ -59,10 +61,11 @@ public class UsersService {
         this.withdrawalRepository = withdrawalRepository;
         this.ratingRepository = ratingRepository;
         this.emailService = emailService;
+        this.verificationTokenRepository = verificationTokenRepository;
     }
 
     public Users addNew(Users users) {
-        users.setActive(true);
+        users.setActive(false);
         // Admin users are auto-approved, others need admin approval
         int userTypeId = users.getUserTypeId().getUserTypeId();
         users.setApproved(userTypeId == 3); // Admin = 3
@@ -98,8 +101,15 @@ public class UsersService {
             // Ideally, we should pass the name to this method or fetch it.
         }
 
-        // Simpler approach: Just say "Welcome" or use Email
-        emailService.sendWelcomeNotification(savedUser.getEmail(), "New User");
+        // Generate Verification Token
+        VerificationToken verificationToken = new VerificationToken(savedUser);
+        verificationTokenRepository.save(verificationToken);
+
+        // Build verification link (defaulting to localhost:8080 for this scope)
+        String verificationLink = "http://localhost:8080/verify-email?token=" + verificationToken.getToken();
+
+        // Send Verification Email instead of Welcome Email
+        emailService.sendVerificationEmail(savedUser.getEmail(), name, verificationLink);
 
         return savedUser;
     }

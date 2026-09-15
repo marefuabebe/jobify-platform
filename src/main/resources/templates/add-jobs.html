@@ -170,10 +170,18 @@
         }
 
         /* Progress Bar */
+        .progress-wizard-wrapper {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 22px 36px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+            margin-bottom: 32px;
+        }
+
         .progress-wizard {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 40px;
             position: relative;
             padding: 0 40px;
         }
@@ -181,74 +189,81 @@
         .progress-wizard::before {
             content: '';
             position: absolute;
-            top: 20px;
+            top: 22px;
             left: 80px;
             right: 80px;
-            height: 2px;
-            background: #e0e0e0;
+            height: 3px;
+            background: #e2e8f0;
+            border-radius: 3px;
             z-index: 1;
         }
 
         .progress-line {
             position: absolute;
-            top: 20px;
+            top: 22px;
             left: 80px;
             width: 0%;
-            height: 2px;
-            background: var(--primary);
+            height: 3px;
+            background: linear-gradient(90deg, #3B82F6, #2563EB);
+            border-radius: 3px;
             z-index: 1;
-            transition: width 0.4s ease;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .step-item {
             position: relative;
             z-index: 2;
             text-align: center;
+            cursor: pointer;
         }
 
         .step-circle {
-            width: 42px;
-            height: 42px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             background: white;
-            border: 2px solid #e0e0e0;
+            border: 2px solid #cbd5e1;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 10px;
-            font-weight: 700;
-            color: var(--gray);
-            transition: all 0.3s ease;
+            margin: 0 auto 8px;
+            font-weight: 800;
+            font-size: 14px;
+            color: #64748b;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .step-item.active .step-circle {
-            border-color: var(--primary);
-            background: var(--primary);
+            border-color: #2563EB;
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
             color: white;
-            box-shadow: 0 0 0 5px rgba(75, 108, 183, 0.1);
+            box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.15);
+            transform: scale(1.08);
         }
 
         .step-item.completed .step-circle {
-            background: #28A745;
-            border-color: #28A745;
+            background: #10b981;
+            border-color: #10b981;
             color: white;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
         }
 
         .step-label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--gray);
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: -0.2px;
         }
 
         .step-item.active .step-label {
-            color: var(--primary);
+            color: #2563EB;
         }
 
         /* Layout Overhaul */
         .wizard-container {
             display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 40px;
+            grid-template-columns: 1fr 420px;
+            gap: 32px;
             align-items: start;
         }
 
@@ -265,59 +280,165 @@
         /* Live Preview Card */
         .preview-card {
             background: white;
-            border-radius: 16px;
-            padding: 24px;
-            border: 1px solid var(--border);
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
             position: sticky;
-            top: 100px;
-            box-shadow: var(--shadow);
+            top: 95px;
+            overflow: hidden;
+            transition: all 0.25s ease;
         }
 
-        .preview-header {
-            border-bottom: 2px solid var(--primary-light);
-            padding-bottom: 12px;
-            margin-bottom: 20px;
+        .preview-top-banner {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            padding: 14px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .preview-title-label {
+        .live-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
             font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--primary);
             font-weight: 800;
-            margin-bottom: 10px;
+            letter-spacing: 0.8px;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        .pulse-dot {
+            width: 7px;
+            height: 7px;
+            background: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .preview-body {
+            padding: 24px;
+        }
+
+        .preview-employer-banner {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .employer-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            color: #2563EB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .employer-company {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+
+        .employer-badge {
+            font-size: 11px;
+            font-weight: 600;
+            color: #10b981;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 2px;
         }
 
         .preview-job-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--dark);
+            font-size: 19px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.3;
+            margin-bottom: 10px;
+            letter-spacing: -0.3px;
+        }
+
+        .preview-category-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f1f5f9;
+            color: #475569;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 18px;
         }
 
         .preview-meta {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .meta-box {
             background: #f8fafc;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #edf2f7;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            transition: background 0.15s ease;
         }
 
         .meta-label {
-            font-size: 10px;
-            color: var(--gray);
-            margin-bottom: 2px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #94a3b8;
+            margin-bottom: 3px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .meta-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .preview-desc-box {
+            background: #fafbfc;
+            border-radius: 12px;
+            padding: 14px;
+            border: 1px dashed #cbd5e1;
+            margin-bottom: 18px;
+        }
+
+        .preview-desc-text {
             font-size: 13px;
-            font-weight: 600;
-            color: var(--dark);
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .preview-skills-title {
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #64748b;
+            margin-bottom: 8px;
         }
 
         /* Navigation Buttons */
@@ -331,41 +452,44 @@
 
         .btn-wizard {
             padding: 12px 30px;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.3s;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.25s ease;
         }
 
         .btn-prev {
             background: white;
-            border: 1px solid var(--border);
-            color: var(--gray);
+            border: 1px solid #cbd5e1;
+            color: #475569;
         }
 
         .btn-prev:hover {
-            background: #f8fafc;
-            color: var(--dark);
+            background: #f1f5f9;
+            color: #0f172a;
         }
 
         .btn-next {
-            background: var(--primary);
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
             border: none;
             color: white;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
         }
 
         .btn-next:hover {
-            background: var(--primary-dark);
             transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
+            color: white;
         }
 
         .skill-badge {
-            background: var(--primary-light);
-            color: var(--primary);
+            background: #eff6ff;
+            color: #2563EB;
             padding: 4px 12px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: 11.5px;
             font-weight: 700;
-            border: 1px solid rgba(75, 108, 183, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.2);
         }
 
         #previewDesc {
@@ -391,7 +515,7 @@
     <th:block th:replace="fragments/client-header :: clientHeader(activePage='post-job')"></th:block>
 
     <!-- Main Content -->
-    <div class="page-container" style="max-width: 98% !important;">
+    <div class="page-container" style="max-width: 1440px !important; margin: 0 auto;">
         <!-- Mobile Back Button -->
         <div class="d-lg-none mb-3">
             <a th:href="@{/client-dashboard/}"
@@ -407,19 +531,21 @@
             <p class="page-subtitle">Find the best talent for your project by providing detailed requirements.</p>
         </div>
 
-        <div class="progress-wizard">
-            <div class="progress-line" id="progressLine"></div>
-            <div class="step-item active" data-step="1">
-                <div class="step-circle">1</div>
-                <div class="step-label">Details</div>
-            </div>
-            <div class="step-item" data-step="2">
-                <div class="step-circle">2</div>
-                <div class="step-label">Specs</div>
-            </div>
-            <div class="step-item" data-step="3">
-                <div class="step-circle">3</div>
-                <div class="step-label">Location</div>
+        <div class="progress-wizard-wrapper">
+            <div class="progress-wizard">
+                <div class="progress-line" id="progressLine"></div>
+                <div class="step-item active" data-step="1">
+                    <div class="step-circle"><i class="fas fa-file-alt"></i></div>
+                    <div class="step-label">1. Job Details</div>
+                </div>
+                <div class="step-item" data-step="2">
+                    <div class="step-circle"><i class="fas fa-sliders-h"></i></div>
+                    <div class="step-label">2. Specifications</div>
+                </div>
+                <div class="step-item" data-step="3">
+                    <div class="step-circle"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="step-label">3. Location & Post</div>
+                </div>
             </div>
         </div>
 
@@ -584,43 +710,63 @@
             <!-- Preview Column -->
             <div class="preview-column">
                 <div class="preview-card">
-                    <div class="preview-title-label">Live Preview</div>
-                    <div class="preview-header">
+                    <div class="preview-top-banner">
+                        <span class="live-pill"><span class="pulse-dot"></span> LIVE APPLICANT VIEW</span>
+                        <small class="text-white-50"><i class="fas fa-eye me-1"></i> Real-time</small>
+                    </div>
+
+                    <div class="preview-body">
+                        <!-- Employer info banner -->
+                        <div class="preview-employer-banner">
+                            <div class="employer-avatar">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div>
+                                <div class="employer-company" th:text="${recruiterProfile != null and recruiterProfile.company != null and !recruiterProfile.company.isEmpty() ? recruiterProfile.company : 'Client Organization'}">Client Organization</div>
+                                <div class="employer-badge"><i class="fas fa-check-circle"></i> Verified Client</div>
+                            </div>
+                        </div>
+
                         <div id="previewTitle" class="preview-job-title">Job Title Appears Here</div>
-                        <div class="text-muted small mt-1">
-                            <i class="fas fa-tag me-1"></i> <span id="previewCategory">Category</span>
+                        
+                        <div>
+                            <span class="preview-category-chip">
+                                <i class="fas fa-briefcase text-primary"></i>
+                                <span id="previewCategory">Category</span>
+                            </span>
                         </div>
-                    </div>
 
-                    <div class="preview-meta">
-                        <div class="meta-box">
-                            <div class="meta-label">Budget</div>
-                            <div id="previewBudget" class="meta-value">$0.00</div>
+                        <div class="preview-meta">
+                            <div class="meta-box">
+                                <div class="meta-label"><i class="fas fa-wallet text-success"></i> Budget</div>
+                                <div id="previewBudget" class="meta-value">$0.00</div>
+                            </div>
+                            <div class="meta-box">
+                                <div class="meta-label"><i class="fas fa-clock text-primary"></i> Type</div>
+                                <div id="previewType" class="meta-value">Fixed</div>
+                            </div>
+                            <div class="meta-box">
+                                <div class="meta-label"><i class="fas fa-map-marker-alt text-danger"></i> Location</div>
+                                <div id="previewLocation" class="meta-value">Remote</div>
+                            </div>
+                            <div class="meta-box">
+                                <div class="meta-label"><i class="fas fa-calendar-check text-warning"></i> Duration</div>
+                                <div id="previewDuration" class="meta-value">Ongoing</div>
+                            </div>
                         </div>
-                        <div class="meta-box">
-                            <div class="meta-label">Type</div>
-                            <div id="previewType" class="meta-value">Fixed</div>
-                        </div>
-                        <div class="meta-box">
-                            <div class="meta-label">Location</div>
-                            <div id="previewLocation" class="meta-value">Remote</div>
-                        </div>
-                        <div class="meta-box">
-                            <div class="meta-label">Duration</div>
-                            <div id="previewDuration" class="meta-value">Ongoing</div>
-                        </div>
-                    </div>
 
-                    <div id="previewDesc" class="small text-muted"
-                        style="max-height: 80px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical;">
-                        Provide a description to see it here...
-                    </div>
-                </div>
+                        <div class="preview-desc-box">
+                            <div id="previewDesc" class="preview-desc-text">
+                                Provide a description to see it here...
+                            </div>
+                        </div>
 
-                <div class="mt-4">
-                    <div class="meta-label mb-2">Required Skills</div>
-                    <div id="previewSkills" class="d-flex flex-wrap gap-1">
-                        <!-- Skill tags will appear here -->
+                        <div class="mt-3">
+                            <div class="preview-skills-title">Required Competencies</div>
+                            <div id="previewSkills" class="d-flex flex-wrap gap-1">
+                                <!-- Skill tags will appear here -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

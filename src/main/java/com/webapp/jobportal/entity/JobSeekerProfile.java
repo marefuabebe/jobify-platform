@@ -41,10 +41,10 @@ public class JobSeekerProfile implements Serializable {
     @Column(name = "employment_type")
     private String employmentType;
 
-    @Column(name = "resume")
+    @Column(name = "resume", length = 500)
     private String resume;
 
-    @Column(name = "profile_photo", nullable = true, length = 255)
+    @Column(name = "profile_photo", nullable = true, length = 500)
     private String profilePhoto;
 
     @Column(name = "bio", length = 5000)
@@ -59,7 +59,7 @@ public class JobSeekerProfile implements Serializable {
     @Column(name = "hourly_rate")
     private Double hourlyRate;
 
-    @Column(name = "verification_document")
+    @Column(name = "verification_document", length = 500)
     private String verificationDocument;
 
     @Column(name = "is_verified")
@@ -83,10 +83,10 @@ public class JobSeekerProfile implements Serializable {
     @Column(name = "certifications", length = 2000)
     private String certifications;
 
-    @Column(name = "education_doc")
+    @Column(name = "education_doc", length = 500)
     private String educationDoc;
 
-    @Column(name = "certification_doc")
+    @Column(name = "certification_doc", length = 500)
     private String certificationDoc;
 
     @Column(name = "availability_status")
@@ -348,7 +348,12 @@ public class JobSeekerProfile implements Serializable {
 
     @Transient
     public String getPhotosImagePath() {
-        if (profilePhoto == null || userAccountId == null)
+        if (profilePhoto == null || profilePhoto.isEmpty())
+            return null;
+        if (profilePhoto.startsWith("http://") || profilePhoto.startsWith("https://")) {
+            return profilePhoto;
+        }
+        if (userAccountId == null)
             return null;
         return "/photos/candidate/" + userAccountId + "/" + profilePhoto;
     }

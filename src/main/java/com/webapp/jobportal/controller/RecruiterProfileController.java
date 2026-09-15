@@ -28,16 +28,19 @@ public class RecruiterProfileController {
     private final RecruiterProfileService recruiterProfileService;
     private final com.webapp.jobportal.services.EmailService emailService;
     private final com.webapp.jobportal.services.NotificationService notificationService;
+    private final com.webapp.jobportal.services.CloudinaryService cloudinaryService;
 
     @Autowired
     public RecruiterProfileController(UsersRepository usersRepository,
             RecruiterProfileService recruiterProfileService,
             com.webapp.jobportal.services.EmailService emailService,
-            com.webapp.jobportal.services.NotificationService notificationService) {
+            com.webapp.jobportal.services.NotificationService notificationService,
+            com.webapp.jobportal.services.CloudinaryService cloudinaryService) {
         this.usersRepository = usersRepository;
         this.recruiterProfileService = recruiterProfileService;
         this.emailService = emailService;
         this.notificationService = notificationService;
+        this.cloudinaryService = cloudinaryService;
     }
 
     @GetMapping("/")
@@ -148,7 +151,7 @@ public class RecruiterProfileController {
         }
 
         model.addAttribute("profile", recruiterProfile);
-        setFileNames(recruiterProfile, multipartFile, verificationFront, verificationBack, businessLicense);
+        uploadAndSetFiles(recruiterProfile, multipartFile, verificationFront, verificationBack, businessLicense);
 
         try {
             // Reset verification if ANY new verification document is uploaded
@@ -164,7 +167,6 @@ public class RecruiterProfileController {
             }
 
             RecruiterProfile savedUser = recruiterProfileService.addNew(recruiterProfile);
-            saveFiles(savedUser, multipartFile, verificationFront, verificationBack, businessLicense);
 
             if ((verificationFront != null && !verificationFront.isEmpty()) ||
                     (verificationBack != null && !verificationBack.isEmpty()) ||
@@ -204,45 +206,61 @@ public class RecruiterProfileController {
         return false;
     }
 
-    private void setFileNames(RecruiterProfile recruiterProfile, MultipartFile multipartFile,
+    private void uploadAndSetFiles(RecruiterProfile recruiterProfile, MultipartFile multipartFile,
             MultipartFile verificationFront, MultipartFile verificationBack, MultipartFile businessLicense) {
+        String cloudinaryFolder = "jobportal/recruiter/" + recruiterProfile.getUserAccountId();
+        String uploadDir = "photos/recruiter/" + recruiterProfile.getUserAccountId();
+
         if (isValidFile(multipartFile)) {
-            recruiterProfile.setProfilePhoto(StringUtils.cleanPath(multipartFile.getOriginalFilename()));
+            try {
+                String photoUrl = cloudinaryService.uploadImage(multipartFile, cloudinaryFolder);
+                recruiterProfile.setProfilePhoto(photoUrl);
+                try {
+                    FileUploadUtil.saveFile(uploadDir, StringUtils.cleanPath(multipartFile.getOriginalFilename()), multipartFile);
+                } catch (Exception ignored) {}
+            } catch (Exception e) {
+                System.err.println("Error uploading profile photo to Cloudinary: " + e.getMessage());
+            }
         }
 
         if (isValidFile(verificationFront)) {
-            recruiterProfile.setVerificationFront(StringUtils.cleanPath(verificationFront.getOriginalFilename()));
+            try {
+                String docUrl = cloudinaryService.uploadDocument(verificationFront, cloudinaryFolder);
+                recruiterProfile.setVerificationFront(docUrl);
+                try {
+                    FileUploadUtil.saveFile(uploadDir, StringUtils.cleanPath(verificationFront.getOriginalFilename()), verificationFront);
+                } catch (Exception ignored) {}
+            } catch (Exception e) {
+                System.err.println("Error uploading verificationFront to Cloudinary: " + e.getMessage());
+            }
         }
 
         if (isValidFile(verificationBack)) {
-            recruiterProfile.setVerificationBack(StringUtils.cleanPath(verificationBack.getOriginalFilename()));
+            try {
+                String docUrl = cloudinaryService.uploadDocument(verificationBack, cloudinaryFolder);
+                recruiterProfile.setVerificationBack(docUrl);
+                try {
+                    FileUploadUtil.saveFile(uploadDir, StringUtils.cleanPath(verificationBack.getOriginalFilename()), verificationBack);
+                } catch (Exception ignored) {}
+            } catch (Exception e) {
+                System.err.println("Error uploading verificationBack to Cloudinary: " + e.getMessage());
+            }
         }
 
         if (isValidFile(businessLicense)) {
-            recruiterProfile.setBusinessLicense(StringUtils.cleanPath(businessLicense.getOriginalFilename()));
+            try {
+                String docUrl = cloudinaryService.uploadDocument(businessLicense, cloudinaryFolder);
+                recruiterProfile.setBusinessLicense(docUrl);
+                try {
+                    FileUploadUtil.saveFile(uploadDir, StringUtils.cleanPath(businessLicense.getOriginalFilename()), businessLicense);
+                } catch (Exception ignored) {}
+            } catch (Exception e) {
+                System.err.println("Error uploading businessLicense to Cloudinary: " + e.getMessage());
+            }
         }
     }
 
     private boolean isValidFile(MultipartFile file) {
         return file != null && file.getOriginalFilename() != null && !file.getOriginalFilename().isEmpty();
-    }
-
-    private void saveFiles(RecruiterProfile savedUser, MultipartFile multipartFile,
-            MultipartFile verificationFront, MultipartFile verificationBack, MultipartFile businessLicense)
-            throws Exception {
-        String uploadDir = "photos/recruiter/" + savedUser.getUserAccountId();
-
-        if (multipartFile != null && !multipartFile.isEmpty()) {
-            FileUploadUtil.saveFile(uploadDir, savedUser.getProfilePhoto(), multipartFile);
-        }
-        if (verificationFront != null && !verificationFront.isEmpty()) {
-            FileUploadUtil.saveFile(uploadDir, savedUser.getVerificationFront(), verificationFront);
-        }
-        if (verificationBack != null && !verificationBack.isEmpty()) {
-            FileUploadUtil.saveFile(uploadDir, savedUser.getVerificationBack(), verificationBack);
-        }
-        if (businessLicense != null && !businessLicense.isEmpty()) {
-            FileUploadUtil.saveFile(uploadDir, savedUser.getBusinessLicense(), businessLicense);
-        }
     }
 }

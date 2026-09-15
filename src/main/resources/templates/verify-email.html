@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification - Jobify</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="/css/login-style.css" />
+</head>
+
+<body class="auth-page">
+
+    <div class="auth-container">
+        <!-- Left Side: Graphic / Branding -->
+        <div class="auth-left position-relative">
+            <div class="brand-header">
+                <div class="logo-box">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <h2>Jobify</h2>
+            </div>
+            <div class="left-content">
+                <h1 class="fw-bold mb-3">Email Verification</h1>
+                <p class="mb-4">Securing your account starts here.</p>
+            </div>
+        </div>
+
+        <!-- Right Side: Verification Status -->
+        <div class="auth-right">
+            <div class="auth-form-container text-center">
+                
+                <div th:if="${success}">
+                    <div class="mb-4 text-success" style="font-size: 64px;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3 class="mb-3">Verified!</h3>
+                    <p class="text-muted mb-4" th:text="${success}"></p>
+                    <a href="/login" class="btn-auth-submit text-decoration-none">Continue to Login</a>
+                </div>
+
+                <div th:if="${error}">
+                    <div class="mb-4 text-danger" style="font-size: 64px;">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <h3 class="mb-3">Verification Failed</h3>
+                    <p class="text-muted mb-4" th:text="${error}"></p>
+                    <a href="/register" class="btn btn-outline-secondary w-100 py-3" style="border-radius: 8px; font-weight: 600;">Back to Registration</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

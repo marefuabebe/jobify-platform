@@ -7,136 +7,84 @@
     <title>Testimonials - Admin Dashboard - Jobify</title>
     <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/webjars/font-awesome/css/all.min.css}" rel="stylesheet">
-    <style th:replace="~{admin/dashboard :: style}"></style>
+    <link th:href="@{/css/admin-styles.css}" rel="stylesheet">
     <style>
-        /* Extract this to shared CSS later if possible, mimicking dashboard.html styles for now to ensure look and feel */
-        :root {
-            --primary: #059862;
-            --primary-light: #07be7b;
-            --primary-dark: #047a4e;
-            --primary-rgb: 5, 152, 98;
-            --bg-body: #15202B;
-            --bg-card: #192734;
-            --border: #38444d;
-            --text: #ffffff;
-            --text-light: #8899a6;
-            --radius: 12px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text);
-            min-height: 100vh;
-        }
-
-        /* Re-declare sidebar styles if fragment doesn't bring css, usually css is in head */
-        /* Assuming we pull styles from dashboard or duplicate them. 
-           For this file, I'll rely on the idea that we should create a shared layout or CSS file eventually.
-           For now, I'll inline the critical CSS to ensure it looks good immediately without breaking other pages.
-        */
-
-        .admin-sidebar {
-            width: 250px;
-            background: var(--bg-body);
-            border-right: 1px solid var(--border);
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            padding: 1rem 0;
-            z-index: 1000;
-        }
-
-        .admin-main {
-            margin-left: 250px;
-            padding: 2rem;
-            min-height: 100vh;
-        }
-
         .section-card {
             background: var(--bg-card);
             border-radius: var(--radius);
-            padding: 1.5rem;
             border: 1px solid var(--border);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
         }
     </style>
 </head>
 
-<body th:classappend="${session.theme == 'light' ? 'light-theme' : ''}">
+<body th:classappend="${session.theme == 'dark' ? 'dark-theme' : 'light-theme'}">
+    <aside class="admin-sidebar" id="sidebar" th:replace="~{admin/fragments/sidebar :: sidebar(activeLink='testimonials')}">
+        <!-- Replaced by sidebar fragment -->
+    </aside>
 
-    <!-- Sidebar Fragment -->
-    <div th:replace="~{admin/fragments/sidebar :: sidebar(activeLink='testimonials')}"></div>
-
-    <!-- Main Content -->
     <main class="admin-main">
-        <!-- Top Bar -->
-        <div class="top-bar"
-            style="background: var(--bg-card); border-radius: 12px; padding: 1rem 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border);">
-            <div class="page-title" style="display: flex; align-items: center; gap: 1rem;">
-                <a href="/admin/dashboard" class="btn btn-outline-secondary"
-                    style="border-color: var(--border); color: var(--text-light); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; transition: all 0.3s ease;">
-                    <i class="fas fa-arrow-left"></i>
-                </a>
-                <div class="title-icon"
-                    style="width: 40px; height: 40px; background: rgba(5, 152, 98, 0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--primary);">
+        <div class="top-bar">
+            <div class="page-title">
+                <div class="title-icon">
                     <i class="fas fa-quote-left"></i>
                 </div>
                 <div>
-                    <h1 style="font-size: 1.5rem; font-weight: 700; margin: 0; color: var(--text);">Testimonials</h1>
-                    <p style="color: var(--text-light); margin: 0;">Manage customer reviews and feedback.</p>
+                    <h1>Testimonials</h1>
+                    <p class="mb-0">Manage customer reviews and feedback.</p>
                 </div>
             </div>
 
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTestimonialModal"
-                style="background: var(--primary); border: none;">
-                <i class="fas fa-plus me-2"></i> Add New
-            </button>
+            <div class="d-flex align-items-center gap-2">
+                <form th:action="@{/admin/theme/toggle}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas me-1"
+                            th:classappend="${session.theme == 'dark' ? 'fa-sun' : 'fa-moon'}"></i>
+                        <span th:text="${session.theme == 'dark' ? 'Light' : 'Dark'}">Dark</span>
+                    </button>
+                </form>
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addTestimonialModal">
+                    <i class="fas fa-plus me-2"></i>Add New
+                </button>
+            </div>
         </div>
 
-        <!-- System Alerts -->
         <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i> <span th:text="${success}"></span>
+            <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-circle me-2"></i> <span th:text="${error}"></span>
+            <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}"></span>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
-        <!-- Testimonials List -->
         <div class="section-card">
             <div class="table-responsive">
-                <table class="table table-dark table-hover mb-0" style="background: transparent;">
+                <table class="table admin-table mb-0">
                     <thead>
                         <tr>
-                            <th style="background: var(--bg-body); border-color: var(--border);">Name</th>
-                            <th style="background: var(--bg-body); border-color: var(--border);">Role</th>
-                            <th style="background: var(--bg-body); border-color: var(--border);">Rating</th>
-                            <th style="background: var(--bg-body); border-color: var(--border);">Message</th>
-                            <th style="background: var(--bg-body); border-color: var(--border);">Actions</th>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Rating</th>
+                            <th>Message</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr th:each="t : ${testimonials}">
-                            <td class="align-middle">
-                                <span th:text="${t.name}" class="fw-bold">Name</span>
-                            </td>
-                            <td class="align-middle" th:text="${t.role}">Role</td>
-                            <td class="align-middle">
+                            <td><span th:text="${t.name}" class="fw-semibold">Name</span></td>
+                            <td th:text="${t.role}">Role</td>
+                            <td>
                                 <span class="text-warning">
                                     <i class="fas fa-star" th:each="i : ${#numbers.sequence(1, t.rating)}"></i>
                                 </span>
                             </td>
-                            <td class="align-middle">
-                                <small th:text="${#strings.abbreviate(t.message, 50)}" class="text-muted">Message
-                                    preview...</small>
-                            </td>
-                            <td class="align-middle">
+                            <td><span th:text="${#strings.abbreviate(t.message, 70)}" class="text-muted">Message</span></td>
+                            <td>
                                 <form th:action="@{/admin/testimonials/delete/{id}(id=${t.id})}" method="post"
-                                    onsubmit="return confirm('Are you sure you want to delete this testimonial?');">
-                                    <button type="button" class="btn btn-sm btn-info me-2" th:data-id="${t.id}"
+                                    class="d-inline" onsubmit="return confirm('Are you sure you want to delete this testimonial?');">
+                                    <button type="button" class="btn btn-sm btn-info me-2 text-white" th:data-id="${t.id}"
                                         th:data-name="${t.name}" th:data-role="${t.role}" th:data-rating="${t.rating}"
                                         th:data-message="${t.message}" onclick="editTestimonial(this)">
                                         <i class="fas fa-edit"></i>
@@ -148,44 +96,35 @@
                             </td>
                         </tr>
                         <tr th:if="${testimonials.empty}">
-                            <td colspan="5" class="text-center py-4 text-muted">
-                                No testimonials found. Add your first one!
-                            </td>
+                            <td colspan="5" class="text-center py-4 text-muted">No testimonials found. Add your first one!</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-
     </main>
 
-    <!-- Add Testimonial Modal -->
     <div class="modal fade" id="addTestimonialModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content"
-                style="background: var(--bg-card); color: var(--text); border: 1px solid var(--border);">
-                <div class="modal-header border-secondary">
+            <div class="modal-content">
+                <div class="modal-header">
                     <h5 class="modal-title">Add Testimonial</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form th:action="@{/admin/testimonials/add}" method="post" enctype="multipart/form-data"
-                        id="testimonialForm">
+                    <form th:action="@{/admin/testimonials/add}" method="post" enctype="multipart/form-data" id="testimonialForm">
                         <input type="hidden" name="id" id="testimonialId">
                         <div class="mb-3">
-                            <label class="form-label text-muted">Client Name</label>
-                            <input type="text" class="form-control bg-dark text-light border-secondary" name="name"
-                                required placeholder="e.g. John Doe">
+                            <label class="form-label">Client Name</label>
+                            <input type="text" class="form-control" name="name" required placeholder="e.g. John Doe">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-muted">Role / Company</label>
-                            <input type="text" class="form-control bg-dark text-light border-secondary" name="role"
-                                required placeholder="e.g. CEO, TechStart">
+                            <label class="form-label">Role / Company</label>
+                            <input type="text" class="form-control" name="role" required placeholder="e.g. CEO, TechStart">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-muted">Rating (1-5)</label>
-                            <select class="form-select bg-dark text-light border-secondary" name="rating" required>
+                            <label class="form-label">Rating (1-5)</label>
+                            <select class="form-select" name="rating" required>
                                 <option value="5" selected>5 Stars</option>
                                 <option value="4">4 Stars</option>
                                 <option value="3">3 Stars</option>
@@ -194,17 +133,16 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-muted">Message</label>
-                            <textarea class="form-control bg-dark text-light border-secondary" name="message" rows="3"
-                                required placeholder="What did they say?"></textarea>
+                            <label class="form-label">Message</label>
+                            <textarea class="form-control" name="message" rows="3" required
+                                placeholder="What did they say?"></textarea>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-muted">Client Photo (Optional)</label>
-                            <input type="file" class="form-control bg-dark text-light border-secondary" name="image"
-                                accept="image/*">
+                            <label class="form-label">Client Photo (Optional)</label>
+                            <input type="file" class="form-control" name="image" accept="image/*">
                         </div>
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">Save Testimonial</button>
+                            <button type="submit" class="btn btn-success">Save Testimonial</button>
                         </div>
                     </form>
                 </div>

@@ -12,31 +12,70 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
     <style>
         :root {
-            --primary: #3B5998;
-            --primary-dark: #2d4373;
-            --secondary: #6C757D;
-            --success: #28a745;
-            --warning: #ffc107;
-            --danger: #dc3545;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #eff6ff;
+            --accent: #06b6d4;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
             --card-bg: #ffffff;
-            --border-color: #e9ecef;
-            --radius-lg: 16px;
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --border-color: #e2e8f0;
+            --border-focus: #3b82f6;
+            --radius-lg: 18px;
+            --shadow-subtle: 0 4px 16px -2px rgba(15, 23, 42, 0.04), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+            --shadow-hover: 0 20px 35px -6px rgba(37, 99, 235, 0.12), 0 8px 16px -4px rgba(0, 0, 0, 0.04);
         }
 
         body {
-            background-color: #f4f6f9;
-            color: #333;
+            background-color: #f8fafc;
+            color: #1e293b;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
 
         /* Layout */
         .dashboard-layout {
             display: grid;
-            grid-template-columns: 260px 1fr;
-            gap: 24px;
+            grid-template-columns: 280px 1fr;
+            gap: 28px;
             margin-bottom: 40px;
             align-items: stretch;
+        }
+
+        .trending-skills-card {
+            background: #ffffff;
+            border-radius: var(--radius-lg);
+            padding: 16px 18px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .trending-title {
+            font-size: 0.76rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #475569;
+        }
+
+        .trending-skill-chip {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .trending-skill-chip:hover {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+            transform: translateY(-1px);
         }
 
         @media (max-width: 992px) {
@@ -45,227 +84,511 @@
             }
         }
 
-        /* Cards */
-        .content-card {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-sm);
+        /* Hero Header & Search Section */
+        .hero-talent-header {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
             border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 32px 36px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-subtle);
+            position: relative;
             overflow: hidden;
-            margin-bottom: 24px;
         }
 
-        .card-header-custom {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border-color);
-            background: white;
+        .hero-talent-header::after {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            border-radius: 50%;
+        }
+
+        .hero-badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--primary);
+            padding: 5px 14px;
+            border-radius: 9999px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: 1px solid rgba(37, 99, 235, 0.15);
+        }
+
+        .pulsing-blue-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.6);
+            animation: pulseBlue 2s infinite;
+        }
+
+        @keyframes pulseBlue {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(37, 99, 235, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+        }
+
+        .hero-talent-title {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.8px;
+            line-height: 1.2;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-talent-subtitle {
+            color: #64748b;
+            font-size: 0.98rem;
+            max-width: 480px;
+            line-height: 1.5;
+        }
+
+        /* Modern Capsule Search */
+        .hero-search-wrapper {
+            width: 100%;
+        }
+
+        .hero-search-capsule {
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 60px;
+            padding: 6px 6px 6px 20px;
+            box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.25s ease;
+        }
+
+        .hero-search-capsule:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 14px 30px -4px rgba(37, 99, 235, 0.15), 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .hero-input-field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hero-field-icon {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .hero-input-field:focus-within .hero-field-icon {
+            color: var(--primary);
+        }
+
+        .hero-input-control {
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 100%;
+            font-size: 0.9rem;
+            color: #1e293b;
+            font-weight: 500;
+        }
+
+        .hero-input-control::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        .hero-capsule-divider {
+            width: 1px;
+            height: 26px;
+            background: #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .btn-hero-search-modern {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 50px;
             font-weight: 700;
-            color: var(--dark);
+            font-size: 0.92rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
+            transition: all 0.25s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+            cursor: pointer;
         }
 
-        .card-body-custom {
-            padding: 24px;
+        .btn-hero-search-modern:hover {
+            background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.38);
+            color: #ffffff;
         }
 
-        .filter-group {
-            margin-bottom: 20px;
+        .badge-count-modern {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 5px 14px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #334155;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
         }
 
-        /* Filter Styles */
+        /* Sidebar Filter Card */
         .sidebar-column {
             position: relative;
         }
 
         .sticky-sidebar {
             position: sticky;
-            top: 100px;
+            top: 90px;
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
 
-        .sidebar-column .content-card {
-            margin-bottom: 0;
-            height: auto;
-        }
-
-        .filter-label {
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 8px;
-            color: #495057;
-            display: block;
-        }
-
-        .filter-input,
-        .filter-select {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        .filter-input:focus,
-        .filter-select:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.1);
-        }
-
-        .btn-filter {
-            background: var(--primary);
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-
-        .btn-filter:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .btn-clear {
-            color: var(--secondary);
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-            display: block;
-            text-align: center;
-            margin-top: 12px;
-        }
-
-        .btn-clear:hover {
-            color: var(--dark);
-        }
-
-        /* Hero Search Bar */
-        .hero-search-container {
-            flex-grow: 1;
-            max-width: 600px;
-            margin-left: 40px;
-        }
-
-        .hero-search-box {
-            background: white;
-            border-radius: 12px;
-            padding: 6px 6px 6px 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        .modern-filter-card {
+            background: #ffffff;
+            border-radius: var(--radius-lg);
             border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-subtle);
+            overflow: hidden;
+        }
+
+        .filter-card-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid #f1f5f9;
             display: flex;
             align-items: center;
-            gap: 5px;
+            justify-content: space-between;
+            background: #ffffff;
+        }
+
+        .filter-header-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--primary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+        }
+
+        .filter-reset-link {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #64748b;
+            text-decoration: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: #f1f5f9;
+            transition: all 0.2s;
+        }
+
+        .filter-reset-link:hover {
+            color: #dc2626;
+            background: #fee2e2;
+        }
+
+        .filter-card-body {
+            padding: 22px;
+        }
+
+        .filter-field-group {
+            margin-bottom: 18px;
+        }
+
+        .filter-field-label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 7px;
+            display: flex;
+            align-items: center;
+            letter-spacing: 0.3px;
+        }
+
+        .filter-input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
             width: 100%;
         }
 
-        .hero-search-input {
-            border: none;
-            padding: 12px;
-            font-size: 15px;
-            flex-grow: 1;
+        .filter-input-icon {
+            position: absolute;
+            left: 13px;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+
+        .filter-input-wrap:focus-within .filter-input-icon {
+            color: var(--primary);
+        }
+
+        .filter-input-modern {
+            width: 100%;
+            padding: 10px 14px 10px 36px;
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            color: #1e293b;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .filter-input-modern:focus {
+            background: #ffffff;
+            border-color: var(--primary);
             outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .filter-input-modern::placeholder {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .filter-select-wrap {
+            position: relative;
             width: 100%;
         }
 
-        .hero-search-divider {
-            width: 1px;
-            height: 24px;
-            background: var(--border-color);
+        .filter-select-modern {
+            width: 100%;
+            padding: 10px 36px 10px 14px;
+            background: #f8fafc url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") no-repeat right 14px center/11px 9px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            color: #1e293b;
+            font-weight: 500;
+            appearance: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
-        .btn-hero-search {
-            background: var(--primary);
-            color: white;
+        .filter-select-modern:focus {
+            background-color: #ffffff;
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .btn-filter-submit {
+            width: 100%;
+            padding: 11px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: #ffffff;
             border: none;
-            padding: 12px 30px;
             border-radius: 10px;
             font-weight: 700;
-            font-size: 15px;
-            transition: all 0.2s;
-            margin-left: 5px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            margin-top: 6px;
         }
 
-        .btn-hero-search:hover {
-            background: var(--primary-dark);
+        .btn-filter-submit:hover {
+            background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
             transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
         }
 
-        @media (max-width: 1200px) {
-            .hero-search-container {
-                display: none;
-                /* Hide on smaller header, filters still in sidebar */
-            }
+        .btn-filter-clear {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            color: #64748b;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 6px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-filter-clear:hover {
+            color: #0f172a;
+            background: #f1f5f9;
+        }
+
+        /* Specialist Help Card */
+        .specialist-help-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .specialist-help-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(37, 99, 235, 0.2);
+            color: #60a5fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            margin-bottom: 14px;
+        }
+
+        .btn-specialist-contact {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-specialist-contact:hover {
+            background: #ffffff;
+            color: #0f172a;
         }
 
         /* Talent Grid */
         .talent-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            gap: 22px;
         }
 
-        @media (max-width: 576px) {
+        @media (max-width: 640px) {
             .talent-grid {
                 grid-template-columns: 1fr;
             }
         }
 
         .talent-card {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: var(--shadow-sm);
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 26px;
+            box-shadow: var(--shadow-subtle);
             border: 1px solid var(--border-color);
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             display: flex;
             flex-direction: column;
             height: 100%;
+            overflow: hidden;
+        }
+
+        .talent-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #2563eb 0%, #6366f1 50%, #06b6d4 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .talent-card:hover {
             transform: translateY(-5px);
-            box-shadow: var(--shadow-md);
-            border-color: rgba(0, 180, 216, 0.3);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(37, 99, 235, 0.3);
+        }
+
+        .talent-card:hover::before {
+            opacity: 1;
         }
 
         .freelancer-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
+            width: 76px;
+            height: 76px;
+            border-radius: 18px;
             object-fit: cover;
-            border: 3px solid white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 3px solid #ffffff;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+            flex-shrink: 0;
         }
 
         .freelancer-name {
-            font-size: 1.1rem;
+            font-size: 1.12rem;
             font-weight: 700;
-            color: var(--primary-dark);
+            color: #0f172a;
             text-decoration: none;
             display: block;
             margin-bottom: 2px;
+            transition: color 0.2s;
+        }
+
+        .freelancer-name:hover {
+            color: var(--primary);
+        }
+
+        .freelancer-title {
+            font-size: 0.88rem;
+            color: #475569;
+            font-weight: 600;
+            margin-bottom: 4px;
         }
 
         .freelancer-location {
-            font-size: 12px;
-            color: #6c757d;
-            margin-bottom: 8px;
+            font-size: 0.8rem;
+            color: #64748b;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
+            margin-bottom: 6px;
         }
 
         .badge-verified {
-            color: #28A745;
-            background: rgba(40, 167, 69, 0.1);
-            padding: 4px 8px;
-            border-radius: 20px;
+            color: #059669;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            padding: 3px 9px;
+            border-radius: 9999px;
             font-size: 11px;
             font-weight: 700;
             display: inline-flex;
@@ -274,86 +597,80 @@
         }
 
         .skill-badge {
-            background: #f8f9fa;
-            color: #495057;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
+            background: #f1f5f9;
+            color: #334155;
+            padding: 5px 12px;
+            border-radius: 9999px;
+            font-size: 11.5px;
+            font-weight: 600;
             display: inline-block;
-            margin: 0 6px 8px 0;
-            border: 1px solid #e9ecef;
+            margin: 0 4px 6px 0;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+
+        .skill-badge:hover {
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--primary);
+            border-color: rgba(37, 99, 235, 0.2);
         }
 
         .actions-row {
             margin-top: auto;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
             width: 100%;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
+            padding-top: 18px;
+            border-top: 1px solid #f1f5f9;
         }
 
         .btn-action {
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 14px;
+            padding: 9px 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.85rem;
             text-align: center;
             text-decoration: none;
             transition: all 0.2s;
-        }
-
-        .btn-action {
-            padding: 8px 5px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 12px;
-            text-align: center;
-            text-decoration: none;
-            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
         .btn-view {
-            background: white;
-            border: 1px solid var(--primary);
-            color: var(--primary);
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            color: #1e293b;
         }
 
         .btn-view:hover {
-            background: var(--primary);
-            color: white;
+            background: #ffffff;
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
         }
 
         .btn-message {
-            background: var(--primary);
-            color: white;
-            border: 1px solid var(--primary);
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: #ffffff;
+            border: none;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
         }
 
         .btn-message:hover {
-            background: var(--primary-dark);
-            border-color: var(--primary-dark);
+            background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
         }
 
         /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
         .animate-on-scroll {
             opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            transform: translateY(16px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
         }
 
         .animate-on-scroll.visible {
@@ -368,7 +685,7 @@
     <!-- Header -->
     <th:block th:replace="fragments/client-header :: clientHeader('find-talent')"></th:block>
 
-    <div class="container-fluid py-4" style="max-width: 1400px;">
+    <div class="container-fluid py-4 px-xl-5 px-3" style="max-width: 1540px;">
         <!-- Mobile Back Button -->
         <div class="d-lg-none mb-3">
             <a th:href="@{/client-dashboard/}"
@@ -379,114 +696,167 @@
             </a>
         </div>
 
-        <!-- Page Title & Hero Search -->
-        <div class="d-flex justify-content-between align-items-center mb-5 animate-on-scroll visible">
-            <div style="flex: 1;">
-                <h2 class="fw-bold text-dark mb-2" style="font-size: 2.2rem; letter-spacing: -0.5px;">
-                    <span class="text-primary">Elite</span> Talent,
-                    <span style="color: var(--primary-dark);">Limitless</span> Potential
-                </h2>
-                <p class="text-muted mb-0" style="font-size: 1.1rem; max-width: 500px;">Connect with world-class experts
-                    and scale your vision with verified professional power.</p>
-            </div>
-
-            <!-- Hero Search (Right Side) -->
-            <div class="hero-search-container">
-                <form th:action="@{/find-talent/}" method="get" class="hero-search-box">
-                    <div class="d-flex align-items-center flex-grow-1">
-                        <i class="fas fa-search text-primary ms-2"></i>
-                        <input type="text" name="search" class="hero-search-input" placeholder="Search keywords..."
-                            th:value="${search}">
+        <!-- Page Title & Hero Search Banner -->
+        <div class="hero-talent-header mb-4 animate-on-scroll visible">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-5">
+                    <div class="hero-badge-pill mb-2">
+                        <span class="pulsing-blue-dot"></span>
+                        <span>TOP-TIER VETTED FREELANCERS</span>
                     </div>
-                    <div class="hero-search-divider"></div>
-                    <div class="d-flex align-items-center flex-grow-1">
-                        <i class="fas fa-map-marker-alt text-primary ms-2"></i>
-                        <input type="text" name="location" class="hero-search-input" placeholder="Location..."
-                            th:value="${location}">
-                    </div>
-                    <button type="submit" class="btn-hero-search">
-                        Search
-                    </button>
-                    <!-- Hidden fields to maintain other filters -->
-                    <input type="hidden" name="skill" th:value="${skill}">
-                    <input type="hidden" name="experienceLevel" th:value="${experienceLevel}">
-                </form>
-            </div>
+                    <h1 class="hero-talent-title mb-2">
+                        <span class="gradient-text">Elite</span> Talent, Limitless Potential
+                    </h1>
+                    <p class="hero-talent-subtitle mb-0">Connect with world-class experts and scale your vision with verified professional power.</p>
+                </div>
 
-            <div class="ms-4 text-end d-none d-xl-block">
-                <span class="badge bg-white text-primary border px-3 py-2 rounded-pill shadow-sm">
-                    <i class="fas fa-users me-2"></i>
-                    <span th:text="${totalItems + ' Professionals Found'}">0 Professionals Found</span>
-                </span>
+                <div class="col-lg-7">
+                    <div class="hero-search-wrapper">
+                        <form th:action="@{/find-talent/}" method="get" class="hero-search-capsule">
+                            <div class="hero-input-field flex-grow-1">
+                                <i class="fas fa-search hero-field-icon"></i>
+                                <input type="text" name="search" class="hero-input-control" placeholder="Search name, skills, or role..." th:value="${search}">
+                            </div>
+                            <div class="hero-capsule-divider"></div>
+                            <div class="hero-input-field" style="max-width: 220px;">
+                                <i class="fas fa-map-marker-alt hero-field-icon"></i>
+                                <input type="text" name="location" class="hero-input-control" placeholder="Location..." th:value="${location}">
+                            </div>
+                            <button type="submit" class="btn-hero-search-modern">
+                                <i class="fas fa-search"></i>
+                                <span>Search</span>
+                            </button>
+                            <!-- Maintain filter params -->
+                            <input type="hidden" name="skill" th:value="${skill}">
+                            <input type="hidden" name="experienceLevel" th:value="${experienceLevel}">
+                        </form>
+                        
+                        <!-- Status Counter Badge Bar -->
+                        <div class="hero-meta-bar mt-2 d-flex align-items-center justify-content-between px-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge-count-modern">
+                                    <i class="fas fa-users text-primary me-1"></i>
+                                    <strong th:text="${totalItems}">0</strong>
+                                    <span class="text-muted ms-1">Professionals Found</span>
+                                </span>
+                            </div>
+                            <div class="d-none d-md-flex align-items-center gap-2 text-muted small">
+                                <i class="fas fa-shield-alt text-primary"></i> 100% Identity & Skill Verified
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="dashboard-layout">
 
             <!-- Sidebar Filters -->
-            <aside class="sidebar-column animate-on-scroll" style="transition-delay: 0.1s;">
+            <aside class="sidebar-column animate-on-scroll visible" style="transition-delay: 0.1s;">
                 <div class="sticky-sidebar">
-                    <div class="content-card">
-                        <div class="card-header-custom">
-                            <i class="fas fa-sliders-h me-2 text-primary"></i> Filters
+                    <div class="modern-filter-card">
+                        <div class="filter-card-header">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="filter-header-icon"><i class="fas fa-sliders-h"></i></span>
+                                <span class="fw-bold text-dark fs-6">Filter Talent</span>
+                            </div>
+                            <a th:href="@{/find-talent/}" class="filter-reset-link"
+                               th:if="${search != null or skill != null or experienceLevel != null or location != null}"
+                               title="Reset all filters">
+                                <i class="fas fa-undo-alt me-1"></i> Reset
+                            </a>
                         </div>
-                        <div class="card-body-custom">
+                        <div class="filter-card-body">
                             <form th:action="@{/find-talent/}" method="get">
-
-                                <!-- Search -->
-                                <div class="filter-group">
-                                    <label class="filter-label">Keywords</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white border-end-0"><i
-                                                class="fas fa-search text-muted"></i></span>
-                                        <input type="text" class="filter-input border-start-0 ps-0" name="search"
-                                            placeholder="Name, skills..." th:value="${search}">
+                                <!-- Keywords -->
+                                <div class="filter-field-group">
+                                    <label class="filter-field-label">
+                                        <i class="fas fa-font text-primary me-1"></i> Keywords
+                                    </label>
+                                    <div class="filter-input-wrap">
+                                        <i class="fas fa-search filter-input-icon"></i>
+                                        <input type="text" class="filter-input-modern" name="search"
+                                               placeholder="Name, skills..." th:value="${search}">
                                     </div>
                                 </div>
 
                                 <!-- Skill -->
-                                <div class="filter-group">
-                                    <label class="filter-label">Specific Skill</label>
-                                    <input type="text" class="filter-input" name="skill" placeholder="e.g. React, Java"
-                                        th:value="${skill}">
+                                <div class="filter-field-group">
+                                    <label class="filter-field-label">
+                                        <i class="fas fa-code text-primary me-1"></i> Specific Skill
+                                    </label>
+                                    <div class="filter-input-wrap">
+                                        <i class="fas fa-tag filter-input-icon"></i>
+                                        <input type="text" class="filter-input-modern" name="skill"
+                                               placeholder="e.g. React, Java" th:value="${skill}">
+                                    </div>
+                                </div>
+
+                                <!-- Location -->
+                                <div class="filter-field-group">
+                                    <label class="filter-field-label">
+                                        <i class="fas fa-map-marker-alt text-primary me-1"></i> Location
+                                    </label>
+                                    <div class="filter-input-wrap">
+                                        <i class="fas fa-location-arrow filter-input-icon"></i>
+                                        <input type="text" class="filter-input-modern" name="location"
+                                               placeholder="City or Country..." th:value="${location}">
+                                    </div>
                                 </div>
 
                                 <!-- Experience -->
-                                <div class="filter-group">
-                                    <label class="filter-label">Experience Level</label>
-                                    <select class="filter-select" name="experienceLevel">
-                                        <option value="">Any Experience</option>
-                                        <option value="Beginner" th:selected="${experienceLevel == 'Beginner'}">Beginner
-                                        </option>
-                                        <option value="Intermediate" th:selected="${experienceLevel == 'Intermediate'}">
-                                            Intermediate</option>
-                                        <option value="Advanced" th:selected="${experienceLevel == 'Advanced'}">Advanced
-                                        </option>
-                                    </select>
+                                <div class="filter-field-group">
+                                    <label class="filter-field-label">
+                                        <i class="fas fa-layer-group text-primary me-1"></i> Experience Level
+                                    </label>
+                                    <div class="filter-select-wrap">
+                                        <select class="filter-select-modern" name="experienceLevel">
+                                            <option value="">Any Experience</option>
+                                            <option value="Beginner" th:selected="${experienceLevel == 'Beginner'}">Beginner</option>
+                                            <option value="Intermediate" th:selected="${experienceLevel == 'Intermediate'}">Intermediate</option>
+                                            <option value="Advanced" th:selected="${experienceLevel == 'Advanced'}">Advanced</option>
+                                        </select>
+                                    </div>
                                 </div>
 
-                                <button type="submit" class="btn-filter shadow-sm">
-                                    Apply Filters
+                                <button type="submit" class="btn-filter-submit">
+                                    <i class="fas fa-filter me-1"></i> Apply Filters
                                 </button>
 
-                                <a th:href="@{/find-talent/}" class="btn-clear"
-                                    th:if="${search != null or skill != null or experienceLevel != null}">
-                                    <i class="fas fa-times me-1"></i> Clear All Filters
+                                <a th:href="@{/find-talent/}" class="btn-filter-clear"
+                                   th:if="${search != null or skill != null or experienceLevel != null or location != null}">
+                                    <i class="fas fa-times-circle me-1"></i> Clear All Filters
                                 </a>
                             </form>
                         </div>
                     </div>
 
-                    <!-- Help Card -->
-                    <div class="content-card bg-primary text-white border-0"
-                        style="background: linear-gradient(135deg, #3B5998 0%, #2d4373 100%);">
-                        <div class="p-4">
-                            <h5 class="fw-bold mb-2">Need a Specialist?</h5>
-                            <p class="small mb-3" style="opacity: 0.9;">Our recruiting team can help you find the
-                                perfect
-                                match for complex projects.</p>
-                            <a href="#" class="btn btn-light btn-sm w-100 fw-bold text-primary">Contact Support</a>
+                    <!-- Trending Skills Cloud -->
+                    <div class="trending-skills-card">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="trending-title"><i class="fas fa-fire-alt text-warning me-1"></i> Popular Skills</span>
                         </div>
+                        <div class="d-flex flex-wrap gap-1">
+                            <a th:href="@{/find-talent/(skill='React')}" class="trending-skill-chip">React</a>
+                            <a th:href="@{/find-talent/(skill='Java')}" class="trending-skill-chip">Java</a>
+                            <a th:href="@{/find-talent/(skill='Python')}" class="trending-skill-chip">Python</a>
+                            <a th:href="@{/find-talent/(skill='UI/UX')}" class="trending-skill-chip">UI/UX</a>
+                            <a th:href="@{/find-talent/(skill='Node.js')}" class="trending-skill-chip">Node.js</a>
+                            <a th:href="@{/find-talent/(skill='Spring Boot')}" class="trending-skill-chip">Spring Boot</a>
+                        </div>
+                    </div>
+
+                    <!-- Specialist Help Card -->
+                    <div class="specialist-help-card">
+                        <div class="specialist-help-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h6 class="fw-bold mb-1 text-white">Need a Dedicated Specialist?</h6>
+                        <p class="small text-white-50 mb-3">Our recruiting advisors match you with top talent for complex or long-term projects.</p>
+                        <a th:href="@{/contact}" class="btn-specialist-contact">
+                            <span>Talk to an Advisor</span>
+                            <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
                     </div>
                 </div>
             </aside>

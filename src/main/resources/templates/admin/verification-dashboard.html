@@ -31,6 +31,7 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 2rem;
+            padding-bottom: 5rem;
         }
 
         .page-header {
@@ -441,7 +442,7 @@
     </style>
 </head>
 
-<body>
+<body th:classappend="${session.theme == 'dark' ? 'dark-theme' : 'light-theme'}">
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container-fluid">
@@ -450,7 +451,10 @@
                 Jobify Admin Portal
             </a>
             <div class="navbar-nav ms-auto d-flex align-items-center gap-3">
-                <!-- Theme Toggle Removed -->
+                <a th:href="@{/admin/theme/toggle}" class="btn btn-outline-light btn-sm">
+                    <i class="fas me-1" th:classappend="${session.theme == 'dark' ? 'fa-sun' : 'fa-moon'}"></i>
+                    <span th:text="${session.theme == 'dark' ? 'Light' : 'Dark'}">Dark</span>
+                </a>
                 <a class="nav-link text-white" href="/admin/dashboard" style="color: var(--text-light) !important;">
                     <i class="fas fa-tachometer-alt me-1"></i>
                     Dashboard
@@ -594,7 +598,7 @@
                                     th:if="${recruiterProfiles[recruiter.userId]?.verificationFront}">
                                     <div class="document-preview" style="cursor: pointer"
                                         onclick="openDocument(this.querySelector('img').src, 'ID Front')">
-                                        <img th:src="@{'/photos/recruiter/' + ${recruiter.userId} + '/' + ${recruiterProfiles[recruiter.userId].verificationFront}}"
+                                        <img th:src="${recruiterProfiles[recruiter.userId].verificationFront.startsWith('http') ? recruiterProfiles[recruiter.userId].verificationFront : '/photos/recruiter/' + recruiter.userId + '/' + recruiterProfiles[recruiter.userId].verificationFront}"
                                             alt="ID Front">
                                     </div>
                                     <div class="document-info">
@@ -609,7 +613,7 @@
                                     th:if="${recruiterProfiles[recruiter.userId]?.verificationBack}">
                                     <div class="document-preview" style="cursor: pointer"
                                         onclick="openDocument(this.querySelector('img').src, 'ID Back')">
-                                        <img th:src="@{'/photos/recruiter/' + ${recruiter.userId} + '/' + ${recruiterProfiles[recruiter.userId].verificationBack}}"
+                                        <img th:src="${recruiterProfiles[recruiter.userId].verificationBack.startsWith('http') ? recruiterProfiles[recruiter.userId].verificationBack : '/photos/recruiter/' + recruiter.userId + '/' + recruiterProfiles[recruiter.userId].verificationBack}"
                                             alt="ID Back">
                                     </div>
                                     <div class="document-info">
@@ -624,7 +628,7 @@
                                     th:if="${recruiterProfiles[recruiter.userId]?.verificationDocument}">
                                     <div class="document-preview" style="cursor: pointer"
                                         onclick="openDocument(this.querySelector('img').src, 'ID Document')">
-                                        <img th:src="@{'/photos/recruiter/' + ${recruiter.userId} + '/' + ${recruiterProfiles[recruiter.userId].verificationDocument}}"
+                                        <img th:src="${recruiterProfiles[recruiter.userId].verificationDocument.startsWith('http') ? recruiterProfiles[recruiter.userId].verificationDocument : '/photos/recruiter/' + recruiter.userId + '/' + recruiterProfiles[recruiter.userId].verificationDocument}"
                                             alt="ID Document">
                                     </div>
                                     <div class="document-info">
@@ -648,7 +652,7 @@
                                 <div class="document-item">
                                     <div class="document-preview">
                                         <img th:if="${recruiterProfiles[recruiter.userId]?.businessLicense}"
-                                            th:src="@{'/photos/recruiter/' + ${recruiter.userId} + '/' + ${recruiterProfiles[recruiter.userId].businessLicense}}"
+                                            th:src="${recruiterProfiles[recruiter.userId].businessLicense.startsWith('http') ? recruiterProfiles[recruiter.userId].businessLicense : '/photos/recruiter/' + recruiter.userId + '/' + recruiterProfiles[recruiter.userId].businessLicense}"
                                             alt="Business License">
                                         <i class="fas fa-file-contract fa-3x text-muted"
                                             th:unless="${recruiterProfiles[recruiter.userId]?.businessLicense}"></i>
@@ -757,7 +761,7 @@
                                     <div class="document-preview" style="cursor: pointer"
                                         th:onclick="openDocument(this.querySelector('img').src, 'ID Document')">
                                         <img th:if="${jobSeekerProfiles[jobSeeker.userId]?.verificationDocument}"
-                                            th:src="@{'/photos/candidate/' + ${jobSeeker.userId} + '/' + ${jobSeekerProfiles[jobSeeker.userId].verificationDocument}}"
+                                            th:src="${jobSeekerProfiles[jobSeeker.userId].verificationDocument.startsWith('http') ? jobSeekerProfiles[jobSeeker.userId].verificationDocument : '/photos/candidate/' + jobSeeker.userId + '/' + jobSeekerProfiles[jobSeeker.userId].verificationDocument}"
                                             alt="ID Document">
                                         <i class="fas fa-file-image fa-3x text-muted"
                                             th:unless="${jobSeekerProfiles[jobSeeker.userId]?.verificationDocument}"></i>
@@ -1019,13 +1023,19 @@
             modal.show();
         }
 
+        function resolveDocUrl(prefix, file) {
+            if (!file || file === 'null') return null;
+            return file.startsWith('http') ? file : `${prefix}${file}`;
+        }
+
         // Helper to view keys
         function viewRecruiterDocs(userId, front, back, doc, license) {
             const docs = [];
-            if (front && front !== 'null') docs.push({ title: 'Government ID (Front)', url: `/photos/recruiter/${userId}/${front}` });
-            if (back && back !== 'null') docs.push({ title: 'Government ID (Back)', url: `/photos/recruiter/${userId}/${back}` });
-            if (doc && doc !== 'null') docs.push({ title: 'ID Document', url: `/photos/recruiter/${userId}/${doc}` });
-            if (license && license !== 'null') docs.push({ title: 'Business License', url: `/photos/recruiter/${userId}/${license}` });
+            const prefix = `/photos/recruiter/${userId}/`;
+            if (front && front !== 'null') docs.push({ title: 'Government ID (Front)', url: resolveDocUrl(prefix, front) });
+            if (back && back !== 'null') docs.push({ title: 'Government ID (Back)', url: resolveDocUrl(prefix, back) });
+            if (doc && doc !== 'null') docs.push({ title: 'ID Document', url: resolveDocUrl(prefix, doc) });
+            if (license && license !== 'null') docs.push({ title: 'Business License', url: resolveDocUrl(prefix, license) });
             viewDocumentCollection(docs);
         }
 
@@ -1036,8 +1046,9 @@
 
         function viewJobSeekerDocs(userId, doc, resume) {
             const docs = [];
-            if (doc && doc !== 'null') docs.push({ title: 'ID Document', url: `/photos/candidate/${userId}/${doc}` });
-            if (resume && resume !== 'null') docs.push({ title: 'Resume', url: `/photos/candidate/${userId}/${resume}` });
+            const prefix = `/photos/candidate/${userId}/`;
+            if (doc && doc !== 'null') docs.push({ title: 'ID Document', url: resolveDocUrl(prefix, doc) });
+            if (resume && resume !== 'null') docs.push({ title: 'Resume', url: resolveDocUrl(prefix, resume) });
             viewDocumentCollection(docs);
         }
 
@@ -1091,8 +1102,8 @@
             viewDocumentCollection([{ title: title, url: url }]);
         }
 
-        // Auto-refresh every 30 seconds
-        setInterval(refreshData, 30000);
+        // NOTE: disabled auto-refresh; it can interrupt scrolling/review near the bottom.
+        // Use the explicit Refresh button instead.
 
         // Initialize tooltips
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));

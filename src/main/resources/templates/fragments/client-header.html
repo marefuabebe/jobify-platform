@@ -194,9 +194,9 @@
             }
         </style>
 
-        <div class="container-fluid" style="padding-left: 0.25rem; padding-right: 0.25rem;">
-            <a class="navbar-brand d-flex align-items-center"
-                style="font-size: 1.25rem; margin-right: 1.5rem; padding-left: 0;" th:href="@{/client-dashboard/}">
+        <div class="container-fluid px-3 px-xl-4" style="max-width: 1440px;">
+            <a class="navbar-brand d-flex align-items-center me-3 me-xl-4"
+                style="font-size: 1.35rem; font-weight: 800; letter-spacing: -0.5px;" th:href="@{/client-dashboard/}">
                 Job<span style="color: #0d6efd;">ify</span>.
             </a>
 
@@ -279,7 +279,7 @@
                     </div>
                 </div>
 
-                <ul class="navbar-nav mb-2 mb-lg-0" style="gap: 12px;">
+                <ul class="navbar-nav mb-2 mb-lg-0 mx-auto" style="gap: 6px;">
                     <li class="nav-item">
                         <a class="nav-link" th:classappend="${activePage == 'dashboard' ? 'active' : ''}"
                             th:href="@{/client-dashboard/}">
@@ -293,18 +293,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:classappend="${activePage == 'post-job' ? 'active' : ''}"
-                            th:href="@{/dashboard/add}">
-                            <i class="fas fa-plus-circle fa-sm"></i> Post Job
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" th:classappend="${activePage == 'jobs' ? 'active' : ''}"
                             th:href="@{/client-dashboard/jobs}">
                             <i class="fas fa-briefcase fa-sm"></i> My Jobs
                         </a>
                     </li>
-                    <li class="nav-item">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="workDropdown" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false"
@@ -363,6 +356,15 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" th:classappend="${activePage == 'notifications' ? 'active' : ''}"
+                            th:href="@{/notifications}">
+                            <i class="fas fa-bell fa-sm"></i> Notifications
+                            <span class="badge bg-danger rounded-pill ms-1"
+                                th:if="${unreadNotificationsCount != null and unreadNotificationsCount > 0}"
+                                th:text="${unreadNotificationsCount}">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" th:classappend="${activePage == 'profile' ? 'active' : ''}"
                             th:href="@{/recruiter-profile/}">
                             <i class="fas fa-user-circle fa-sm"></i> Profile
@@ -370,14 +372,20 @@
                     </li>
                 </ul>
 
-                <!-- Desktop: User Profile (Hidden on Mobile) -->
-                <div class="d-none d-lg-flex align-items-center ms-3" th:if="${user != null}">
-                    <ul class="navbar-nav align-items-center">
+                <!-- Desktop: User Profile & Actions (Hidden on Mobile) -->
+                <div class="d-none d-lg-flex align-items-center ms-auto gap-3" th:if="${user != null}">
+                    <a th:href="@{/dashboard/add}" class="btn btn-primary btn-sm rounded-pill px-3 py-2 fw-bold d-flex align-items-center gap-2 shadow-sm"
+                        style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); border: none; font-size: 0.82rem; white-space: nowrap;">
+                        <i class="fas fa-plus"></i>
+                        <span>Post a Job</span>
+                    </a>
+
+                    <ul class="navbar-nav align-items-center mb-0">
                         <!-- Notification Dropdown -->
                         <th:block th:replace="fragments/notification-dropdown :: notificationDropdown"></th:block>
                     </ul>
 
-                    <div class="dropdown ms-3">
+                    <div class="dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center p-0" href="#" id="userDropdown"
                             role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <img th:if="${user.photosImagePath != null}" th:src="@{${user.photosImagePath}}"

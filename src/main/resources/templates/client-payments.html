@@ -1,371 +1,802 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
     xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8" />
-    <title>Payments - Jobify</title>
+    <title>Financial Overview & Payments | Jobify</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
     <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}" />
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <!-- Add jQuery for notifications.js -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         :root {
-            --primary: #4B6CB7;
-            --primary-light: #182848;
-            --accent: #00b4d8;
-            --success: #2ecc71;
-            --warning: #f1c40f;
-            --danger: #e74c3c;
-            /* Modern palette */
-            --bg-body: #f5f7fa;
-            --glass-bg: rgba(255, 255, 255, 0.8);
-            --glass-border: rgba(255, 255, 255, 0.4);
-            --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-            --radius-xl: 20px;
+            --primary: #3B5998;
+            --primary-light: #eef2f9;
+            --primary-dark: #2d4373;
+            --dark: #0f172a;
+            --gray: #64748b;
+            --light-border: #e2e8f0;
+            --radius-xl: 18px;
+            --shadow-sm: 0 2px 6px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 12px 28px -6px rgba(15, 23, 42, 0.08), 0 6px 12px -4px rgba(15, 23, 42, 0.04);
         }
 
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-            color: #2D3436;
-            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: var(--dark);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* Stats Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-bottom: 24px;
-        }
-
-        .stat-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-xl);
-            padding: 20px;
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        /* Executive Dark Header */
+        .page-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #2b457b 100%);
+            padding: 44px 0;
+            color: white;
+            margin-bottom: 32px;
             position: relative;
-            overflow: hidden;
-            box-shadow: var(--card-shadow);
         }
 
-        .stat-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-        }
-
-        .stat-card::after {
+        .page-header::after {
             content: '';
             position: absolute;
             bottom: 0;
             left: 0;
-            width: 0;
-            height: 4px;
-            transition: width 0.4s ease;
+            right: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        .stat-card:hover::after {
-            width: 100%;
+        .page-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 24px;
         }
 
-        .stat-value {
-            font-size: 38px;
+        .header-title h1 {
+            font-size: 30px;
             font-weight: 800;
-            margin-bottom: 2px;
-            background: linear-gradient(45deg, var(--primary), var(--accent));
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
         }
 
-        .stat-label {
+        .header-title p {
+            color: #94a3b8;
+            font-size: 15px;
+            margin: 0;
+        }
+
+        /* KPI Stat Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        @media (max-width: 1200px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--light-border);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: #cbd5e1;
+        }
+
+        .kpi-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .kpi-icon-pill {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .kpi-card:hover .kpi-icon-pill {
+            transform: scale(1.08);
+        }
+
+        .kpi-icon-pill.emerald {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .kpi-icon-pill.blue {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .kpi-icon-pill.indigo {
+            background: #f5f3ff;
+            color: #7c3aed;
+        }
+
+        .kpi-icon-pill.amber {
+            background: #fffbeb;
+            color: #d97706;
+        }
+
+        .kpi-badge {
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.3px;
+        }
+
+        .kpi-badge.emerald {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .kpi-badge.blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .kpi-badge.indigo {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .kpi-badge.amber {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--dark);
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+            margin-bottom: 6px;
+        }
+
+        .kpi-label {
             font-size: 13px;
             font-weight: 700;
-            color: #636E72;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.8px;
+            color: #64748b;
+            margin-bottom: 4px;
         }
 
-        .stat-icon {
+        .kpi-subtext {
+            font-size: 12.5px;
+            color: #94a3b8;
+            margin: 0;
+        }
+
+        /* Filter & Control Toolbar */
+        .toolbar-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--light-border);
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 420px;
+        }
+
+        .search-box i {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 32px;
-            opacity: 0.15;
-            transition: all 0.4s ease;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 14px;
         }
 
-        .stat-card:hover .stat-icon {
-            transform: scale(1.2) rotate(-10deg);
-            opacity: 0.3;
+        .search-box input {
+            width: 100%;
+            padding: 10px 16px 10px 42px;
+            border-radius: 12px;
+            border: 1.5px solid var(--light-border);
+            font-size: 14px;
+            background: #f8fafc;
+            color: var(--dark);
+            transition: all 0.2s ease;
         }
 
-        .stat-card.blue::after {
-            background: #4B6CB7;
+        .search-box input:focus {
+            background: white;
+            border-color: #2563eb;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
         }
 
-        .stat-card.green::after {
-            background: #2ecc71;
+        .filter-pills {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .stat-card.purple::after {
-            background: #9b59b6;
+        .filter-pill {
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            border: 1px solid var(--light-border);
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
         }
 
-        .stat-card.orange::after {
-            background: #e67e22;
+        .filter-pill:hover,
+        .filter-pill.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
         }
 
         /* Content Card */
         .content-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid var(--glass-border);
+            background: white;
             border-radius: var(--radius-xl);
-            box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.6), var(--card-shadow);
-            margin-bottom: 24px;
+            border: 1px solid var(--light-border);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 28px;
             overflow: hidden;
         }
 
-        .card-header-premium {
+        .content-card-header {
             padding: 20px 24px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid #f1f5f9;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            background: rgba(255, 255, 255, 0.4);
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
-        .card-title {
-            font-size: 18px;
+        .content-card-title {
+            font-size: 17px;
             font-weight: 800;
+            color: var(--dark);
             margin: 0;
-            color: var(--primary-light);
-            text-transform: uppercase;
-            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         /* Modern Table */
-        .table-premium {
+        .table-modern {
             width: 100%;
             margin-bottom: 0;
-            border-color: rgba(0, 0, 0, 0.05);
+            border-collapse: separate;
+            border-spacing: 0;
         }
 
-        .table-premium th {
-            padding: 16px 24px;
+        .table-modern thead th {
+            background: #f8fafc;
+            color: #64748b;
             font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #636E72;
-            background: rgba(255, 255, 255, 0.5);
-            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+            letter-spacing: 0.8px;
+            padding: 14px 24px;
+            border-bottom: 1px solid var(--light-border);
             border-top: none;
         }
 
-        .table-premium td {
-            padding: 16px 24px;
+        .table-modern tbody td {
+            padding: 18px 24px;
             vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
             font-size: 14px;
-            color: var(--primary-light);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            font-weight: 500;
+            color: var(--dark);
+            transition: background 0.15s ease;
         }
 
-        .table-premium tr:last-child td {
+        .table-modern tbody tr:last-child td {
             border-bottom: none;
         }
 
-        .table-premium tr:hover td {
-            background: rgba(75, 108, 183, 0.04);
+        .table-modern tbody tr:hover td {
+            background: #f8fafc;
         }
 
-        /* Status Badges */
-        .badge-soft {
+        /* Squircle Icon */
+        .squircle-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            flex-shrink: 0;
+        }
+
+        /* User Avatar */
+        .avatar-squircle {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+            flex-shrink: 0;
+        }
+
+        .avatar-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* Status Badge */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             padding: 6px 12px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
-        .badge-soft.success {
-            background: rgba(46, 204, 113, 0.15);
-            color: #27ae60;
+        .status-pill.pending {
+            background: #fffbeb;
+            color: #b45309;
+            border: 1px solid #fef3c7;
         }
 
-        .badge-soft.warning {
-            background: rgba(241, 196, 15, 0.15);
-            color: #d35400;
+        .status-pill.pending::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
         }
 
-        /* Animations */
-        .animate-up {
-            animation: fadeInUp 0.6s ease-out forwards;
-            opacity: 0;
-            transform: translateY(20px);
+        /* Buttons */
+        .btn-release-pay {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
         }
 
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
+        .btn-release-pay:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.45);
+            color: white;
+        }
+
+        /* Empty State */
+        .empty-state-card {
+            padding: 60px 24px;
+            text-align: center;
+        }
+
+        .empty-icon-circle {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12);
+        }
+
+        .empty-state-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .empty-state-desc {
+            color: #64748b;
+            font-size: 14.5px;
+            max-width: 520px;
+            margin: 0 auto 24px;
+            line-height: 1.6;
+        }
+
+        /* Security Trust Grid */
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 992px) {
+            .trust-grid {
+                grid-template-columns: 1fr;
             }
         }
 
-        .counter {
-            font-variant-numeric: tabular-nums;
+        .trust-tile {
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--light-border);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .trust-tile-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid #edf2f7;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .trust-tile-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .trust-tile-desc {
+            font-size: 13px;
+            color: #64748b;
+            margin: 0;
+            line-height: 1.5;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Unified Header -->
-    <th:block th:replace="fragments/client-header :: clientHeader('payments')"></th:block>
+    <!-- Unified Client Header -->
+    <th:block th:replace="fragments/client-header :: clientHeader('financials')"></th:block>
 
-    <div class="container-fluid py-3" style="max-width: 1400px;">
-
-        <!-- Header Section -->
-        <div class="d-flex justify-content-between align-items-center mb-4 animate-up">
-            <div>
-                <h2 class="fw-bold mb-1" style="color: var(--primary-light);">Financial Overview</h2>
-                <p class="text-muted mb-0">Track your project expenses and payment history.</p>
-            </div>
-            <a th:href="@{/client-dashboard/}" class="btn btn-outline-primary rounded-pill px-4">
-                <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
-            </a>
-        </div>
-
-        <!-- Stats Grid -->
-        <div class="stats-grid animate-up" style="animation-delay: 0.1s;">
-            <!-- Total Paid Stat -->
-            <div class="stat-card blue">
-                <div class="stat-value counter" th:data-target="${totalPaid != null ? totalPaid : 0}">0</div>
-                <div class="stat-label">Total Paid</div>
-                <i class="fas fa-wallet stat-icon"></i>
-            </div>
-
-            <!-- Avg Project Value (Derived) -->
-            <div class="stat-card green">
-                <div class="d-flex align-items-baseline">
-                    <span class="stat-value text-success">$</span>
-                    <div class="stat-value counter"
-                        th:data-target="${totalProjectValue != null ? totalProjectValue : 0}">0</div>
+    <!-- Page Header Banner -->
+    <div class="page-header">
+        <div class="page-container">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div class="header-title">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge rounded-pill fw-bold" style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 12px; padding: 6px 14px;">
+                            <i class="fas fa-shield-alt me-1"></i> 100% Escrow Protected
+                        </span>
+                        <span class="badge rounded-pill fw-bold" style="background: rgba(255, 255, 255, 0.1); color: #cbd5e1; font-size: 12px; padding: 6px 14px;">
+                            <i class="fas fa-bolt me-1"></i> Instant Disbursements
+                        </span>
+                    </div>
+                    <h1>Financial Overview & Payments</h1>
+                    <p>Monitor completed project expenditures, ongoing milestone escrow, and contractor disbursements.</p>
                 </div>
-                <div class="stat-label">Total Project Value</div>
-                <i class="fas fa-chart-pie stat-icon"></i>
-            </div>
-
-            <!-- Pending Projects -->
-            <div class="stat-card purple">
-                <div class="stat-value counter"
-                    th:data-target="${ongoingProjects != null ? ongoingProjects.size() : 0}">0</div>
-                <div class="stat-label">Active Projects</div>
-                <i class="fas fa-hourglass-half stat-icon"></i>
+                <div class="d-flex align-items-center gap-3">
+                    <a th:href="@{/contract/manage}" class="btn btn-outline-light rounded-pill px-4 btn-sm fw-bold">
+                        <i class="fas fa-file-contract me-2"></i> Manage Contracts
+                    </a>
+                    <a th:href="@{/client-dashboard/}" class="btn btn-light rounded-pill px-4 btn-sm fw-bold text-dark shadow-sm">
+                        <i class="fas fa-arrow-left me-2"></i> Dashboard
+                    </a>
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- Alert Messages -->
-        <div th:if="${error}" class="alert alert-danger shadow-sm rounded-4 animate-up" role="alert"
-            style="animation-delay: 0.2s;">
-            <i class="fas fa-exclamation-circle me-2"></i> <span th:text="${error}"></span>
+    <!-- Main Container -->
+    <div class="page-container flex-grow-1">
+
+        <!-- Flash Messages -->
+        <div th:if="${error}" class="alert alert-danger shadow-sm rounded-4 mb-4 d-flex align-items-center" role="alert">
+            <i class="fas fa-exclamation-circle me-3 fs-5"></i>
+            <div>
+                <strong>Action Needed:</strong> <span th:text="${error}"></span>
+            </div>
         </div>
-        <div th:if="${success}" class="alert alert-success shadow-sm rounded-4 animate-up" role="alert"
-            style="animation-delay: 0.2s;">
-            <i class="fas fa-check-circle me-2"></i> <span th:text="${success}"></span>
+        <div th:if="${success}" class="alert alert-success shadow-sm rounded-4 mb-4 d-flex align-items-center" role="alert">
+            <i class="fas fa-check-circle me-3 fs-5"></i>
+            <div>
+                <strong>Payment Successful:</strong> <span th:text="${success}"></span>
+            </div>
         </div>
 
-        <!-- Payments Table Card -->
-        <div class="content-card animate-up" style="animation-delay: 0.3s;">
-            <div class="card-header-premium">
-                <h5 class="card-title"><i class="fas fa-history me-2"></i> Active Projects & Payments</h5>
+        <!-- 4 Executive KPI Cards -->
+        <div class="kpi-grid">
+            <!-- Total Paid Card -->
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-top">
+                        <div class="kpi-icon-pill emerald">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <span class="kpi-badge emerald">
+                            <i class="fas fa-check-circle me-1"></i> Disbursed
+                        </span>
+                    </div>
+                    <div class="kpi-label">Total Paid</div>
+                    <div class="kpi-value text-success" th:text="${'$' + #numbers.formatDecimal(totalPaid ?: 0, 1, 'COMMA', 2, 'POINT')}">
+                        $0.00
+                    </div>
+                </div>
+                <p class="kpi-subtext">Total verified contractor payments</p>
+            </div>
+
+            <!-- Committed Escrow Value Card -->
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-top">
+                        <div class="kpi-icon-pill blue">
+                            <i class="fas fa-vault"></i>
+                        </div>
+                        <span class="kpi-badge blue">
+                            <i class="fas fa-lock me-1"></i> Escrow Held
+                        </span>
+                    </div>
+                    <div class="kpi-label">Active Project Value</div>
+                    <div class="kpi-value text-primary" th:text="${'$' + #numbers.formatDecimal(totalProjectValue ?: 0, 1, 'COMMA', 2, 'POINT')}">
+                        $0.00
+                    </div>
+                </div>
+                <p class="kpi-subtext">Committed for ongoing hired work</p>
+            </div>
+
+            <!-- Active Projects Count Card -->
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-top">
+                        <div class="kpi-icon-pill indigo">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <span class="kpi-badge indigo">
+                            <i class="fas fa-clock me-1"></i> In Progress
+                        </span>
+                    </div>
+                    <div class="kpi-label">Active Contracts</div>
+                    <div class="kpi-value" th:text="${ongoingProjects != null ? ongoingProjects.size() : 0}">
+                        0
+                    </div>
+                </div>
+                <p class="kpi-subtext">Freelancers hired on current projects</p>
+            </div>
+
+            <!-- Security & Platform Gateway -->
+            <div class="kpi-card">
+                <div>
+                    <div class="kpi-top">
+                        <div class="kpi-icon-pill amber">
+                            <i class="fas fa-shield-check"></i>
+                        </div>
+                        <span class="kpi-badge amber">
+                            <i class="fas fa-badge-check me-1"></i> Stripe PCI-DSS
+                        </span>
+                    </div>
+                    <div class="kpi-label">Platform Fee</div>
+                    <div class="kpi-value" style="color: #b45309;">
+                        5.0% Flat
+                    </div>
+                </div>
+                <p class="kpi-subtext">No hidden fees &bull; Instant tax receipts</p>
+            </div>
+        </div>
+
+        <!-- Filter & Control Toolbar -->
+        <div class="toolbar-card">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="projectSearchInput" placeholder="Search projects, freelancers, or rates..." onkeyup="filterProjectRows()" />
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+                <div class="filter-pills">
+                    <a href="javascript:void(0)" class="filter-pill active" onclick="setTabFilter('all', this)">
+                        <i class="fas fa-layer-group me-1"></i> All Postings
+                    </a>
+                    <a href="javascript:void(0)" class="filter-pill" onclick="setTabFilter('pending', this)">
+                        <i class="fas fa-hourglass-half me-1"></i> Pending Release
+                    </a>
+                </div>
+
+                <button class="btn btn-outline-secondary rounded-pill btn-sm px-3 fw-bold" onclick="window.print()" title="Print or Save PDF Statement">
+                    <i class="fas fa-print me-1"></i> Statement
+                </button>
+            </div>
+        </div>
+
+        <!-- Active Projects & Invoices Table Card -->
+        <div class="content-card">
+            <div class="content-card-header">
+                <div class="content-card-title">
+                    <i class="fas fa-receipt text-primary"></i> Active Projects & Pending Escrow
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 fw-bold fs-7 ms-2"
+                        th:text="${(ongoingProjects != null ? ongoingProjects.size() : 0) + ' Pending'}">0 Pending</span>
+                </div>
+                <div class="text-muted small">
+                    <i class="fas fa-info-circle me-1"></i> Funds are released to freelancers upon milestone sign-off.
+                </div>
             </div>
 
             <div class="table-responsive">
-                <table class="table table-premium table-hover">
+                <table class="table-modern" id="projectsTable">
                     <thead>
                         <tr>
                             <th>Project</th>
                             <th>Freelancer</th>
                             <th>Agreed Rate</th>
-                            <th>Status</th>
-                            <th>Action</th>
+                            <th>Escrow Status</th>
+                            <th class="text-end">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="project : ${ongoingProjects}">
+                        <tr th:each="project : ${ongoingProjects}" class="project-row">
+                            <!-- Project Details -->
                             <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="rounded-3 bg-light p-2 me-3 text-primary">
-                                        <i class="fas fa-rocket"></i>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="squircle-icon">
+                                        <i class="fas fa-laptop-code"></i>
                                     </div>
-                                    <span class="fw-bold"
-                                        th:text="${project.job?.jobTitle ?: 'Unknown Project'}">Project Title</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <!-- Use project.userId which IS the JobSeekerProfile -->
-                                    <div th:if="${project.userId != null}">
-                                        <!-- Corrected Image Path using helper -->
-                                        <img th:if="${project.userId.photosImagePath != null}"
-                                            th:src="@{${project.userId.photosImagePath}}"
-                                            class="rounded-circle border border-2 border-white shadow-sm me-2"
-                                            width="32" height="32"
-                                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-
-                                        <div th:unless="${project.userId.photosImagePath != null}"
-                                            class="rounded-circle bg-light d-flex align-items-center justify-content-center border border-2 border-white shadow-sm me-2 text-muted"
-                                            style="width: 32px; height: 32px; font-size: 12px;">
-                                            <span
-                                                th:text="${project.userId.firstName != null ? #strings.substring(project.userId.firstName, 0, 1) : 'U'}">U</span>
+                                    <div>
+                                        <div class="fw-bold project-title" th:text="${project.job?.jobTitle ?: 'Project Title'}">
+                                            Full Stack Web App
                                         </div>
-                                        <span
-                                            th:text="${(project.userId.firstName ?: '') + ' ' + (project.userId.lastName ?: '')}">Freelancer
-                                            Name</span>
-                                    </div>
-                                    <div th:unless="${project.userId != null}">
-                                        <span class="text-muted">Unknown Freelancer</span>
+                                        <small class="text-muted" th:text="${'Job ID #' + (project.job?.jobPostId ?: 'N/A')}">
+                                            Job ID #101
+                                        </small>
                                     </div>
                                 </div>
                             </td>
-                            <td class="fw-bold text-dark" th:text="${'$' + (project.proposedRate ?: '0.00')}">$0.00</td>
+
+                            <!-- Freelancer Info -->
                             <td>
-                                <span class="badge-soft warning">Pending Payment</span>
+                                <div class="d-flex align-items-center gap-3">
+                                    <img th:if="${project.userId != null and project.userId.photosImagePath != null}"
+                                        th:src="@{${project.userId.photosImagePath}}" class="avatar-squircle"
+                                        alt="Freelancer Avatar"
+                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+
+                                    <div th:unless="${project.userId != null and project.userId.photosImagePath != null}"
+                                        class="avatar-placeholder"
+                                        th:text="${project.userId != null and project.userId.firstName != null ? #strings.substring(project.userId.firstName, 0, 1) : 'F'}">
+                                        F
+                                    </div>
+
+                                    <div>
+                                        <div class="fw-bold freelancer-name"
+                                            th:text="${project.userId != null ? ((project.userId.firstName ?: '') + ' ' + (project.userId.lastName ?: '')) : 'Freelancer'}">
+                                            Freelancer Name
+                                        </div>
+                                        <small class="text-muted">
+                                            <i class="fas fa-check-circle text-success me-1" style="font-size: 11px;"></i> Assigned Contractor
+                                        </small>
+                                    </div>
+                                </div>
                             </td>
+
+                            <!-- Agreed Rate -->
                             <td>
+                                <div class="fw-bold text-dark fs-6"
+                                    th:text="${'$' + #numbers.formatDecimal(project.proposedRate ?: 0, 1, 'COMMA', 2, 'POINT')}">
+                                    $0.00
+                                </div>
+                                <small class="text-muted">+ 5% platform fee</small>
+                            </td>
+
+                            <!-- Escrow Status -->
+                            <td>
+                                <span class="status-pill pending">
+                                    Pending Release
+                                </span>
+                            </td>
+
+                            <!-- Action Button -->
+                            <td class="text-end">
                                 <form th:if="${project.job != null}" th:action="@{/client-dashboard/process-payment}"
-                                    method="post" class="d-inline">
+                                    method="post" class="d-inline" onsubmit="return confirmPayment(this, event)">
                                     <input type="hidden" name="projectId" th:value="${project.job.jobPostId}" />
                                     <input type="hidden" name="paymentMethod" value="Direct Transfer" />
-                                    <!-- Pay Now Button -->
-                                    <button type="submit"
-                                        class="btn btn-success btn-sm rounded-pill px-4 fw-bold shadow-sm"
-                                        style="min-width: 100px; height: 32px; font-size: 13px; transition: all 0.3s ease;"
-                                        onclick="return confirm('Process payment for this project?')">
-                                        <i class="fas fa-credit-card me-2"></i>Pay Now
+                                    <button type="submit" class="btn-release-pay">
+                                        <i class="fas fa-credit-card"></i> Release Payment
                                     </button>
                                 </form>
                             </td>
                         </tr>
+
                         <!-- Empty State -->
                         <tr th:if="${ongoingProjects == null or ongoingProjects.isEmpty()}">
-                            <td colspan="5" class="text-center py-5 text-muted">
-                                <i class="fas fa-folder-open fa-2x mb-3 opacity-50"></i>
-                                <p class="mb-0">No active projects requiring payment.</p>
+                            <td colspan="5" class="p-0">
+                                <div class="empty-state-card">
+                                    <div class="empty-icon-circle">
+                                        <i class="fas fa-file-invoice-dollar"></i>
+                                    </div>
+                                    <h4 class="empty-state-title">No Invoices Requiring Immediate Action</h4>
+                                    <p class="empty-state-desc">
+                                        All current engagements and milestones have been settled. When your hired freelancers submit milestone deliverables, your one-click release actions will appear right here.
+                                    </p>
+                                    <div class="d-flex align-items-center justify-content-center gap-3">
+                                        <a th:href="@{/client-dashboard/proposals}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+                                            <i class="fas fa-envelope-open-text me-2"></i> Review Proposals
+                                        </a>
+                                        <a th:href="@{/find-talent/}" class="btn btn-outline-secondary rounded-pill px-4 fw-bold">
+                                            <i class="fas fa-search me-2"></i> Find Talent
+                                        </a>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -373,54 +804,91 @@
             </div>
         </div>
 
+        <!-- Escrow Protection & Trust Features -->
+        <div class="trust-grid">
+            <div class="trust-tile">
+                <div class="trust-tile-icon">
+                    <i class="fas fa-vault"></i>
+                </div>
+                <div>
+                    <h5 class="trust-tile-title">Milestone Escrow Protection</h5>
+                    <p class="trust-tile-desc">
+                        Your deposit is held safely in escrow and only released to the contractor when you review and sign off on deliverables.
+                    </p>
+                </div>
+            </div>
+
+            <div class="trust-tile">
+                <div class="trust-tile-icon">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <div>
+                    <h5 class="trust-tile-title">Itemized Invoicing & Tax Receipts</h5>
+                    <p class="trust-tile-desc">
+                        Every transaction generates a verifiable, PDF-exportable corporate invoice including applicable taxes and fee breakdowns.
+                    </p>
+                </div>
+            </div>
+
+            <div class="trust-tile">
+                <div class="trust-tile-icon">
+                    <i class="fas fa-scale-balanced"></i>
+                </div>
+                <div>
+                    <h5 class="trust-tile-title">24/7 Dispute Mediation</h5>
+                    <p class="trust-tile-desc">
+                        Our neutral resolution desk protects both clients and freelancers in case deliverables do not meet agreed specifications.
+                    </p>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Scripts -->
+    <!-- Unified Footer -->
+    <th:block th:replace="fragments/footer :: footer"></th:block>
 
+    <!-- Interactive Scripts -->
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Check visibility of elements first
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, { threshold: 0.1 });
-
-            document.querySelectorAll('.animate-up').forEach(el => observer.observe(el));
-
-
-            // Dynamic Counter Animation
-            const counters = document.querySelectorAll('.counter');
-            counters.forEach(counter => {
-                const targetText = counter.getAttribute('data-target');
-                const target = targetText ? +targetText : 0;
-
-                const duration = 1500; // 1.5s animation
-                const increment = target > 0 ? target / (duration / 16) : 0;
-
-                if (target === 0) {
-                    counter.innerText = "0";
-                    return;
-                }
-
-                let current = 0;
-                const updateCounter = () => {
-                    current += increment;
-                    if (current < target) {
-                        counter.innerText = Math.ceil(current);
-                        requestAnimationFrame(updateCounter);
-                    } else {
-                        counter.innerText = target;
-                    }
-                };
-                // Small delay to start animation after page load
-                setTimeout(updateCounter, 300);
+        // Live search filter for project rows
+        function filterProjectRows() {
+            const query = document.getElementById('projectSearchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('.project-row');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(query) ? '' : 'none';
             });
-        });
-    </script>
+        }
 
+        // Tab filter helper
+        function setTabFilter(tab, element) {
+            document.querySelectorAll('.filter-pill').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            const rows = document.querySelectorAll('.project-row');
+            rows.forEach(row => row.style.display = '');
+        }
+
+        // SweetAlert payment confirmation
+        function confirmPayment(form, event) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Release Escrow Payment?',
+                text: 'This will disburse funds to the freelancer and complete this project milestone.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Yes, Release Payment',
+                cancelButtonText: 'Review First',
+                borderRadius: '16px'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+            return false;
+        }
+    </script>
 </body>
 
 </html>

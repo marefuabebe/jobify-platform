@@ -72,12 +72,7 @@ public class JobPostActivityService {
         JobPostActivity job = jobPostActivityRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Job not found"));
 
-        // Populate transient verification flag
-        if (job.getPostedById() != null) {
-            recruiterProfileRepository.findById(job.getPostedById().getUserId())
-                    .ifPresent(profile -> job.setPostedByVerified(profile.getIsVerified()));
-        }
-
+        populateRecruiterDetails(job);
         return job;
     }
 
@@ -278,7 +273,49 @@ public class JobPostActivityService {
     }
 
     public List<JobPostActivity> getRecentJobs() {
-        return jobPostActivityRepository.getRecentJobs();
+        List<JobPostActivity> recentJobs = jobPostActivityRepository.getRecentJobs();
+        if (recentJobs != null) {
+            recentJobs.forEach(this::populateRecruiterDetails);
+        }
+        return recentJobs;
+    }
+
+    private void populateRecruiterDetails(JobPostActivity job) {
+        if (job == null) return;
+        if (job.getPostedById() != null) {
+            try {
+                recruiterProfileRepository.findById(job.getPostedById().getUserId()).ifPresent(profile -> {
+                    job.setPostedByVerified(Boolean.TRUE.equals(profile.getIsVerified()));
+                    job.setRecruiterFirstName(profile.getFirstName());
+                    job.setRecruiterLastName(profile.getLastName());
+                    job.setRecruiterCity(profile.getCity());
+                    job.setRecruiterCountry(profile.getCountry());
+                    job.setRecruiterProfilePhoto(profile.getPhotosImagePath());
+
+                    String comp = profile.getCompany();
+                    if (comp == null || comp.trim().isEmpty()) {
+                        if (job.getJobCompanyId() != null && job.getJobCompanyId().getName() != null
+                                && !job.getJobCompanyId().getName().trim().isEmpty()) {
+                            comp = job.getJobCompanyId().getName();
+                        } else {
+                            String fullName = ((profile.getFirstName() != null ? profile.getFirstName().trim() : "") + " "
+                                    + (profile.getLastName() != null ? profile.getLastName().trim() : "")).trim();
+                            comp = !fullName.isEmpty() ? fullName : "Verified Client";
+                        }
+                    }
+                    job.setRecruiterCompany(comp.trim());
+                });
+            } catch (Exception ignored) {
+            }
+        }
+        if (job.getRecruiterCompany() == null || job.getRecruiterCompany().trim().isEmpty()) {
+            if (job.getJobCompanyId() != null && job.getJobCompanyId().getName() != null
+                    && !job.getJobCompanyId().getName().trim().isEmpty()) {
+                job.setRecruiterCompany(job.getJobCompanyId().getName().trim());
+            } else {
+                job.setRecruiterCompany("Verified Client");
+            }
+        }
     }
 
     public List<JobCompany> getTrustedCompanies() {

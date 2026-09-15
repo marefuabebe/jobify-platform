@@ -20,6 +20,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +50,7 @@ public class AdminController {
     private final PaymentRepository paymentRepository;
     private final TestimonialsService testimonialsService;
     private final StripeService stripeService; // Inject Service
+    private final CloudinaryService cloudinaryService;
 
     @Autowired
     public AdminController(UsersService usersService, JobPostActivityService jobPostActivityService,
@@ -57,7 +60,8 @@ public class AdminController {
             JobSeekerProfileRepository jobSeekerProfileRepository, JobPostActivityRepository jobPostActivityRepository,
             UsersRepository usersRepository, NotificationService notificationService,
             DisputeService disputeService, PaymentRepository paymentRepository,
-            TestimonialsService testimonialsService, StripeService stripeService) { // Add to constructor
+            TestimonialsService testimonialsService, StripeService stripeService,
+            CloudinaryService cloudinaryService) { // Add to constructor
         this.usersService = usersService;
         this.jobPostActivityService = jobPostActivityService;
         this.jobSeekerApplyService = jobSeekerApplyService;
@@ -74,6 +78,7 @@ public class AdminController {
         this.paymentRepository = paymentRepository;
         this.testimonialsService = testimonialsService;
         this.stripeService = stripeService;
+        this.cloudinaryService = cloudinaryService;
     }
 
     // ... existing mappings ...
@@ -588,6 +593,12 @@ public class AdminController {
                 return org.springframework.http.ResponseEntity.notFound().build();
             }
 
+            if (fileName.startsWith("http://") || fileName.startsWith("https://")) {
+                return org.springframework.http.ResponseEntity.status(org.springframework.http.HttpStatus.FOUND)
+                        .location(java.net.URI.create(fileName))
+                        .build();
+            }
+
             com.webapp.jobportal.util.FileDownloadUtil downloadUtil = new com.webapp.jobportal.util.FileDownloadUtil();
             org.springframework.core.io.Resource resource = downloadUtil.getFileAsResourse(uploadDir, fileName);
 
@@ -864,17 +875,21 @@ public class AdminController {
             Users user = usersRepository.findByEmail(auth.getName()).orElse(null);
 
             if (user != null && !multipartFile.isEmpty()) {
-                String originalFilename = multipartFile.getOriginalFilename();
-                if (originalFilename != null) {
-                    String fileName = org.springframework.util.StringUtils.cleanPath(originalFilename);
-                    user.setPhotos(fileName);
-                    usersService.save(user);
+                String folder = "jobportal/users/" + user.getUserId();
+                String photoUrl = cloudinaryService.uploadImage(multipartFile, folder);
+                user.setPhotos(photoUrl);
+                usersService.save(user);
 
-                    String uploadDir = "photos/users/" + user.getUserId();
-                    com.webapp.jobportal.util.FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+                try {
+                    String originalFilename = multipartFile.getOriginalFilename();
+                    if (originalFilename != null) {
+                        String fileName = org.springframework.util.StringUtils.cleanPath(originalFilename);
+                        String uploadDir = "photos/users/" + user.getUserId();
+                        com.webapp.jobportal.util.FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+                    }
+                } catch (Exception ignored) {}
 
-                    redirectAttributes.addFlashAttribute("success", "Profile picture updated successfully!");
-                }
+                redirectAttributes.addFlashAttribute("success", "Profile picture updated successfully!");
             }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error uploading profile picture: " + e.getMessage());
@@ -1068,6 +1083,27 @@ public class AdminController {
         return "admin/analytics";
     }
 
+    @PostMapping("/theme/toggle")
+    public String toggleTheme(HttpServletRequest request, HttpSession session) {
+        String current = (String) session.getAttribute("theme");
+        String next = "dark".equalsIgnoreCase(current) ? "light" : "dark";
+        session.setAttribute("theme", next);
+
+        // Prefer returning to the current page; fall back safely.
+        String ref = request.getHeader("Referer");
+        String fallback = "/admin/dashboard";
+        if (ref == null || ref.isBlank()) {
+            return "redirect:" + fallback;
+        }
+        // If an absolute URL is provided, Spring will still treat it as a redirect target.
+        return "redirect:" + ref;
+    }
+
+    @GetMapping("/theme/toggle")
+    public String toggleThemeGet(HttpServletRequest request, HttpSession session) {
+        return toggleTheme(request, session);
+    }
+
     // Testimonials Management
     @GetMapping("/testimonials")
     public String testimonials(Model model) {
@@ -1081,12 +1117,19 @@ public class AdminController {
             RedirectAttributes redirectAttributes) {
         try {
             if (multipartFile != null && !multipartFile.isEmpty()) {
-                String fileName = org.springframework.util.StringUtils.cleanPath(multipartFile.getOriginalFilename());
-                testimonial.setImageUrl(fileName);
+                String folder = "jobportal/testimonials";
+                String imageUrl = cloudinaryService.uploadImage(multipartFile, folder);
+                testimonial.setImageUrl(imageUrl);
                 testimonialsService.saveTestimonial(testimonial);
 
-                String uploadDir = "photos/testimonials/" + testimonial.getId();
-                com.webapp.jobportal.util.FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+                try {
+                    String originalFilename = multipartFile.getOriginalFilename();
+                    String fileName = org.springframework.util.StringUtils
+                            .cleanPath(originalFilename != null ? originalFilename
+                                    : ("testimonial-" + System.currentTimeMillis()));
+                    String uploadDir = "photos/testimonials/" + testimonial.getId();
+                    com.webapp.jobportal.util.FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+                } catch (Exception ignored) {}
             } else {
                 testimonialsService.saveTestimonial(testimonial);
             }

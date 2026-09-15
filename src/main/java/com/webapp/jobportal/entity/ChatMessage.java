@@ -40,7 +40,7 @@ public class ChatMessage {
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
 
-    @Column(name = "attachment_path")
+    @Column(name = "attachment_path", length = 500)
     private String attachmentPath;
 
     @Column(name = "attachment_type")

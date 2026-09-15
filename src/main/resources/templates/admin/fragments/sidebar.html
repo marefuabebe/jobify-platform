@@ -82,6 +82,14 @@
                 </a>
             </div>
         </nav>
+
+        <div class="sidebar-footer-action">
+            <a th:href="@{/admin/theme/toggle}" class="btn btn-outline-secondary w-100"
+                style="border-radius: 12px; border-color: var(--border); color: var(--text-light);">
+                <i class="fas me-2" th:classappend="${session.theme == 'dark' ? 'fa-sun' : 'fa-moon'}"></i>
+                <span th:text="${session.theme == 'dark' ? 'Light mode' : 'Dark mode'}">Dark mode</span>
+            </a>
+        </div>
     </aside>
 </body>
 

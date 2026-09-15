@@ -351,7 +351,7 @@
     </style>
 </head>
 
-<body>
+<body th:classappend="${session.theme == 'dark' ? 'dark-theme' : 'light-theme'}">
     <!-- Sidebar -->
     <aside class="admin-sidebar" id="sidebar">
         <div class="sidebar-brand">
@@ -417,7 +417,13 @@
             </div>
 
             <div class="d-flex align-items-center gap-2">
-                <!-- Theme Toggle Removed -->
+                <form th:action="@{/admin/theme/toggle}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas me-1"
+                            th:classappend="${session.theme == 'dark' ? 'fa-sun' : 'fa-moon'}"></i>
+                        <span th:text="${session.theme == 'dark' ? 'Light' : 'Dark'}">Dark</span>
+                    </button>
+                </form>
                 <a th:href="@{/logout}" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>

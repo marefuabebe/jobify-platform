@@ -1,45 +1,49 @@
 package com.webapp.jobportal.services;
 
 import com.webapp.jobportal.entity.JobPostActivity;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class EmailService {
 
-        private final JavaMailSender mailSender;
+        @Value("${jobify.email.proxy.url:}")
+        private String proxyUrl;
 
-        @Autowired
-        public EmailService(JavaMailSender mailSender) {
-                this.mailSender = mailSender;
-        }
+        private final RestTemplate restTemplate = new RestTemplate();
 
         public void sendEmail(String to, String subject, String text) {
                 sendEmail(to, subject, text, false);
         }
 
         public void sendEmail(String to, String subject, String text, boolean isHtml) {
+                if (proxyUrl == null || proxyUrl.isEmpty() || proxyUrl.equals("YOUR_GAS_WEBAPP_URL")) {
+                        System.err.println("Email proxy URL is not configured. Email to " + to + " was not sent.");
+                        return;
+                }
+
                 try {
-                        MimeMessage message = mailSender.createMimeMessage();
-                        MimeMessageHelper helper = new MimeMessageHelper(message,
-                                        MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-                                        StandardCharsets.UTF_8.name());
+                        HttpHeaders headers = new HttpHeaders();
+                        headers.setContentType(MediaType.APPLICATION_JSON);
 
-                        helper.setTo(to);
-                        helper.setSubject(subject);
-                        helper.setText(text, isHtml);
-                        helper.setFrom("noreply@jobportal.com"); // Set a default from address
+                        Map<String, String> payload = new HashMap<>();
+                        payload.put("to", to);
+                        payload.put("subject", subject);
+                        payload.put("html", text); // GAS script expects 'html' key for HTML content, or we can just send it as 'html' and the GAS script sets htmlBody
 
-                        mailSender.send(message);
-                } catch (MessagingException e) {
-                        System.err.println("Error sending email: " + e.getMessage());
-                        // In production, log this properly
+                        HttpEntity<Map<String, String>> request = new HttpEntity<>(payload, headers);
+                        
+                        String response = restTemplate.postForObject(proxyUrl, request, String.class);
+                        System.out.println("Email sent via Proxy. Response: " + response);
+                } catch (Exception e) {
+                        System.err.println("Error sending email via Proxy: " + e.getMessage());
                 }
         }
 
@@ -498,5 +502,28 @@ public class EmailService {
                 String htmlContent = buildHtmlEmail(subject, "Admin", content, "Review Contract",
                                 "http://localhost:8080/admin/contracts"); // Placeholder Admin URL
                 sendEmail(adminEmail, subject, htmlContent, true);
+        }
+
+        public void sendPasswordResetEmail(String userEmail, String resetLink) {
+                String subject = "Password Reset Request";
+                String content = "<p>We received a request to reset the password for your Jobify account.</p>" +
+                                "<p>If you made this request, please click the button below to set a new password. " +
+                                "This link will expire in 24 hours.</p>" +
+                                "<p class='info-box' style='border-left-color: #ffc107;'>" +
+                                "If you did not request a password reset, you can safely ignore this email.</p>";
+
+                String htmlContent = buildHtmlEmail(subject, "User", content, "Reset Password", resetLink);
+                sendEmail(userEmail, subject, htmlContent, true);
+        public void sendVerificationEmail(String userEmail, String userName, String verificationLink) {
+                String subject = "Verify your Jobify Account";
+                String content = "<p>Welcome to Jobify!</p>" +
+                                "<p>Before you can log in and start using your account, we need to verify your email address.</p>" +
+                                "<p>Please click the button below to verify your email. " +
+                                "This link will expire in 5 minutes.</p>" +
+                                "<p class='info-box' style='border-left-color: #28a745;'>" +
+                                "If you did not create this account, you can safely ignore this email.</p>";
+
+                String htmlContent = buildHtmlEmail(subject, userName, content, "Verify Email Address", verificationLink);
+                sendEmail(userEmail, subject, htmlContent, true);
         }
 }

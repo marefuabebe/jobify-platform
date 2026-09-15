@@ -18,7 +18,7 @@ public class Milestone {
     private String description;
     private Double amount;
 
-    private String status; // PENDING, FUNDED, IN_PROGRESS, SUBMITTED, APPROVED, WITHDRAWN
+    private String status; // PENDING, FUNDED, IN_PROGRESS, SUBMITTED, APPROVED, AVAILABLE_BALANCE, WITHDRAWN, DISPUTED
 
     @Column(name = "stripe_session_id")
     private String stripeSessionId;

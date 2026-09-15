@@ -103,7 +103,7 @@ public class Users implements Serializable {
         this.registrationDate = registrationDate;
     }
 
-    @Column(nullable = true, length = 64)
+    @Column(nullable = true, length = 500)
     private String photos;
 
     @Column(name = "stripe_account_id")
@@ -135,8 +135,11 @@ public class Users implements Serializable {
 
     @Transient
     public String getPhotosImagePath() {
-        if (photos == null || userId == 0)
+        if (photos == null || photos.isEmpty() || userId == 0)
             return null;
+        if (photos.startsWith("http://") || photos.startsWith("https://")) {
+            return photos;
+        }
         return "/photos/users/" + userId + "/" + photos;
     }
 

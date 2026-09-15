@@ -915,7 +915,7 @@
                                 <div class="recruiter-info">
                                     <div class="recruiter-avatar">
                                         <img th:if="${job.recruiterProfilePhoto != null and job.recruiterProfilePhoto != '' and job.recruiterUserAccountId != null}"
-                                            th:src="@{'/photos/recruiter/' + ${job.recruiterUserAccountId} + '/' + ${job.recruiterProfilePhoto}}"
+                                            th:src="${job.recruiterProfilePhoto.startsWith('http') ? job.recruiterProfilePhoto : '/photos/recruiter/' + job.recruiterUserAccountId + '/' + job.recruiterProfilePhoto}"
                                             alt="Recruiter Profile"
                                             style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(251, 79, 20, 0.2);" />
                                         <i th:unless="${job.recruiterProfilePhoto != null and job.recruiterProfilePhoto != '' and job.recruiterUserAccountId != null}"

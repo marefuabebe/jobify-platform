@@ -87,6 +87,24 @@ public class ContractController {
             milestone.setStripeSessionId(paymentIntent.getId()); // Saving Intent ID here for tracking
             milestoneRepository.save(milestone);
 
+            // Ensure Payment record exists with status PENDING for this milestone
+            Payment payment = paymentRepository.findByStripeSessionId(paymentIntent.getId());
+            if (payment == null) {
+                payment = new Payment();
+                payment.setPayer(client);
+                payment.setPayee(freelancer);
+                payment.setJob(application.getJob());
+                payment.setMilestone(milestone);
+                payment.setAmount(milestone.getAmount());
+                payment.setServiceFee(milestone.getAmount() * 0.10);
+                payment.setTotalAmount(milestone.getAmount());
+                payment.setPaymentDate(new Date());
+                payment.setPaymentMethod("Stripe Escrow");
+                payment.setStatus("PENDING");
+                payment.setStripeSessionId(paymentIntent.getId());
+                paymentRepository.save(payment);
+            }
+
             model.addAttribute("clientSecret", paymentIntent.getClientSecret());
             model.addAttribute("stripePublicKey", stripePublicKey);
             model.addAttribute("milestone", milestone);
@@ -95,7 +113,7 @@ public class ContractController {
             return "contract-checkout";
         } catch (StripeException e) {
             e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error", "Payment initiation failed.");
+            redirectAttributes.addFlashAttribute("error", "Payment initiation failed: " + e.getMessage());
             return "redirect:/job-details-apply/" + application.getJob().getJobPostId();
         }
     }
@@ -239,27 +257,43 @@ public class ContractController {
         Milestone milestone = milestoneRepository.findById(milestoneId).orElseThrow();
 
         // 1. Update Statuses
-        milestone.setStatus("APPROVED");
+        // Client has approved; funds are now available in freelancer's platform balance.
+        milestone.setStatus("AVAILABLE_BALANCE");
         milestoneRepository.save(milestone);
 
         Contract contract = milestone.getContract();
         contract.setStatus("ACTIVE");
         contractRepository.save(contract);
 
-        // 2. Record Payment (funds released from escrow to freelancer's Available
-        // Balance on platform)
-        Payment payment = new Payment(
-                contract.getClient(),
-                contract.getFreelancer(),
-                contract.getJobApplication().getJob(),
-                milestone.getAmount(),
-                0.0,
-                milestone.getAmount(),
-                "Stripe Escrow",
-                "COMPLETED"); // Funds now in freelancer's Available Balance; withdrawn when they cash out via
-                              // Stripe
-        payment.setMilestone(milestone);
-        paymentRepository.save(payment);
+        // 2. Update existing Payment or record new Payment (funds released from escrow to freelancer's Available Balance on platform)
+        Payment payment = null;
+        if (milestone.getStripeSessionId() != null) {
+            payment = paymentRepository.findByStripeSessionId(milestone.getStripeSessionId());
+        }
+        if (payment == null) {
+            List<Payment> jobPayments = paymentRepository.findByJob(contract.getJobApplication().getJob());
+            payment = jobPayments.stream()
+                    .filter(p -> p.getMilestone() != null && p.getMilestone().getId().equals(milestone.getId()))
+                    .findFirst().orElse(null);
+        }
+
+        if (payment != null) {
+            payment.setStatus("COMPLETED");
+            payment.setPaymentDate(new Date());
+            paymentRepository.save(payment);
+        } else {
+            payment = new Payment(
+                    contract.getClient(),
+                    contract.getFreelancer(),
+                    contract.getJobApplication().getJob(),
+                    milestone.getAmount(),
+                    milestone.getAmount() * 0.10,
+                    milestone.getAmount(),
+                    "Stripe Escrow",
+                    "COMPLETED");
+            payment.setMilestone(milestone);
+            paymentRepository.save(payment);
+        }
 
         // Notify Freelancer
         notificationService.createNotification(
@@ -291,7 +325,7 @@ public class ContractController {
         }
 
         // 1. Revert Status
-        milestone.setStatus("FUNDED");
+        milestone.setStatus("IN_PROGRESS");
         milestoneRepository.save(milestone);
 
         Contract contract = milestone.getContract();
@@ -324,6 +358,16 @@ public class ContractController {
         // 1. Update Contract Status
         contract.setStatus("DISPUTED");
         contractRepository.save(contract);
+
+        // 1b. Freeze milestone workflow while disputed
+        // (Funds are held; no approval/withdrawal should proceed until admin decision.)
+        for (Milestone m : contract.getMilestones()) {
+            String s = m.getStatus();
+            if ("FUNDED".equals(s) || "IN_PROGRESS".equals(s) || "SUBMITTED".equals(s)) {
+                m.setStatus("DISPUTED");
+                milestoneRepository.save(m);
+            }
+        }
 
         // 2. Notify Admin (simulated via email or just log/notification)
         // In a real app, this would go to an admin dashboard

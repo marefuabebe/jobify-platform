@@ -195,10 +195,9 @@
             }
         </style>
 
-        <div class="container-fluid" style="padding-left: 0.25rem; padding-right: 0.25rem;">
-            <a class="navbar-brand d-flex align-items-center"
-                style="font-size: 1.25rem; margin-right: 1.5rem; padding-left: 0; margin-left: 50px;"
-                th:href="@{/freelancer-dashboard/}">
+        <div class="container-fluid px-3 px-xl-4" style="max-width: 1440px;">
+            <a class="navbar-brand d-flex align-items-center me-3 me-xl-4"
+                style="font-size: 1.35rem; font-weight: 800; letter-spacing: -0.5px;" th:href="@{/freelancer-dashboard/}">
                 Job<span style="color: #0d6efd;">ify</span>.
             </a>
 
@@ -281,7 +280,7 @@
                     </div>
                 </div>
 
-                <ul class="navbar-nav mb-2 mb-lg-0 mx-auto" style="gap: 12px;">
+                <ul class="navbar-nav mb-2 mb-lg-0 mx-auto" style="gap: 6px;">
                     <li class="nav-item">
                         <a class="nav-link" th:classappend="${activePage == 'dashboard' ? 'active' : ''}"
                             th:href="@{/freelancer-dashboard/}">
@@ -352,6 +351,15 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" th:classappend="${activePage == 'notifications' ? 'active' : ''}"
+                            th:href="@{/notifications}">
+                            <i class="fas fa-bell fa-sm"></i> Notifications
+                            <span class="badge bg-danger rounded-pill ms-1"
+                                th:if="${unreadNotificationsCount != null and unreadNotificationsCount > 0}"
+                                th:text="${unreadNotificationsCount}">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" th:classappend="${activePage == 'profile' ? 'active' : ''}"
                             th:href="@{/job-seeker-profile/}">
                             <i class="fas fa-user fa-sm"></i> Profile
@@ -359,15 +367,20 @@
                     </li>
                 </ul>
 
-                <!-- Desktop: User Profile (Hidden on Mobile) -->
-                <div class="d-none d-lg-flex align-items-center ms-3" th:if="${user != null}"
-                    style="margin-right: 50px;">
-                    <ul class="navbar-nav align-items-center">
+                <!-- Desktop: User Profile & Actions (Hidden on Mobile) -->
+                <div class="d-none d-lg-flex align-items-center ms-auto gap-3" th:if="${user != null}">
+                    <a th:href="@{/find-work/}" class="btn btn-outline-light btn-sm rounded-pill px-3 py-2 fw-bold d-flex align-items-center gap-2"
+                        style="font-size: 0.82rem; white-space: nowrap; border-color: rgba(255,255,255,0.25);">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Find Work</span>
+                    </a>
+
+                    <ul class="navbar-nav align-items-center mb-0">
                         <!-- Notification Dropdown -->
                         <th:block th:replace="fragments/notification-dropdown :: notificationDropdown"></th:block>
                     </ul>
 
-                    <div class="dropdown ms-3">
+                    <div class="dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center p-0" href="#" id="userDropdown"
                             role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <img th:if="${user.photosImagePath != null}" th:src="@{${user.photosImagePath}}"

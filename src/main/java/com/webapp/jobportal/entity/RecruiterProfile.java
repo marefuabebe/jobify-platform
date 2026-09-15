@@ -33,13 +33,13 @@ public class RecruiterProfile {
     @Column(name = "company")
     private String company;
 
-    @Column(name = "profile_photo", nullable = true, length = 255)
+    @Column(name = "profile_photo", nullable = true, length = 500)
     private String profilePhoto;
 
-    @Column(name = "verification_document", nullable = true)
+    @Column(name = "verification_document", nullable = true, length = 500)
     private String verificationDocument;
 
-    @Column(name = "business_license", nullable = true)
+    @Column(name = "business_license", nullable = true, length = 500)
     private String businessLicense;
 
     @Column(name = "is_verified")
@@ -229,15 +229,18 @@ public class RecruiterProfile {
 
     @Transient
     public String getPhotosImagePath() {
-        if (profilePhoto == null)
+        if (profilePhoto == null || profilePhoto.isEmpty())
             return null;
+        if (profilePhoto.startsWith("http://") || profilePhoto.startsWith("https://")) {
+            return profilePhoto;
+        }
         return "/photos/recruiter/" + userAccountId + "/" + profilePhoto;
     }
 
-    @Column(name = "verification_front", nullable = true)
+    @Column(name = "verification_front", nullable = true, length = 500)
     private String verificationFront;
 
-    @Column(name = "verification_back", nullable = true)
+    @Column(name = "verification_back", nullable = true, length = 500)
     private String verificationBack;
 
     public String getVerificationFront() {

@@ -39,6 +39,7 @@ public class ChatController {
     private final JobSeekerApplyService jobSeekerApplyService;
     private final NotificationService notificationService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final com.webapp.jobportal.services.CloudinaryService cloudinaryService;
 
     // File upload directory
     private final String uploadDir = "photos/";
@@ -48,13 +49,15 @@ public class ChatController {
             JobPostActivityService jobPostActivityService,
             JobSeekerApplyService jobSeekerApplyService,
             NotificationService notificationService,
-            SimpMessagingTemplate messagingTemplate) {
+            SimpMessagingTemplate messagingTemplate,
+            com.webapp.jobportal.services.CloudinaryService cloudinaryService) {
         this.chatService = chatService;
         this.usersService = usersService;
         this.jobPostActivityService = jobPostActivityService;
         this.jobSeekerApplyService = jobSeekerApplyService;
         this.notificationService = notificationService;
         this.messagingTemplate = messagingTemplate;
+        this.cloudinaryService = cloudinaryService;
     }
 
     @GetMapping({ "/", "" })
@@ -466,22 +469,6 @@ public class ChatController {
             throw new RuntimeException("Unauthorized");
 
         try {
-            String filename = org.springframework.util.StringUtils
-                    .cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-            // Basic unique name
-            String uniqueFilename = System.currentTimeMillis() + "_" + filename;
-
-            // Save to user-photos directory (reusing existing static resource mapping)
-            java.nio.file.Path uploadPath = java.nio.file.Paths.get(uploadDir);
-            if (!java.nio.file.Files.exists(uploadPath)) {
-                java.nio.file.Files.createDirectories(uploadPath);
-            }
-
-            try (java.io.InputStream inputStream = file.getInputStream()) {
-                java.nio.file.Path filePath = uploadPath.resolve(uniqueFilename);
-                java.nio.file.Files.copy(inputStream, filePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            }
-
             // Determine type
             String contentType = file.getContentType();
             String type = "FILE";
@@ -490,6 +477,23 @@ public class ChatController {
             } else if (contentType != null && contentType.startsWith("audio")) {
                 type = "AUDIO";
             }
+
+            String folder = "jobportal/chat/" + currentUser.getUserId();
+            String attachmentUrl = cloudinaryService.uploadMedia(file, folder);
+
+            try {
+                String filename = org.springframework.util.StringUtils
+                        .cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+                String uniqueFilename = System.currentTimeMillis() + "_" + filename;
+                java.nio.file.Path uploadPath = java.nio.file.Paths.get(uploadDir);
+                if (!java.nio.file.Files.exists(uploadPath)) {
+                    java.nio.file.Files.createDirectories(uploadPath);
+                }
+                try (java.io.InputStream inputStream = file.getInputStream()) {
+                    java.nio.file.Path filePath = uploadPath.resolve(uniqueFilename);
+                    java.nio.file.Files.copy(inputStream, filePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                }
+            } catch (Exception ignored) {}
 
             // Create Message
             ChatMessage chatMessage = new ChatMessage();
@@ -504,7 +508,7 @@ public class ChatController {
             } else {
                 chatMessage.setMessage("Sent a file");
             }
-            chatMessage.setAttachmentPath(uniqueFilename);
+            chatMessage.setAttachmentPath(attachmentUrl);
             chatMessage.setAttachmentType(type);
 
             if (jobId != null) {

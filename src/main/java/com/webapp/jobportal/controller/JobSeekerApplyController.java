@@ -93,6 +93,11 @@ public class JobSeekerApplyController {
         return "job-details";
     }
 
+    @GetMapping("job-details/apply/{jobId}")
+    public String displayApplyGet(@PathVariable("jobId") int jobId) {
+        return "redirect:/job-details-apply/" + jobId;
+    }
+
     @PostMapping("job-details/apply/{jobId}")
     public String apply(@PathVariable("jobId") int jobId, JobSeekerApply jobSeekerApply,
             RedirectAttributes redirectAttributes) {
@@ -166,6 +171,7 @@ public class JobSeekerApplyController {
             }
 
             redirectAttributes.addFlashAttribute("success", "Application submitted successfully!");
+            return "redirect:/job-details-apply/" + jobId;
         }
 
         return "redirect:/freelancer-dashboard/";

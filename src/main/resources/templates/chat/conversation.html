@@ -1002,17 +1002,19 @@
                                 class="msg-text">Message content</span>
 
                             <!-- Image Attachment -->
-                            <img th:if="${msg.attachmentType == 'IMAGE'}" th:src="@{'/photos/' + ${msg.attachmentPath}}"
+                            <img th:if="${msg.attachmentType == 'IMAGE'}"
+                                th:src="${msg.attachmentPath.startsWith('http') ? msg.attachmentPath : '/photos/' + msg.attachmentPath}"
                                 class="message-image" alt="Image" onclick="window.open(this.src)" />
 
                             <!-- Audio Attachment -->
                             <audio th:if="${msg.attachmentType == 'AUDIO'}" controls>
-                                <source th:src="@{'/photos/' + ${msg.attachmentPath}}" type="audio/webm" />
+                                <source th:src="${msg.attachmentPath.startsWith('http') ? msg.attachmentPath : '/photos/' + msg.attachmentPath}" type="audio/webm" />
                                 Your browser does not support the audio element.
                             </audio>
 
                             <!-- File Attachment -->
-                            <a th:if="${msg.attachmentType == 'FILE'}" th:href="@{'/photos/' + ${msg.attachmentPath}}"
+                            <a th:if="${msg.attachmentType == 'FILE'}"
+                                th:href="${msg.attachmentPath.startsWith('http') ? msg.attachmentPath : '/photos/' + msg.attachmentPath}"
                                 target="_blank" class="text-white text-decoration-none">
                                 <i class="fas fa-file-download me-2"></i> <span th:text="${msg.message}">File</span>
                             </a>
@@ -1216,12 +1218,13 @@
                 // Bubble content
                 contentHtml += '<div class="message-bubble">';
                 if (chatMessage.attachmentPath) {
+                    var attachUrl = chatMessage.attachmentPath.startsWith('http') ? chatMessage.attachmentPath : ('/photos/' + chatMessage.attachmentPath);
                     if (chatMessage.attachmentType === 'IMAGE') {
-                        contentHtml += '<img src="/photos/' + chatMessage.attachmentPath + '" class="message-image" onclick="window.open(this.src)" />';
+                        contentHtml += '<img src="' + attachUrl + '" class="message-image" onclick="window.open(this.src)" />';
                     } else if (chatMessage.attachmentType === 'AUDIO') {
-                        contentHtml += '<audio controls><source src="/photos/' + chatMessage.attachmentPath + '" type="audio/webm"></audio>';
+                        contentHtml += '<audio controls><source src="' + attachUrl + '" type="audio/webm"></audio>';
                     } else {
-                        contentHtml += '<a href="/photos/' + chatMessage.attachmentPath + '" target="_blank" class="text-white text-decoration-none"><i class="fas fa-file-download me-2"></i> ' + (chatMessage.message || 'File') + '</a>';
+                        contentHtml += '<a href="' + attachUrl + '" target="_blank" class="text-white text-decoration-none"><i class="fas fa-file-download me-2"></i> ' + (chatMessage.message || 'File') + '</a>';
                     }
                 } else {
                     contentHtml += '<span class="msg-text">' + (chatMessage.message || '') + '</span>';

@@ -18,7 +18,7 @@ public class Testimonial {
 
     private Integer rating;
 
-    @Column(name = "image_url")
+    @Column(name = "image_url", length = 500)
     private String imageUrl;
 
     public Testimonial() {
@@ -82,7 +82,13 @@ public class Testimonial {
 
     @Transient
     public String getPhotosImagePath() {
-        if (imageUrl == null || id == null) {
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            return null;
+        }
+        if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+            return imageUrl;
+        }
+        if (id == null) {
             return null;
         }
         return "/photos/testimonials/" + id + "/" + imageUrl;

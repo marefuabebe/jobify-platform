@@ -183,9 +183,7 @@
             <div class="col-md-4">
                 <div class="profile-header">
 
-                    <img class="profile-avatar" th:src="${profile.profilePhoto != null
-                     ? '/photos/recruiter/' + profile.userAccountId + '/' + profile.profilePhoto
-                     : '/images/avatar.png'}" alt="Profile Photo" />
+                    <img class="profile-avatar" th:src="${profile.photosImagePath != null ? profile.photosImagePath : '/images/avatar.png'}" alt="Profile Photo" />
 
                     <h4 class="fw-bold mb-1">
                         <span

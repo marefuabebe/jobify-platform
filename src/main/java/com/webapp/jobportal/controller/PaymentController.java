@@ -35,6 +35,9 @@ public class PaymentController {
     @Value("${stripe.public.key}")
     private String stripePublicKey;
 
+    @Value("${app.base.url:http://localhost:8080}")
+    private String baseUrl;
+
     private final JobPostActivityService jobPostActivityService;
     private final JobSeekerApplyService jobSeekerApplyService;
     private final UsersService usersService;
@@ -62,7 +65,9 @@ public class PaymentController {
         this.notificationService = notificationService;
     }
 
-    @PostMapping("/payment/checkout")
+    @org.springframework.web.bind.annotation.RequestMapping(value = "/payment/checkout", method = {
+            org.springframework.web.bind.annotation.RequestMethod.GET,
+            org.springframework.web.bind.annotation.RequestMethod.POST })
     public String createCheckoutSession(@RequestParam("jobId") Integer jobId,
             @RequestParam("milestoneId") Integer milestoneId,
             @RequestParam("amount") Double amount,
@@ -84,9 +89,6 @@ public class PaymentController {
             redirectAttributes.addFlashAttribute("error", "Milestone not found.");
             return "redirect:/contract/details/" + (job.getPostedById() != null ? job.getJobPostId() : "");
         }
-
-        // Base URL for redirects (hardcoded for localhost for now, ideally configured)
-        String baseUrl = "http://localhost:8080";
 
         try {
             SessionCreateParams params = SessionCreateParams.builder()
@@ -113,21 +115,24 @@ public class PaymentController {
             Session session = Session.create(params);
 
             // Create preliminary payment record
-            Payment payment = new Payment();
-            payment.setPayer(currentUser);
-            // Assuming the job has a selected freelancer, we set them as payee if
-            // applicable
-            // For now, simpler implementation:
-            payment.setJob(job);
-            payment.setAmount(amount);
-            payment.setServiceFee(amount * 0.10); // 10% Platform Fee
-            payment.setTotalAmount(amount); // Client pays full amount, we deduct fee before transfer
-            payment.setPaymentDate(new Date());
-            payment.setPaymentMethod("Stripe");
-            payment.setStatus("PENDING");
-            payment.setStripeSessionId(session.getId());
-
-            paymentRepository.save(payment);
+            Payment payment = paymentRepository.findByStripeSessionId(session.getId());
+            if (payment == null) {
+                payment = new Payment();
+                payment.setPayer(currentUser);
+                if (milestone.getContract() != null) {
+                    payment.setPayee(milestone.getContract().getFreelancer());
+                }
+                payment.setJob(job);
+                payment.setMilestone(milestone);
+                payment.setAmount(amount);
+                payment.setServiceFee(amount * 0.10); // 10% Platform Fee
+                payment.setTotalAmount(amount); // Client pays full amount, we deduct fee before transfer
+                payment.setPaymentDate(new Date());
+                payment.setPaymentMethod("Stripe Checkout");
+                payment.setStatus("PENDING");
+                payment.setStripeSessionId(session.getId());
+                paymentRepository.save(payment);
+            }
 
             return "redirect:" + session.getUrl();
 
@@ -148,24 +153,49 @@ public class PaymentController {
                 Session session = Session.retrieve(sessionId);
                 if ("paid".equals(session.getPaymentStatus())) {
                     Payment payment = paymentRepository.findByStripeSessionId(sessionId);
+                    if (payment == null && milestoneId != null) {
+                        com.webapp.jobportal.entity.Milestone m = milestoneRepository.findById(milestoneId).orElse(null);
+                        if (m != null && m.getContract() != null) {
+                            payment = new Payment();
+                            payment.setPayer(m.getContract().getClient());
+                            payment.setPayee(m.getContract().getFreelancer());
+                            payment.setJob(m.getContract().getJobApplication().getJob());
+                            payment.setMilestone(m);
+                            payment.setAmount(m.getAmount());
+                            payment.setServiceFee(m.getAmount() * 0.10);
+                            payment.setTotalAmount(m.getAmount());
+                            payment.setPaymentDate(new Date());
+                            payment.setPaymentMethod("Stripe Checkout");
+                            payment.setStripeSessionId(sessionId);
+                        }
+                    }
                     if (payment != null) {
                         payment.setStatus("ESCROW_HELD");
                         paymentRepository.save(payment);
                         redirectAttributes.addFlashAttribute("success",
                                 "Payment secured in Escrow! Please wait for work to be submitted.");
                     }
-
-                    // Also update milestone if not already done via milestone_id param
-                    if (milestoneId == null) {
-                        // Attempt to find by session ID if possible, or we rely on the specific ID
-                        // Milestone milestone = milestoneRepository.findByStripeSessionId(sessionId);
-                        // ...
-                    }
                 }
             } else if (paymentIntentId != null) {
                 PaymentIntent intent = PaymentIntent.retrieve(paymentIntentId);
                 if ("succeeded".equals(intent.getStatus())) {
                     Payment payment = paymentRepository.findByStripeSessionId(paymentIntentId);
+                    if (payment == null && milestoneId != null) {
+                        com.webapp.jobportal.entity.Milestone m = milestoneRepository.findById(milestoneId).orElse(null);
+                        if (m != null && m.getContract() != null) {
+                            payment = new Payment();
+                            payment.setPayer(m.getContract().getClient());
+                            payment.setPayee(m.getContract().getFreelancer());
+                            payment.setJob(m.getContract().getJobApplication().getJob());
+                            payment.setMilestone(m);
+                            payment.setAmount(m.getAmount());
+                            payment.setServiceFee(m.getAmount() * 0.10);
+                            payment.setTotalAmount(m.getAmount());
+                            payment.setPaymentDate(new Date());
+                            payment.setPaymentMethod("Stripe Escrow");
+                            payment.setStripeSessionId(paymentIntentId);
+                        }
+                    }
                     if (payment != null) {
                         payment.setStatus("ESCROW_HELD");
                         paymentRepository.save(payment);

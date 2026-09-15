@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org/">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org/"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8" />
@@ -10,202 +11,675 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" />
     <!-- Summernote -->
     <link th:rel="stylesheet" type="text/css" media="all" th:href="@{/summernote/summernote-lite.min.css}" />
+
+    <style>
+        :root {
+            --primary: #3B5998;
+            --primary-light: #eef2f9;
+            --primary-dark: #2d4373;
+            --dark: #0f172a;
+            --gray: #64748b;
+            --light-border: #e2e8f0;
+            --radius-xl: 18px;
+            --shadow-sm: 0 2px 6px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 12px 28px -6px rgba(15, 23, 42, 0.08), 0 6px 12px -4px rgba(15, 23, 42, 0.04);
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: var(--dark);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #2b457b 100%);
+            padding: 46px 0;
+            color: white;
+            margin-bottom: 32px;
+            position: relative;
+        }
+
+        .page-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .page-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .header-title h1 {
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .header-title p {
+            color: #94a3b8;
+            font-size: 15px;
+            margin: 0;
+        }
+
+        /* Identity Sidebar Card */
+        .identity-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--light-border);
+            box-shadow: var(--shadow-sm);
+            padding: 30px 24px;
+            position: sticky;
+            top: 90px;
+            text-align: center;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .identity-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 18px;
+        }
+
+        .avatar-img {
+            width: 136px;
+            height: 136px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+        }
+
+        .avatar-upload-btn {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3B82F6, #2563EB);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .avatar-upload-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .recruiter-name-heading {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 4px;
+            letter-spacing: -0.3px;
+        }
+
+        .recruiter-role-sub {
+            color: var(--gray);
+            font-size: 13.5px;
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+
+        .meta-chip-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+            text-align: left;
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 14px;
+            border: 1px solid #edf2f7;
+        }
+
+        .meta-chip-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .meta-chip-item i {
+            width: 16px;
+            text-align: center;
+            color: #94a3b8;
+        }
+
+        /* Trust & Verification Meter */
+        .trust-box {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 18px;
+            text-align: left;
+        }
+
+        .trust-box.pending {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-color: rgba(217, 119, 6, 0.2);
+        }
+
+        .trust-box.unverified {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border-color: rgba(220, 38, 38, 0.2);
+        }
+
+        .trust-title {
+            font-size: 13px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .trust-box .progress {
+            height: 6px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.08);
+            margin: 8px 0;
+        }
+
+        .trust-subtitle {
+            font-size: 11.5px;
+            color: #475569;
+        }
+
+        /* Form Section Cards */
+        .section-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--light-border);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .section-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .section-card-header {
+            padding: 22px 28px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .section-icon-badge {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .section-card-title {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--dark);
+            margin: 0;
+            letter-spacing: -0.3px;
+        }
+
+        .section-card-desc {
+            font-size: 13px;
+            color: var(--gray);
+            margin: 2px 0 0 0;
+        }
+
+        .section-card-body {
+            padding: 28px;
+        }
+
+        /* Input Controls */
+        .form-label {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .input-group-modern {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group-modern i.input-icon {
+            position: absolute;
+            left: 16px;
+            color: #94a3b8;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .form-control-modern {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border-radius: 12px;
+            border: 1.5px solid var(--light-border);
+            font-size: 14.5px;
+            background: #f8fafc;
+            color: var(--dark);
+            transition: all 0.2s ease;
+        }
+
+        .form-control-modern:focus {
+            background: white;
+            border-color: #2563eb;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+        }
+
+        .form-control-standard {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1.5px solid var(--light-border);
+            font-size: 14.5px;
+            background: #f8fafc;
+            color: var(--dark);
+            transition: all 0.2s ease;
+        }
+
+        .form-control-standard:focus {
+            background: white;
+            border-color: #2563eb;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+        }
+
+        /* Modern Upload Tile */
+        .doc-upload-tile {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 14px;
+            padding: 22px 20px;
+            text-align: center;
+            transition: all 0.2s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .doc-upload-tile:hover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .doc-upload-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #e2e8f0;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .doc-upload-tile:hover .doc-upload-icon {
+            background: #2563eb;
+            color: white;
+            transform: scale(1.08);
+        }
+
+        .doc-upload-title {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .doc-upload-hint {
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 12px;
+        }
+
+        /* Action Bar */
+        .action-bar-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--light-border);
+            box-shadow: var(--shadow-sm);
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 50px;
+        }
+
+        .btn-save-profile {
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+            border: none;
+            color: white;
+            padding: 12px 36px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14.5px;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-save-profile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+            color: white;
+        }
+    </style>
 </head>
 
-<body class="bg-light d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100">
 
     <!-- Header -->
     <th:block th:replace="fragments/client-header :: clientHeader('profile')"></th:block>
 
-    <div class="container py-5 flex-grow-1">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold mb-0">Edit Profile</h2>
-            <a th:href="@{/client-dashboard/}" class="btn btn-outline-primary rounded-pill px-4 btn-sm fw-bold">
-                <i class="fas fa-arrow-left me-2"></i> Dashboard
-            </a>
+    <!-- Page Header Banner -->
+    <div class="page-header">
+        <div class="page-container">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div class="header-title">
+                    <h1>Recruiter Profile & Company Settings</h1>
+                    <p>Manage your organization identity, public employer profile, contact details, and account verification.</p>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <a th:href="@{/client-dashboard/}" class="btn btn-outline-light rounded-pill px-4 btn-sm fw-bold">
+                        <i class="fas fa-arrow-left me-2"></i> Dashboard
+                    </a>
+                </div>
+            </div>
         </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <div class="page-container flex-grow-1">
+
         <form th:action="@{/recruiter-profile/addNew}" method="post" th:object="${profile}"
             enctype="multipart/form-data">
 
             <div class="row g-4">
-                <!-- Left Sidebar: Identity & Avatar -->
+                <!-- Left Column: Identity Sidebar -->
                 <div class="col-lg-4">
-                    <div class="card border-0 shadow-sm rounded-4 text-center p-4 sticky-top"
-                        style="top: 100px; z-index: 1000;">
-                        <h5 class="fw-bold mb-4 text-start">Profile Photo</h5>
-                        <div class="position-relative d-inline-block mx-auto mb-3">
+                    <div class="identity-card">
+                        <div class="avatar-wrapper">
                             <img id="avatarPreview"
-                                th:src="${profile.photosImagePath != null ? profile.photosImagePath : 'https://ui-avatars.com/api/?name=' + user.firstName + '+' + user.lastName + '&background=0d6efd&color=fff'}"
-                                class="rounded-circle img-thumbnail"
-                                style="width: 150px; height: 150px; object-fit: cover;" />
-                            <label for="imageUpload"
-                                class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle p-2 shadow-sm border border-white"
-                                style="cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                                th:src="${profile.photosImagePath != null ? profile.photosImagePath : 'https://ui-avatars.com/api/?name=' + user.firstName + '+' + user.lastName + '&background=2563eb&color=fff'}"
+                                class="avatar-img" alt="Recruiter Photo" />
+                            <label for="imageUpload" class="avatar-upload-btn" title="Change Profile Picture">
                                 <i class="fas fa-camera"></i>
                                 <input type="file" id="imageUpload" class="d-none" name="image" accept="image/*"
                                     onchange="previewImage(this)">
                             </label>
                         </div>
 
-                        <h4 class="fw-bold mb-1" th:text="${(user.firstName ?: '') + ' ' + (user.lastName ?: '')}">
-                            Recruiter Name</h4>
-                        <p class="text-muted small mb-3">Recruiter Account</p>
+                        <h3 class="recruiter-name-heading" th:text="${(user.firstName ?: '') + ' ' + (user.lastName ?: '')}">
+                            Recruiter Name
+                        </h3>
+                        <p class="recruiter-role-sub">
+                            <i class="fas fa-briefcase me-1 text-primary"></i> Client & Hiring Manager
+                        </p>
 
-                        <!-- Verification Status -->
-                        <div class="mb-4">
-                            <span
-                                class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2"
-                                th:if="${user.isVerified}">
-                                <i class="fas fa-check-circle me-1"></i> Verified
-                            </span>
-                            <span
-                                class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-2"
-                                th:if="${!user.isVerified && user.documentStatus == 'UNDER_REVIEW'}">
-                                <i class="fas fa-clock me-1"></i> Pending Review
-                            </span>
-                            <span
-                                class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-2"
-                                th:if="${!user.isVerified && user.documentStatus != 'UNDER_REVIEW'}">
-                                <i class="fas fa-times-circle me-1"></i> Unverified
-                            </span>
-                        </div>
-
-                        <div class="text-start">
-                            <div class="alert alert-light border text-muted small">
-                                <i class="fas fa-info-circle me-1"></i> Upload a clear photo to increase trust with
-                                candidates.
+                        <!-- Trust & Verification Status Box -->
+                        <div th:if="${user.isVerified}" class="trust-box">
+                            <div class="trust-title text-success">
+                                <i class="fas fa-check-circle"></i> Verified Employer
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" style="width: 100%;"></div>
+                            </div>
+                            <div class="trust-subtitle">
+                                <i class="fas fa-shield-check me-1 text-success"></i> Full hiring and contract privileges active.
                             </div>
                         </div>
+
+                        <div th:if="${!user.isVerified && user.documentStatus == 'UNDER_REVIEW'}" class="trust-box pending">
+                            <div class="trust-title text-warning">
+                                <i class="fas fa-clock"></i> Verification In Review
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" style="width: 65%;"></div>
+                            </div>
+                            <div class="trust-subtitle">
+                                Documents submitted. Admin review in progress.
+                            </div>
+                        </div>
+
+                        <div th:if="${!user.isVerified && user.documentStatus != 'UNDER_REVIEW'}" class="trust-box unverified">
+                            <div class="trust-title text-danger">
+                                <i class="fas fa-exclamation-triangle"></i> Verification Incomplete
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-danger" style="width: 25%;"></div>
+                            </div>
+                            <div class="trust-subtitle">
+                                Upload Govt. ID below to unlock job posting.
+                            </div>
+                        </div>
+
+                        <!-- Organization Meta Info -->
+                        <div class="meta-chip-list">
+                            <div class="meta-chip-item">
+                                <i class="fas fa-building text-primary"></i>
+                                <strong th:text="${profile.company != null and !profile.company.isEmpty() ? profile.company : 'Company not set'}">Company Name</strong>
+                            </div>
+                            <div class="meta-chip-item">
+                                <i class="fas fa-map-marker-alt text-danger"></i>
+                                <span th:text="${(profile.city != null and !profile.city.isEmpty() ? profile.city : '') + (profile.country != null and !profile.country.isEmpty() ? ', ' + profile.country : 'Location not set')}">Location</span>
+                            </div>
+                            <div class="meta-chip-item" th:if="${user.userId != null and user.userId.email != null}">
+                                <i class="fas fa-envelope text-secondary"></i>
+                                <span th:text="${user.userId.email}">email@example.com</span>
+                            </div>
+                        </div>
+
+                        <!-- View Public Profile Button -->
+                        <a th:href="@{/recruiter-profile/view/{id}(id=${profile.userAccountId})}"
+                            class="btn btn-outline-primary btn-sm w-100 rounded-pill fw-bold py-2">
+                            <i class="fas fa-external-link-alt me-1"></i> View Public Profile
+                        </a>
                     </div>
                 </div>
 
-                <!-- Right Column: Details Loop -->
+                <!-- Right Column: Edit Sections -->
                 <div class="col-lg-8">
 
-                    <!-- Section 1: Basic Info -->
-                    <div class="card border-0 shadow-sm rounded-4 mb-4 animate-up delay-100">
-                        <div class="card-header bg-white border-bottom-0 pt-4 px-4">
-                            <h5 class="fw-bold text-dark mb-0"><i
-                                    class="fas fa-user-circle text-primary me-2"></i>Personal Details
-                            </h5>
+                    <!-- Section 1: Personal Details -->
+                    <div class="section-card">
+                        <div class="section-card-header">
+                            <div class="section-icon-badge" style="background: #eef2ff; color: #4338ca;">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div>
+                                <h4 class="section-card-title">Personal Details</h4>
+                                <p class="section-card-desc">Your personal hiring manager contact information.</p>
+                            </div>
                         </div>
-                        <div class="card-body p-4">
+                        <div class="section-card-body">
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold">First Name</label>
-                                    <input type="text" class="form-control" th:field="*{firstName}" placeholder="John"
-                                        required />
+                                    <label class="form-label">First Name</label>
+                                    <div class="input-group-modern">
+                                        <i class="fas fa-user input-icon"></i>
+                                        <input type="text" class="form-control-modern" th:field="*{firstName}" placeholder="e.g. Elisa" required />
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Last Name</label>
-                                    <input type="text" class="form-control" th:field="*{lastName}" placeholder="Doe"
-                                        required />
+                                    <label class="form-label">Last Name</label>
+                                    <div class="input-group-modern">
+                                        <i class="fas fa-user input-icon"></i>
+                                        <input type="text" class="form-control-modern" th:field="*{lastName}" placeholder="e.g. Ayano" required />
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold">City</label>
-                                    <input type="text" class="form-control" th:field="*{city}" placeholder="New York" />
+                                    <label class="form-label">City</label>
+                                    <div class="input-group-modern">
+                                        <i class="fas fa-map-marker-alt input-icon"></i>
+                                        <input type="text" class="form-control-modern" th:field="*{city}" placeholder="e.g. Hosanna" />
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold">State/Region</label>
-                                    <input type="text" class="form-control" th:field="*{state}" placeholder="NY" />
+                                    <label class="form-label">State / Region</label>
+                                    <div class="input-group-modern">
+                                        <i class="fas fa-map input-icon"></i>
+                                        <input type="text" class="form-control-modern" th:field="*{state}" placeholder="e.g. Central Ethiopia" />
+                                    </div>
                                 </div>
                                 <div class="col-md-12">
-                                    <label class="form-label fw-semibold">Country</label>
-                                    <input type="text" class="form-control" th:field="*{country}"
-                                        placeholder="United States" />
+                                    <label class="form-label">Country</label>
+                                    <div class="input-group-modern">
+                                        <i class="fas fa-globe input-icon"></i>
+                                        <input type="text" class="form-control-modern" th:field="*{country}" placeholder="e.g. Ethiopia" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Section 2: Company Info -->
-                    <div class="card border-0 shadow-sm rounded-4 mb-4 animate-up delay-200">
-                        <div class="card-header bg-white border-bottom-0 pt-4 px-4">
-                            <h5 class="fw-bold text-dark mb-0"><i class="fas fa-building text-primary me-2"></i>Company
-                                Profile</h5>
+                    <!-- Section 2: Company Profile -->
+                    <div class="section-card">
+                        <div class="section-card-header">
+                            <div class="section-icon-badge" style="background: #eff6ff; color: #1d4ed8;">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div>
+                                <h4 class="section-card-title">Company Profile</h4>
+                                <p class="section-card-desc">Brand information presented to freelancers and applicants.</p>
+                            </div>
                         </div>
-                        <div class="card-body p-4">
+                        <div class="section-card-body">
                             <div class="row g-3">
                                 <div class="col-md-12">
-                                    <label class="form-label fw-semibold">Company Name</label>
-                                    <input type="text" class="form-control" th:field="*{company}"
-                                        placeholder="Acme Inc." />
-                                </div>
-                                <div class="col-md-12">
-                                    <label class="form-label fw-semibold">Tagline <span
-                                            class="text-muted fw-normal small">(Optional)</span></label>
-                                    <input type="text" class="form-control" th:field="*{tagline}"
-                                        placeholder="Transforming the future of tech..." />
-                                    <div class="form-text text-muted small">A short, catchy line to appear on your
-                                        profile.</div>
-                                </div>
-                                <div class="col-md-12">
-                                    <label class="form-label fw-semibold">Website <span
-                                            class="text-muted fw-normal small">(Optional)</span></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light border-end-0"><i
-                                                class="fas fa-globe text-muted"></i></span>
-                                        <input type="url" class="form-control border-start-0 ps-0" th:field="*{website}"
-                                            placeholder="https://www.example.com" />
+                                    <label class="form-label">Company Name</label>
+                                    <div class="input-group-modern">
+                                        <i class="fas fa-building input-icon"></i>
+                                        <input type="text" class="form-control-modern" th:field="*{company}" placeholder="e.g. Elisa.PLC" />
                                     </div>
                                 </div>
                                 <div class="col-md-12">
-                                    <label class="form-label fw-semibold">Bio / About Company</label>
+                                    <label class="form-label">Tagline <span class="text-muted fw-normal small">(Optional)</span></label>
+                                    <div class="input-group-modern">
+                                        <i class="fas fa-quote-left input-icon"></i>
+                                        <input type="text" class="form-control-modern" th:field="*{tagline}" placeholder="e.g. Transforming the future of tech..." />
+                                    </div>
+                                    <small class="text-muted mt-1 d-block">A concise mission statement displayed on your job listings.</small>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label">Website <span class="text-muted fw-normal small">(Optional)</span></label>
+                                    <div class="input-group-modern">
+                                        <i class="fas fa-globe input-icon"></i>
+                                        <input type="url" class="form-control-modern" th:field="*{website}" placeholder="https://www.example.com" />
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label">Bio / About Company</label>
                                     <textarea class="form-control" id="bio" th:field="*{bio}" rows="5"
-                                        placeholder="Tell us about your company culture, mission, and what you're looking for..."></textarea>
+                                        placeholder="Tell freelancers about your company culture, mission, and projects..."></textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Section 3: Verification -->
-                    <div class="card border-0 shadow-sm rounded-4 mb-4 animate-up delay-300">
-                        <div class="card-header bg-white border-bottom-0 pt-4 px-4">
-                            <h5 class="fw-bold text-dark mb-0"><i
-                                    class="fas fa-shield-alt text-primary me-2"></i>Identity Verification</h5>
+                    <!-- Section 3: Identity & Business Verification -->
+                    <div class="section-card">
+                        <div class="section-card-header">
+                            <div class="section-icon-badge" style="background: #ecfdf5; color: #047857;">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div>
+                                <h4 class="section-card-title">Identity & Trust Verification</h4>
+                                <p class="section-card-desc">Government-issued identification to establish credibility with freelancers.</p>
+                            </div>
                         </div>
-                        <div class="card-body p-4">
-                            <div class="alert alert-primary bg-primary-subtle border-primary-subtle text-primary d-flex align-items-center mb-4"
-                                role="alert">
-                                <i class="fas fa-info-circle me-3 fs-5"></i>
+                        <div class="section-card-body">
+                            <div class="alert alert-primary bg-primary-subtle border-primary-subtle text-primary d-flex align-items-center mb-4" style="border-radius: 14px;">
+                                <i class="fas fa-shield-check me-3 fs-4"></i>
                                 <div>
-                                    To maintain a safe community, we require all recruiters to verify their identity
-                                    before posting jobs.
+                                    <strong>Verified Employer Status</strong> unlocks instant job publishing and highlights your posts to top freelancers.
                                 </div>
                             </div>
 
-                            <div class="row g-4">
+                            <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Front ID (Govt. Issued)</label>
-                                    <div class="file-upload-wrapper p-3 border rounded-3 bg-light text-center">
-                                        <input type="file" class="form-control form-control-sm mb-2"
-                                            name="verificationFrontFile" accept="image/*" />
-                                        <small class="text-muted d-block">Passport or Driver's License</small>
+                                    <label class="form-label">Front ID (Govt. Issued)</label>
+                                    <div class="doc-upload-tile" onclick="document.getElementById('verificationFrontInput').click()">
+                                        <div class="doc-upload-icon">
+                                            <i class="fas fa-id-card"></i>
+                                        </div>
+                                        <div class="doc-upload-title" id="frontFileName">Passport or Driver's License (Front)</div>
+                                        <div class="doc-upload-hint">PNG, JPG, or PDF up to 10MB</div>
+                                        <span class="btn btn-sm btn-outline-primary rounded-pill px-3">Browse File</span>
+                                        <input type="file" id="verificationFrontInput" class="d-none" name="verificationFrontFile" accept="image/*,application/pdf"
+                                            onchange="updateFileName(this, 'frontFileName')" />
                                     </div>
                                 </div>
+
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Back ID</label>
-                                    <div class="file-upload-wrapper p-3 border rounded-3 bg-light text-center">
-                                        <input type="file" class="form-control form-control-sm mb-2"
-                                            name="verificationBackFile" accept="image/*" />
-                                        <small class="text-muted d-block">Back side of ID</small>
+                                    <label class="form-label">Back ID</label>
+                                    <div class="doc-upload-tile" onclick="document.getElementById('verificationBackInput').click()">
+                                        <div class="doc-upload-icon">
+                                            <i class="fas fa-address-card"></i>
+                                        </div>
+                                        <div class="doc-upload-title" id="backFileName">ID Card / License (Back)</div>
+                                        <div class="doc-upload-hint">Back side with barcodes or signatures</div>
+                                        <span class="btn btn-sm btn-outline-primary rounded-pill px-3">Browse File</span>
+                                        <input type="file" id="verificationBackInput" class="d-none" name="verificationBackFile" accept="image/*,application/pdf"
+                                            onchange="updateFileName(this, 'backFileName')" />
                                     </div>
                                 </div>
-                                <div class="col-12">
-                                    <label class="form-label fw-semibold">Business License <span
-                                            class="text-muted fw-normal small">(Optional)</span></label>
-                                    <input type="file" class="form-control" name="businessLicenseFile"
-                                        accept="image/*,application/pdf" />
+
+                                <div class="col-12 mt-3">
+                                    <label class="form-label">Business Registration / License <span class="text-muted fw-normal small">(Optional)</span></label>
+                                    <div class="input-group-modern">
+                                        <i class="fas fa-file-invoice input-icon"></i>
+                                        <input type="file" class="form-control-modern" name="businessLicenseFile" accept="image/*,application/pdf" />
+                                    </div>
+                                    <small class="text-muted mt-1 d-block">Upload your corporate charter or tax documentation for verified enterprise standing.</small>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Action Buttons -->
-                    <div class="d-flex justify-content-end gap-3 animate-up delay-300 mb-5">
-                        <a th:href="@{/client-dashboard/}" class="btn btn-light px-4 border">Cancel</a>
-                        <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">
-                            Save Changes
+                    <!-- Action Bar -->
+                    <div class="action-bar-card">
+                        <a th:href="@{/client-dashboard/}" class="btn btn-outline-secondary px-4 fw-bold" style="border-radius: 12px;">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn-save-profile">
+                            <i class="fas fa-check-circle"></i> Save Profile Changes
                         </button>
                     </div>
 
@@ -225,8 +699,8 @@
         $(document).ready(function () {
             // Initialize Summernote for Bio
             $('#bio').summernote({
-                height: 200,
-                placeholder: "Tell us about your company culture, mission, and what you're looking for...",
+                height: 180,
+                placeholder: "Tell freelancers about your company culture, mission, and projects...",
                 toolbar: [
                     ['style', ['style']],
                     ['font', ['bold', 'underline', 'clear']],
@@ -248,44 +722,14 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
-    </script>
 
-    <style>
-        .file-upload-wrapper:hover {
-            border-color: #0d6efd !important;
-            background-color: #fff !important;
-        }
-
-        .form-control:focus {
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
-            border-color: #0d6efd;
-        }
-
-        .animate-up {
-            animation: fadeInUp 0.5s ease-out forwards;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        .delay-100 {
-            animation-delay: 0.1s;
-        }
-
-        .delay-200 {
-            animation-delay: 0.2s;
-        }
-
-        .delay-300 {
-            animation-delay: 0.3s;
-        }
-
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
+        // File name preview for custom tiles
+        function updateFileName(input, targetId) {
+            if (input.files && input.files[0]) {
+                document.getElementById(targetId).textContent = input.files[0].name;
             }
         }
-    </style>
+    </script>
 
     <!-- SweetAlert for Success/Error -->
     <script th:inline="javascript">
@@ -299,7 +743,8 @@
                 title: 'Profile Saved!',
                 text: 'Your profile has been updated successfully.',
                 icon: 'success',
-                confirmButtonColor: '#0d6efd'
+                confirmButtonColor: '#2563eb',
+                borderRadius: '16px'
             });
         }
 
@@ -308,7 +753,8 @@
                 title: 'Documents Submitted Successfully!',
                 text: 'Please verify your identity to enable full access to hiring features. Status will be updated after admin approval.',
                 icon: 'success',
-                confirmButtonColor: '#0d6efd'
+                confirmButtonColor: '#2563eb',
+                borderRadius: '16px'
             });
         }
 
@@ -317,7 +763,8 @@
                 title: 'Error',
                 text: errorMsg,
                 icon: 'error',
-                confirmButtonColor: '#0d6efd'
+                confirmButtonColor: '#2563eb',
+                borderRadius: '16px'
             });
         }
         /*]]>*/

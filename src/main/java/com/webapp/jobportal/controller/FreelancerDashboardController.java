@@ -485,9 +485,10 @@ public class FreelancerDashboardController {
 
             // Mark milestones as WITHDRAWN and complete contract if fully paid
             contractRepository.findByJobApplication_Job_JobPostId(job.getJobPostId()).ifPresent(contract -> {
-                // All approved milestones are now withdrawn
+                // All available balance milestones are now withdrawn
                 contract.getMilestones().stream()
-                        .filter(m -> "APPROVED".equals(m.getStatus()) || "RELEASED".equals(m.getStatus()))
+                        .filter(m -> "AVAILABLE_BALANCE".equals(m.getStatus()) || "APPROVED".equals(m.getStatus())
+                                || "RELEASED".equals(m.getStatus()))
                         .forEach(m -> {
                             m.setStatus("WITHDRAWN");
                             milestoneRepository.save(m);
@@ -548,7 +549,11 @@ public class FreelancerDashboardController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error", "Failed to connect Stripe: " + e.getMessage());
+            String errorMsg = e.getMessage();
+            if (errorMsg != null && errorMsg.contains("signed up for Connect")) {
+                errorMsg = "Stripe Connect is not enabled on this Stripe account. Please enable Connect at https://dashboard.stripe.com/connect to allow freelancer payouts.";
+            }
+            redirectAttributes.addFlashAttribute("error", "Failed to connect Stripe: " + errorMsg);
             return "redirect:/freelancer-dashboard/earnings";
         }
     }

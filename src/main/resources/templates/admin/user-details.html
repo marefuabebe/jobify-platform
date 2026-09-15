@@ -120,14 +120,20 @@
     </style>
 </head>
 
-<body th:classappend="${session.theme == 'light' ? 'light-theme' : ''}">
+<body th:classappend="${session.theme == 'dark' ? 'dark-theme' : 'light-theme'}">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
             <a class="navbar-brand" href="/admin/dashboard">
                 <i class="fas fa-briefcase me-2"></i> Jobify Admin
             </a>
             <div class="d-flex align-items-center gap-3">
-                <!-- Theme Toggle Removed -->
+                <form th:action="@{/admin/theme/toggle}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-outline-light btn-sm">
+                        <i class="fas me-1"
+                            th:classappend="${session.theme == 'dark' ? 'fa-sun' : 'fa-moon'}"></i>
+                        <span th:text="${session.theme == 'dark' ? 'Light' : 'Dark'}">Dark</span>
+                    </button>
+                </form>
                 <a class="nav-link" href="/admin/users/pending">
                     <i class="fas fa-arrow-left me-1"></i> Back to Pending Users
                 </a>

@@ -383,7 +383,7 @@
                         </div>
 
                         <div th:each="milestone : ${contract.milestones}" class="milestone-card"
-                            th:classappend="${milestone.status == 'PENDING' ? 'status-pending' : (milestone.status == 'RELEASED' or milestone.status == 'APPROVED' or milestone.status == 'WITHDRAWN' ? 'status-completed' : 'status-active')}">
+                            th:classappend="${milestone.status == 'PENDING' ? 'status-pending' : (milestone.status == 'RELEASED' or milestone.status == 'APPROVED' or milestone.status == 'AVAILABLE_BALANCE' or milestone.status == 'WITHDRAWN' ? 'status-completed' : 'status-active')}">
 
                             <div class="milestone-header">
                                 <div>
@@ -399,16 +399,17 @@
                                         $0.00
                                     </div>
                                     <span class="status-badge" th:classappend="${milestone.status == 'PENDING' ? 'pending' : 
-                                                        (milestone.status == 'APPROVED' or milestone.status == 'RELEASED' ? 'approved' :
+                                                        (milestone.status == 'APPROVED' or milestone.status == 'RELEASED' or milestone.status == 'AVAILABLE_BALANCE' ? 'approved' :
                                                         (milestone.status == 'WITHDRAWN' ? 'paid' : 'funded'))}"
                                         th:text="${milestone.status == 'PENDING' ? 'Pending' : 
+                                                      (milestone.status == 'AVAILABLE_BALANCE' ? 'Available Balance' :
                                                       (milestone.status == 'APPROVED' or milestone.status == 'RELEASED' ? 'Approved' :
-                                                      (milestone.status == 'WITHDRAWN' ? 'Paid' : 'Funded'))}">STATUS</span>
+                                                      (milestone.status == 'WITHDRAWN' ? 'Paid' : 'Funded')))}">STATUS</span>
                                 </div>
                             </div>
 
                             <div class="milestone-actions mt-3 pt-3 border-top"
-                                th:if="${milestone.status != 'RELEASED' and milestone.status != 'APPROVED' and milestone.status != 'WITHDRAWN'}">
+                                th:if="${milestone.status != 'RELEASED' and milestone.status != 'APPROVED' and milestone.status != 'AVAILABLE_BALANCE' and milestone.status != 'WITHDRAWN'}">
                                 <div class="d-flex justify-content-end">
                                     <!-- Client Actions -->
                                     <div sec:authorize="hasAuthority('Recruiter')">
@@ -540,7 +541,7 @@
                                             <i class="fas fa-clock me-1"></i> Awaiting client approval
                                         </span>
                                         <span
-                                            th:if="${milestone.status == 'APPROVED' or milestone.status == 'RELEASED'}"
+                                            th:if="${milestone.status == 'AVAILABLE_BALANCE' or milestone.status == 'APPROVED' or milestone.status == 'RELEASED'}"
                                             class="text-muted small">
                                             <i class="fas fa-wallet me-1"></i> Funds in your balance – withdraw from
                                             Earnings

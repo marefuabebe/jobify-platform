@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
 </head>
 
-<body th:classappend="${session.theme == 'light' ? 'light-theme' : ''}">
+<body th:classappend="${session.theme == 'dark' ? 'dark-theme' : 'light-theme'}">
 
     <!-- Sidebar Fragment -->
     <div th:replace="~{admin/fragments/sidebar :: sidebar('disputes')}"></div>
@@ -39,7 +39,13 @@
             </div>
 
             <div class="user-menu d-flex align-items-center gap-2">
-                <!-- Theme Toggle Removed -->
+                <form th:action="@{/admin/theme/toggle}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas me-1"
+                            th:classappend="${session.theme == 'dark' ? 'fa-sun' : 'fa-moon'}"></i>
+                        <span th:text="${session.theme == 'dark' ? 'Light' : 'Dark'}">Dark</span>
+                    </button>
+                </form>
                 <a href="/logout" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>

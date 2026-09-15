@@ -46,6 +46,7 @@ public class JobSeekerProfileController {
     private NotificationService notificationService;
     private com.webapp.jobportal.services.RecruiterProfileService recruiterProfileService;
     private com.webapp.jobportal.services.JobPostActivityService jobPostActivityService;
+    private com.webapp.jobportal.services.CloudinaryService cloudinaryService;
 
     @Autowired
     public JobSeekerProfileController(JobSeekerProfileService jobSeekerProfileService,
@@ -54,7 +55,8 @@ public class JobSeekerProfileController {
             EmailService emailService,
             NotificationService notificationService,
             com.webapp.jobportal.services.JobPostActivityService jobPostActivityService,
-            com.webapp.jobportal.services.RecruiterProfileService recruiterProfileService) {
+            com.webapp.jobportal.services.RecruiterProfileService recruiterProfileService,
+            com.webapp.jobportal.services.CloudinaryService cloudinaryService) {
         this.jobSeekerProfileService = jobSeekerProfileService;
         this.usersRepository = usersRepository;
         this.ratingService = ratingService;
@@ -62,6 +64,7 @@ public class JobSeekerProfileController {
         this.notificationService = notificationService;
         this.jobPostActivityService = jobPostActivityService;
         this.recruiterProfileService = recruiterProfileService;
+        this.cloudinaryService = cloudinaryService;
     }
 
     @GetMapping("/")
@@ -210,17 +213,18 @@ public class JobSeekerProfileController {
             }
         }
 
-        String imageName = "";
-        String resumeName = "";
-        String verificationDocName = "";
-        String educationDocName = "";
-        String certificationsDocName = "";
+        String uploadDir = "photos/candidate/" + jobSeekerProfile.getUserAccountId();
+        String cloudinaryFolder = "jobportal/candidate/" + jobSeekerProfile.getUserAccountId();
 
         // Handle image upload
         if (image != null && !image.isEmpty()) {
             try {
-                imageName = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
-                jobSeekerProfile.setProfilePhoto(imageName);
+                String imageUrl = cloudinaryService.uploadImage(image, cloudinaryFolder);
+                jobSeekerProfile.setProfilePhoto(imageUrl);
+                try {
+                    String imageName = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
+                    FileUploadUtil.saveFile(uploadDir, imageName, image);
+                } catch (Exception ignored) {}
             } catch (Exception e) {
                 redirectAttributes.addFlashAttribute("error", true);
                 return "redirect:/job-seeker-profile/";
@@ -237,10 +241,14 @@ public class JobSeekerProfileController {
             System.out.println("Controller: Received verificationDoc: " + verificationDoc.getOriginalFilename()
                     + ", size: " + verificationDoc.getSize());
             try {
-                verificationDocName = StringUtils
-                        .cleanPath(Objects.requireNonNull(verificationDoc.getOriginalFilename()));
-                jobSeekerProfile.setVerificationDocument(verificationDocName);
+                String docUrl = cloudinaryService.uploadDocument(verificationDoc, cloudinaryFolder);
+                jobSeekerProfile.setVerificationDocument(docUrl);
                 jobSeekerProfile.setDocumentStatus("UNDER_REVIEW");
+                try {
+                    String verificationDocName = StringUtils
+                            .cleanPath(Objects.requireNonNull(verificationDoc.getOriginalFilename()));
+                    FileUploadUtil.saveFile(uploadDir, verificationDocName, verificationDoc);
+                } catch (Exception ignored) {}
             } catch (Exception e) {
                 redirectAttributes.addFlashAttribute("error", true);
                 return "redirect:/job-seeker-profile/";
@@ -256,8 +264,12 @@ public class JobSeekerProfileController {
         // Handle resume upload
         if (pdf != null && !pdf.isEmpty()) {
             try {
-                resumeName = StringUtils.cleanPath(Objects.requireNonNull(pdf.getOriginalFilename()));
-                jobSeekerProfile.setResume(resumeName);
+                String resumeUrl = cloudinaryService.uploadDocument(pdf, cloudinaryFolder);
+                jobSeekerProfile.setResume(resumeUrl);
+                try {
+                    String resumeName = StringUtils.cleanPath(Objects.requireNonNull(pdf.getOriginalFilename()));
+                    FileUploadUtil.saveFile(uploadDir, resumeName, pdf);
+                } catch (Exception ignored) {}
             } catch (Exception e) {
                 redirectAttributes.addFlashAttribute("error", true);
                 return "redirect:/job-seeker-profile/";
@@ -272,8 +284,12 @@ public class JobSeekerProfileController {
         // Handle education document upload
         if (educationDoc != null && !educationDoc.isEmpty()) {
             try {
-                educationDocName = StringUtils.cleanPath(Objects.requireNonNull(educationDoc.getOriginalFilename()));
-                jobSeekerProfile.setEducationDoc(educationDocName);
+                String eduUrl = cloudinaryService.uploadDocument(educationDoc, cloudinaryFolder);
+                jobSeekerProfile.setEducationDoc(eduUrl);
+                try {
+                    String educationDocName = StringUtils.cleanPath(Objects.requireNonNull(educationDoc.getOriginalFilename()));
+                    FileUploadUtil.saveFile(uploadDir, educationDocName, educationDoc);
+                } catch (Exception ignored) {}
             } catch (Exception e) {
                 redirectAttributes.addFlashAttribute("error", true);
                 return "redirect:/job-seeker-profile/";
@@ -287,9 +303,13 @@ public class JobSeekerProfileController {
         // Handle certifications document upload
         if (certificationsDoc != null && !certificationsDoc.isEmpty()) {
             try {
-                certificationsDocName = StringUtils
-                        .cleanPath(Objects.requireNonNull(certificationsDoc.getOriginalFilename()));
-                jobSeekerProfile.setCertificationDoc(certificationsDocName);
+                String certUrl = cloudinaryService.uploadDocument(certificationsDoc, cloudinaryFolder);
+                jobSeekerProfile.setCertificationDoc(certUrl);
+                try {
+                    String certificationsDocName = StringUtils
+                            .cleanPath(Objects.requireNonNull(certificationsDoc.getOriginalFilename()));
+                    FileUploadUtil.saveFile(uploadDir, certificationsDocName, certificationsDoc);
+                } catch (Exception ignored) {}
             } catch (Exception e) {
                 redirectAttributes.addFlashAttribute("error", true);
                 return "redirect:/job-seeker-profile/";
@@ -302,30 +322,6 @@ public class JobSeekerProfileController {
 
         try {
             jobSeekerProfileService.addNew(jobSeekerProfile);
-
-            // Handle file uploads after saving the profile
-            if (image != null && !image.isEmpty()) {
-                String uploadDir = "photos/candidate/" + jobSeekerProfile.getUserAccountId();
-                FileUploadUtil.saveFile(uploadDir, imageName, image);
-            }
-            if (pdf != null && !pdf.isEmpty()) {
-                String uploadDir = "photos/candidate/" + jobSeekerProfile.getUserAccountId();
-                FileUploadUtil.saveFile(uploadDir, resumeName, pdf);
-            }
-            if (educationDoc != null && !educationDoc.isEmpty()) {
-                String uploadDir = "photos/candidate/" + jobSeekerProfile.getUserAccountId();
-                FileUploadUtil.saveFile(uploadDir, educationDocName, educationDoc);
-            }
-            if (certificationsDoc != null && !certificationsDoc.isEmpty()) {
-                String uploadDir = "photos/candidate/" + jobSeekerProfile.getUserAccountId();
-                FileUploadUtil.saveFile(uploadDir, certificationsDocName, certificationsDoc);
-            }
-            if (verificationDoc != null && !verificationDoc.isEmpty()) {
-                String uploadDir = "photos/candidate/" + jobSeekerProfile.getUserAccountId();
-                System.out.println("Controller: Saving verificationDoc to dir: " + uploadDir);
-                FileUploadUtil.saveFile(uploadDir, verificationDocName, verificationDoc);
-            }
-
             redirectAttributes.addFlashAttribute("success", "Profile updated successfully!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", true);
@@ -433,6 +429,12 @@ public class JobSeekerProfileController {
     @GetMapping("/downloadResume")
     public ResponseEntity<?> downloadResume(@RequestParam(value = "fileName") String fileName,
             @RequestParam(value = "userID") String userId) {
+
+        if (fileName != null && (fileName.startsWith("http://") || fileName.startsWith("https://"))) {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(java.net.URI.create(fileName))
+                    .build();
+        }
 
         FileDownloadUtil downloadUtil = new FileDownloadUtil();
         Resource resource = null;
