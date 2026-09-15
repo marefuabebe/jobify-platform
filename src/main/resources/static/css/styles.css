@@ -1290,6 +1290,49 @@ a {
     }
 }
 
+/* Base Process Card (Mobile 2-column) */
+.mobile-process-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+}
+
+.mobile-process-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+}
+
+.process-step-pill {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(75, 108, 183, 0.3);
+}
+
+.process-icon-wrap {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(75, 108, 183, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 @media (max-width: 767.98px) {
     .hero-section {
         padding: 30px 0 20px 0;
@@ -1417,6 +1460,123 @@ a {
         margin-top: auto;
     }
 
+    /* 2-column "The Team / Meet the Minds" on Mobile */
+    .team-card {
+        padding-bottom: 16px;
+        border-radius: 14px;
+    }
+    .team-img-wrapper {
+        padding-top: 16px;
+        margin-bottom: 12px;
+    }
+    .team-img {
+        width: 82px;
+        height: 82px;
+        border-width: 3px;
+    }
+    .team-name {
+        font-size: 0.92rem;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .team-role {
+        font-size: 0.74rem;
+        margin-bottom: 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* 2-column "Latest Insights" (Blog) on Mobile */
+    .blog-card {
+        border-radius: 14px;
+    }
+    .blog-card .card-img-top {
+        height: 110px;
+    }
+    .blog-card .card-body {
+        padding: 12px 10px;
+    }
+    .blog-card .card-title {
+        font-size: 0.88rem;
+        margin-bottom: 8px;
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .blog-card .card-text {
+        font-size: 0.75rem;
+        line-height: 1.35;
+        margin-bottom: 10px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .blog-card .badge {
+        font-size: 0.65rem;
+        padding: 3px 7px;
+    }
+    .blog-card .read-more-btn {
+        font-size: 0.72rem;
+    }
+
+    /* 2-column "Newsroom" on Mobile */
+    .news-card {
+        padding: 14px 12px !important;
+        border-radius: 14px;
+    }
+    .news-date {
+        font-size: 0.68rem;
+        margin-bottom: 4px;
+    }
+    .news-title {
+        font-size: 0.85rem;
+        margin-bottom: 6px;
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .news-excerpt {
+        font-size: 0.74rem;
+        line-height: 1.35;
+        margin-bottom: 8px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .read-more-link {
+        font-size: 0.72rem;
+    }
+
+    /* 2-column "How It Works" on Mobile */
+    .step-card {
+        padding: 16px 10px;
+        border-radius: 14px;
+        margin-bottom: 0;
+    }
+    .step-number {
+        width: 44px;
+        height: 44px;
+        font-size: 1.15rem;
+        margin-bottom: 12px;
+    }
+    .step-title {
+        font-size: 0.92rem;
+        margin-bottom: 6px;
+    }
+    .step-description {
+        font-size: 0.75rem;
+        line-height: 1.35;
+    }
+
     /* Ensure tables scroll horizontally on mobile */
     .table-responsive {
         overflow-x: auto;
@@ -1445,6 +1605,48 @@ a {
     .category-card h5 {
         font-size: 0.84rem;
         margin-bottom: 8px;
+    }
+
+    .team-img {
+        width: 68px;
+        height: 68px;
+    }
+
+    .blog-card .card-img-top {
+        height: 92px;
+    }
+
+    .blog-card .card-text {
+        display: none; /* Keeps 2-column blog cards neat and square on phones */
+    }
+
+    .news-excerpt {
+        display: none; /* Keeps 2-column news cards crisp on small phones */
+    }
+
+    .step-card {
+        padding: 12px 8px;
+    }
+
+    .step-number {
+        width: 36px;
+        height: 36px;
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+    }
+
+    .step-title {
+        font-size: 0.82rem;
+        margin-bottom: 4px;
+    }
+
+    .step-description {
+        font-size: 0.7rem;
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 
     .mobile-trust-grid {
