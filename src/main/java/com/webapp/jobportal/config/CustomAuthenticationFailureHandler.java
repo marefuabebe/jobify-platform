@@ -25,7 +25,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
     private final UsersRepository usersRepository;
 
     @Autowired
-    public CustomAuthenticationFailureHandler(UsersRepository usersRepository) {
+    public CustomAuthenticationFailureHandler(@org.springframework.context.annotation.Lazy UsersRepository usersRepository) {
         this.usersRepository = usersRepository;
     }
 

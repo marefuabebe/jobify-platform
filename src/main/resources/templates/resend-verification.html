@@ -56,22 +56,20 @@
                 </div>
 
                 <!-- Already Active Action -->
-                <div th:if="${alreadyActive}" class="text-center mb-4">
+                <div th:if="${alreadyActive == true}" class="text-center mb-4">
                     <a href="/login" class="btn btn-primary w-100 py-3 fw-semibold" style="border-radius: 8px;">
                         <i class="fas fa-sign-in-alt me-2"></i>Sign In Now
                     </a>
                 </div>
 
                 <!-- Form -->
-                <form th:unless="${alreadyActive and sent != true}" th:action="@{/resend-verification}" method="post">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-
+                <form th:unless="${alreadyActive == true}" th:action="@{/resend-verification}" method="post">
                     <div class="form-group mb-4">
                         <label for="email" class="form-label fw-semibold text-secondary">Email Address</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0"><i class="fas fa-envelope text-muted"></i></span>
                             <input type="email" id="email" name="email" class="form-control border-start-0"
-                                   th:value="${email}" placeholder="name@example.com" required autofocus />
+                                   th:value="${email != null ? email : ''}" placeholder="name@example.com" required autofocus />
                         </div>
                     </div>
 
