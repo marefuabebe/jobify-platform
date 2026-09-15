@@ -33,6 +33,9 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     private com.webapp.jobportal.repository.JobSeekerProfileRepository jobSeekerProfileRepository;
 
     @Autowired
+    private com.webapp.jobportal.repository.RecruiterProfileRepository recruiterProfileRepository;
+
+    @Autowired
     private com.webapp.jobportal.services.EmailService emailService;
 
     @Override
@@ -43,46 +46,45 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         try {
             CustomOAuth2User oauth2User = (CustomOAuth2User) authentication.getPrincipal();
             String email = oauth2User.getEmail();
-            String name = oauth2User.getName();
+            String givenName = oauth2User.getGivenName();
+            String familyName = oauth2User.getFamilyName();
+            String picture = oauth2User.getPicture();
 
             Optional<Users> userOptional = usersRepository.findByEmail(email);
             Users user;
 
             if (userOptional.isEmpty()) {
-                // Register new user
+                // Register new user without a role yet
                 Users newUser = new Users();
                 newUser.setEmail(email);
                 newUser.setPassword(java.util.UUID.randomUUID().toString());
                 newUser.setActive(true);
                 newUser.setApproved(true);
                 newUser.setRegistrationDate(new Date());
-
-                // Default to Job Seeker (TypeId 2)
-                Optional<UsersType> usersType = usersTypeRepository.findById(2);
-                if (usersType.isPresent()) {
-                    newUser.setUserTypeId(usersType.get());
-                }
+                newUser.setUserTypeId(null); // Pending role selection
 
                 user = usersRepository.save(newUser);
 
-                // Create minimal JobSeekerProfile to avoid redirect loops
-                // Similar to UsersService.addNew logic
-                System.out.println("Creating default JobSeekerProfile for Google User: " + email);
-                com.webapp.jobportal.entity.JobSeekerProfile profile = new com.webapp.jobportal.entity.JobSeekerProfile(
-                        user);
-                // Set defaults if constructor doesn't
-                profile.setFirstName(name);
-                profile.setLastName("");
-                // We'd need to autowire JobSeekerProfileRepository
-                jobSeekerProfileRepository.save(profile);
+                // Temporary authority for role selection page
+                List<org.springframework.security.core.GrantedAuthority> authorities = new java.util.ArrayList<>();
+                authorities.add(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_PENDING_ROLE"));
 
-                // Send Welcome Email
-                emailService.sendWelcomeNotification(email, name);
+                org.springframework.security.authentication.UsernamePasswordAuthenticationToken newAuth =
+                        new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                                authentication.getPrincipal(),
+                                authentication.getCredentials(),
+                                authorities);
 
+                SecurityContextHolder.getContext().setAuthentication(newAuth);
+                org.springframework.security.web.context.SecurityContextRepository securityContextRepository =
+                        new org.springframework.security.web.context.HttpSessionSecurityContextRepository();
+                securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
+
+                response.sendRedirect("/oauth2/choose-role");
+                return;
             } else {
                 user = userOptional.get();
                 if (!user.isActive()) {
-                    // CRITICAL: Clear the security context so the user is NOT logged in.
                     SecurityContextHolder.clearContext();
                     if (request.getSession(false) != null) {
                         request.getSession(false).invalidate();
@@ -90,30 +92,82 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                     response.sendRedirect("/login?disabled=true");
                     return;
                 }
+
+                // If user has not chosen a role yet
+                if (user.getUserTypeId() == null) {
+                    List<org.springframework.security.core.GrantedAuthority> authorities = new java.util.ArrayList<>();
+                    authorities.add(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_PENDING_ROLE"));
+
+                    org.springframework.security.authentication.UsernamePasswordAuthenticationToken newAuth =
+                            new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                                    authentication.getPrincipal(),
+                                    authentication.getCredentials(),
+                                    authorities);
+
+                    SecurityContextHolder.getContext().setAuthentication(newAuth);
+                    org.springframework.security.web.context.SecurityContextRepository securityContextRepository =
+                            new org.springframework.security.web.context.HttpSessionSecurityContextRepository();
+                    securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
+
+                    response.sendRedirect("/oauth2/choose-role");
+                    return;
+                }
+
+                // Self-healing for existing users if firstName was saved as email or blank
+                if (user.getUserTypeId().getUserTypeId() == 2) {
+                    jobSeekerProfileRepository.findById(user.getUserId()).ifPresent(p -> {
+                        boolean updated = false;
+                        if (p.getFirstName() == null || p.getFirstName().trim().isEmpty() || p.getFirstName().equalsIgnoreCase(email)) {
+                            p.setFirstName(givenName);
+                            if (p.getLastName() == null || p.getLastName().trim().isEmpty()) {
+                                p.setLastName(familyName);
+                            }
+                            updated = true;
+                        }
+                        if ((p.getProfilePhoto() == null || p.getProfilePhoto().trim().isEmpty()) && picture != null) {
+                            p.setProfilePhoto(picture);
+                            updated = true;
+                        }
+                        if (updated) {
+                            jobSeekerProfileRepository.save(p);
+                        }
+                    });
+                } else if (user.getUserTypeId().getUserTypeId() == 1) {
+                    recruiterProfileRepository.findById(user.getUserId()).ifPresent(p -> {
+                        boolean updated = false;
+                        if (p.getFirstName() == null || p.getFirstName().trim().isEmpty() || p.getFirstName().equalsIgnoreCase(email)) {
+                            p.setFirstName(givenName);
+                            if (p.getLastName() == null || p.getLastName().trim().isEmpty()) {
+                                p.setLastName(familyName);
+                            }
+                            updated = true;
+                        }
+                        if ((p.getProfilePhoto() == null || p.getProfilePhoto().trim().isEmpty()) && picture != null) {
+                            p.setProfilePhoto(picture);
+                            updated = true;
+                        }
+                        if (updated) {
+                            recruiterProfileRepository.save(p);
+                        }
+                    });
+                }
             }
 
             // --- 2. Inject Authorities into SecurityContext ---
-            // Fetch the user's role (e.g. "Freelancer")
             String roleName = user.getUserTypeId().getUserTypeName();
             List<org.springframework.security.core.GrantedAuthority> authorities = new java.util.ArrayList<>();
             authorities.add(new org.springframework.security.core.authority.SimpleGrantedAuthority(roleName));
 
-            // Create a NEW Authentication token with these authorities
-            // We use UsernamePasswordAuthenticationToken or similar, preserving the
-            // Principal
-            org.springframework.security.authentication.UsernamePasswordAuthenticationToken newAuth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
-                    authentication.getPrincipal(),
-                    authentication.getCredentials(),
-                    authorities);
+            org.springframework.security.authentication.UsernamePasswordAuthenticationToken newAuth =
+                    new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                            authentication.getPrincipal(),
+                            authentication.getCredentials(),
+                            authorities);
 
-            // --- 3. Save to Session ---
-            // Ensure session is created and context is saved properly for Spring Security
-            // 6+
             SecurityContextHolder.getContext().setAuthentication(newAuth);
 
-            // Use HttpSessionSecurityContextRepository to save the context explicitly
-            org.springframework.security.web.context.SecurityContextRepository securityContextRepository = new org.springframework.security.web.context.HttpSessionSecurityContextRepository();
-
+            org.springframework.security.web.context.SecurityContextRepository securityContextRepository =
+                    new org.springframework.security.web.context.HttpSessionSecurityContextRepository();
             securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
 
             response.sendRedirect("/dashboard/");

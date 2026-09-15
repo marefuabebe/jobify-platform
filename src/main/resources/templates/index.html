@@ -72,126 +72,184 @@
             <div class="row align-items-center">
                 <!-- Left Content -->
                 <div class="col-lg-6">
-                    <div class="pe-lg-5">
-                        <h1 class="hero-title animate-up">The <span class="highlight-text">Easiest Way</span> to Get
-                            Your New Job
-                        </h1>
-                        <p class="hero-subtitle animate-up delay-100">Each month, more than 3 million job seekers turn
-                            to website in their
-                            search for work, making over 140,000 applications every single day</p>
+                    <div class="pe-lg-4 hero-content-wrap">
+                        <!-- Modern Top Badge -->
+                        <div class="hero-badge-pill animate-up mb-3">
+                            <span class="pulse-dot-primary"></span>
+                            <span>#1 Platform for Global Freelance & Full-time Talent</span>
+                        </div>
 
-                        <!-- Search Form -->
+                        <h1 class="hero-title animate-up">The <span class="highlight-text">Smarter Way</span> to Get
+                            Your Dream Job
+                        </h1>
+                        <p class="hero-subtitle animate-up delay-100">Connect with top-tier clients, explore verified
+                            opportunities, and build your career with safe escrow milestone payments.</p>
+
+                        <!-- Search Form (Modern Responsive App Style) -->
                         <form th:action="@{/find-work/}" method="get" class="animate-up delay-200">
-                            <div class="search-box-container">
-                                <div class="search-input-group">
-                                    <i class="fas fa-layer-group"></i>
-                                    <select class="form-select shadow-none" name="category">
-                                        <option selected value="">Category</option>
-                                        <option value="AI & Machine Learning">AI & Machine Learning</option>
-                                        <option value="Data Science & Analytics">Data Science & Analytics</option>
-                                        <option value="Web, Mobile & Software Development">Software Development</option>
-                                        <option value="Sales & Marketing">Sales & Marketing</option>
-                                        <option value="Design & Creative">Design & Creative</option>
-                                        <option value="Writing">Writing</option>
-                                        <option value="Engineering & Architecture">Engineering</option>
-                                        <option value="IT & Networking">IT & Networking</option>
-                                        <option value="Customer Service">Customer Service</option>
-                                        <option value="Legal">Legal</option>
-                                    </select>
-                                </div>
-                                <div class="search-input-group">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    <select class="form-select shadow-none" name="location">
-                                        <option selected value="">Location</option>
-                                        <option value="New York">New York</option>
-                                        <option value="Remote">Remote</option>
-                                        <option value="London">London</option>
-                                        <option value="Berlin">Berlin</option>
-                                    </select>
-                                </div>
-                                <div class="search-input-group">
+                            <div class="search-box-container modern-search-card">
+                                <!-- Keyword Input (Primary) -->
+                                <div class="search-input-group search-keyword-group">
                                     <i class="fas fa-search"></i>
-                                    <input type="text" name="job" placeholder="Keyword" required>
+                                    <input type="text" name="job" placeholder="Search job title, skills, or keywords..." required>
                                 </div>
-                                <button type="submit" class="btn btn-search">Search</button>
+
+                                <!-- Side-by-Side Filters Row (Category & Location) -->
+                                <div class="search-filters-row">
+                                    <div class="search-input-group search-filter-col">
+                                        <i class="fas fa-layer-group"></i>
+                                        <select class="form-select shadow-none" name="category">
+                                            <option selected value="">Category</option>
+                                            <option value="AI & Machine Learning">AI & Machine Learning</option>
+                                            <option value="Data Science & Analytics">Data Science & Analytics</option>
+                                            <option value="Web, Mobile & Software Development">Software Development</option>
+                                            <option value="Sales & Marketing">Sales & Marketing</option>
+                                            <option value="Design & Creative">Design & Creative</option>
+                                            <option value="Writing">Writing</option>
+                                            <option value="Engineering & Architecture">Engineering</option>
+                                            <option value="IT & Networking">IT & Networking</option>
+                                            <option value="Customer Service">Customer Service</option>
+                                            <option value="Legal">Legal</option>
+                                        </select>
+                                    </div>
+                                    <div class="search-input-group search-filter-col">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <select class="form-select shadow-none" name="location">
+                                            <option selected value="">Location</option>
+                                            <option value="Remote">Remote</option>
+                                            <option value="New York">New York</option>
+                                            <option value="London">London</option>
+                                            <option value="Berlin">Berlin</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-search">
+                                    <i class="fas fa-search me-2 d-md-none"></i><span>Search Jobs</span>
+                                </button>
                             </div>
                         </form>
 
-                        <div class="popular-searches">
-                            <strong>Popular Searches:</strong>
-                            <a href="#">UX/UI Designer</a>,
-                            <a href="#">Developer</a>,
-                            <a href="#">Engineer & Architect</a>,
-                            <a href="#">Information Technology</a>
+                        <!-- Popular Searches as Tap-Friendly Chips -->
+                        <div class="popular-searches-wrapper animate-up delay-200">
+                            <span class="popular-label">Popular:</span>
+                            <div class="popular-chips-group">
+                                <a th:href="@{/find-work/(job='Developer')}" class="popular-chip">
+                                    <i class="fas fa-code"></i> Developer
+                                </a>
+                                <a th:href="@{/find-work/(job='UX/UI Designer')}" class="popular-chip">
+                                    <i class="fas fa-palette"></i> UX/UI
+                                </a>
+                                <a th:href="@{/find-work/(job='AI & Machine Learning')}" class="popular-chip">
+                                    <i class="fas fa-robot"></i> AI & ML
+                                </a>
+                                <a th:href="@{/find-work/(job='Remote')}" class="popular-chip">
+                                    <i class="fas fa-globe"></i> Remote
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Mobile Live Stats Banner (Replaces Bulky Graphic on Mobile) -->
+                        <div class="mobile-trust-grid d-block d-lg-none mt-4 animate-up delay-300">
+                            <div class="trust-stat-card">
+                                <div class="stat-icon-wrap"><i class="fas fa-briefcase"></i></div>
+                                <div>
+                                    <span class="stat-num">10k+</span>
+                                    <span class="stat-lbl">Active Jobs</span>
+                                </div>
+                            </div>
+                            <div class="trust-stat-card">
+                                <div class="stat-icon-wrap"><i class="fas fa-star text-warning"></i></div>
+                                <div>
+                                    <span class="stat-num">4.9/5</span>
+                                    <span class="stat-lbl">Top Rating</span>
+                                </div>
+                            </div>
+                            <div class="trust-stat-card">
+                                <div class="stat-icon-wrap"><i class="fas fa-shield-alt text-success"></i></div>
+                                <div>
+                                    <span class="stat-num">100%</span>
+                                    <span class="stat-lbl">Escrow Safe</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Image -->
-                <div class="col-lg-6 text-center mt-5 mt-lg-0 animate-up delay-300">
+                <!-- Right Image (Visible on Desktop Only) -->
+                <div class="col-lg-6 text-center mt-5 mt-lg-0 animate-up delay-300 d-none d-lg-block">
                     <img th:src="@{/assets/hero-illustration.png}" alt="Job Search Hero" class="img-fluid"
-                        style="max-height: 550px;">
+                        style="max-height: 520px;">
                 </div>
             </div>
 
-            <!-- Bottom Categories Teaser -->
+            <!-- Bottom Categories Teaser (2-Column on Mobile, 3-Column on Desktop) -->
             <div class="browse-category reveal">
                 <h5>Browse by category</h5>
-                <p class="text-muted small">Find the job that's perfect for you. about 800+ new jobs everyday</p>
+                <p class="text-muted small">Find the job that's perfect for you. About 800+ new jobs everyday</p>
 
-                <div class="row mt-5 text-start">
-                    <div class="col-md-4 mb-4 reveal delay-100">
+                <div class="row mt-4 mt-md-5 g-3 g-md-4 text-start">
+                    <div class="col-6 col-lg-4 reveal delay-100">
                         <div class="category-card">
                             <i class="fas fa-pencil-ruler category-card-icon"></i>
                             <h5>Design & Creative</h5>
-                            <p>Graphic design, UI/UX, animation, and other creative fields.</p>
-                            <a th:href="@{/find-work/(category='Design & Creative')}" class="explore-link">EXPLORE
-                                NOW <i class="fas fa-arrow-right"></i></a>
+                            <p>Graphic design, UI/UX, animation, and creative fields.</p>
+                            <a th:href="@{/find-work/(category='Design & Creative')}" class="explore-link">
+                                <span>Explore</span> <i class="fas fa-arrow-right"></i>
+                            </a>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-4 reveal delay-200">
+                    <div class="col-6 col-lg-4 reveal delay-200">
                         <div class="category-card">
                             <i class="fas fa-code category-card-icon"></i>
-                            <h5>Web & Software Dev</h5>
-                            <p>Web development, mobile apps, software engineering, and more.</p>
+                            <h5>Web & Software</h5>
+                            <p>Web development, mobile apps, and software engineering.</p>
                             <a th:href="@{/find-work/(category='Web, Mobile & Software Development')}"
-                                class="explore-link">EXPLORE NOW <i class="fas fa-arrow-right"></i></a>
+                                class="explore-link">
+                                <span>Explore</span> <i class="fas fa-arrow-right"></i>
+                            </a>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-4 reveal delay-300">
+                    <div class="col-6 col-lg-4 reveal delay-300">
                         <div class="category-card">
                             <i class="fas fa-chart-line category-card-icon"></i>
-                            <h5>Data Science & Analytics</h5>
-                            <p>Data analysis, machine learning, AI, and big data solutions.</p>
+                            <h5>Data Science</h5>
+                            <p>Data analysis, machine learning, AI, and big data.</p>
                             <a th:href="@{/find-work/(category='Data Science & Analytics')}"
-                                class="explore-link">EXPLORE NOW <i class="fas fa-arrow-right"></i></a>
+                                class="explore-link">
+                                <span>Explore</span> <i class="fas fa-arrow-right"></i>
+                            </a>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-4 reveal delay-100">
+                    <div class="col-6 col-lg-4 reveal delay-100">
                         <div class="category-card">
                             <i class="fas fa-network-wired category-card-icon"></i>
                             <h5>IT & Networking</h5>
-                            <p>Network administration, security, support, and IT infrastructure.</p>
-                            <a th:href="@{/find-work/(category='IT & Networking')}" class="explore-link">EXPLORE NOW
-                                <i class="fas fa-arrow-right"></i></a>
+                            <p>Network admin, cybersecurity, and cloud infra.</p>
+                            <a th:href="@{/find-work/(category='IT & Networking')}" class="explore-link">
+                                <span>Explore</span> <i class="fas fa-arrow-right"></i>
+                            </a>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-4 reveal delay-200">
+                    <div class="col-6 col-lg-4 reveal delay-200">
                         <div class="category-card">
                             <i class="fas fa-bullhorn category-card-icon"></i>
                             <h5>Sales & Marketing</h5>
-                            <p>Digital marketing, sales, SEO, content marketing, and more.</p>
-                            <a th:href="@{/find-work/(category='Sales & Marketing')}" class="explore-link">EXPLORE
-                                NOW <i class="fas fa-arrow-right"></i></a>
+                            <p>Digital marketing, sales, SEO, and content growth.</p>
+                            <a th:href="@{/find-work/(category='Sales & Marketing')}" class="explore-link">
+                                <span>Explore</span> <i class="fas fa-arrow-right"></i>
+                            </a>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-4 reveal delay-300">
+                    <div class="col-6 col-lg-4 reveal delay-300">
                         <div class="category-card">
                             <i class="fas fa-drafting-compass category-card-icon"></i>
                             <h5>Engineering</h5>
-                            <p>Civil, mechanical, stress engineering, and architecture jobs.</p>
+                            <p>Civil, mechanical, CAD, and architecture projects.</p>
                             <a th:href="@{/find-work/(category='Engineering & Architecture')}"
-                                class="explore-link">EXPLORE NOW <i class="fas fa-arrow-right"></i></a>
+                                class="explore-link">
+                                <span>Explore</span> <i class="fas fa-arrow-right"></i>
+                            </a>
                         </div>
                     </div>
                 </div>

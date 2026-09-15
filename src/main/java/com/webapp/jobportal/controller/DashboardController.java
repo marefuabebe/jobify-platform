@@ -41,7 +41,7 @@ public class DashboardController {
         } else if (hasFreelancerRole) {
             return "redirect:/freelancer-dashboard/";
         } else {
-            return "redirect:/";
+            return "redirect:/oauth2/choose-role";
         }
     }
 }

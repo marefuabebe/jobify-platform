@@ -72,6 +72,7 @@ public class WebSecurityConfig {
                         auth.requestMatchers("/client-dashboard/**").hasAuthority("Client");
                         auth.requestMatchers("/freelancer-dashboard/**").hasAuthority("Freelancer");
                         auth.requestMatchers("/admin/**").hasAuthority("Admin");
+                        auth.requestMatchers("/oauth2/choose-role/**").authenticated();
 
                         auth.anyRequest().authenticated();
                 }).sessionManagement(session -> session

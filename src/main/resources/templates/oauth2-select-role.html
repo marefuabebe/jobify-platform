@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Your Role - Jobify</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #4B6CB7;
+            --primary-light: #7390D8;
+            --primary-dark: #324C8C;
+            --secondary: #1a1d1f;
+            --text-dark: #212529;
+            --text-muted: #6c757d;
+            --bg-light: #f4f7fc;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 8px 24px rgba(75, 108, 183, 0.08);
+            --shadow-hover: 0 12px 32px rgba(75, 108, 183, 0.16);
+            --radius-md: 16px;
+            --radius-sm: 10px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #eef2f9 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header-brand {
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1a1d1f;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        .selection-card {
+            background: #ffffff;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 820px;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .user-welcome-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: #f0f4ff;
+            border: 1px solid #d4e2ff;
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        .user-welcome-badge img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-welcome-badge .avatar-fallback {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1a1d1f;
+            margin-bottom: 0.6rem;
+            letter-spacing: -0.5px;
+        }
+
+        .page-subtitle {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .role-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.75rem;
+            margin-bottom: 2.5rem;
+            text-align: left;
+        }
+
+        @media (max-width: 768px) {
+            .role-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .selection-card {
+                padding: 2rem 1.25rem;
+            }
+        }
+
+        .role-option {
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 2rem 1.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .role-option:hover {
+            border-color: var(--primary-light);
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-3px);
+        }
+
+        .role-option.selected {
+            border-color: var(--primary);
+            background: #fcfdff;
+            box-shadow: 0 0 0 3px rgba(75, 108, 183, 0.15), var(--shadow-md);
+        }
+
+        .role-radio {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 22px;
+            height: 22px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .role-icon-box {
+            width: 58px;
+            height: 58px;
+            border-radius: 14px;
+            background: #f0f4ff;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            margin-bottom: 1.25rem;
+            transition: var(--transition);
+        }
+
+        .role-option.selected .role-icon-box {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .role-heading {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1a1d1f;
+            margin-bottom: 0.5rem;
+        }
+
+        .role-description {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            margin-bottom: 1.25rem;
+            line-height: 1.5;
+        }
+
+        .role-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.88rem;
+            color: #495057;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .role-features li {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .role-features li i {
+            color: #10b981;
+            font-size: 0.95rem;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.95rem 3rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(75, 108, 183, 0.35);
+            transition: var(--transition);
+            min-width: 240px;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(75, 108, 183, 0.45);
+            color: white;
+        }
+
+        .btn-submit:disabled {
+            background: #cbd5e1;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .footer-note {
+            margin-top: 1.5rem;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            border: 1px solid #f87171;
+            color: #991b1b;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-sm);
+            margin-bottom: 1.5rem;
+            text-align: left;
+            font-size: 0.92rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header-brand">
+        <a href="/" class="logo">Jobify<span>.</span></a>
+    </header>
+
+    <main class="main-container">
+        <div class="selection-card">
+            <!-- User Badge -->
+            <div class="user-welcome-badge">
+                <img th:if="${picture != null and !picture.isEmpty()}" th:src="${picture}" alt="Avatar" />
+                <div th:unless="${picture != null and !picture.isEmpty()}" class="avatar-fallback"
+                    th:text="${displayName != null and !displayName.isEmpty() ? displayName.substring(0,1).toUpperCase() : 'U'}">
+                    U
+                </div>
+                <span>Connected as <strong th:text="${displayName}">User</strong> (<span th:text="${email}">user@example.com</span>)</span>
+            </div>
+
+            <h1 class="page-title">Join as a Client or Freelancer</h1>
+            <p class="page-subtitle">Select how you would like to use Jobify to complete your account setup.</p>
+
+            <div th:if="${error}" class="alert-error">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span th:text="${error}">An error occurred</span>
+            </div>
+
+            <form th:action="@{/oauth2/choose-role}" method="POST" id="roleForm">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                <div class="role-grid">
+                    <!-- Option 1: Client -->
+                    <label class="role-option" id="clientCard" for="roleClient">
+                        <input type="radio" class="role-radio" name="userTypeId" id="roleClient" value="1"
+                            onchange="onRoleChange()" />
+                        <div>
+                            <div class="role-icon-box">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <h2 class="role-heading">I'm a Client, hiring for a project</h2>
+                            <p class="role-description">Find, hire, and manage top freelance talent for your company or personal projects.</p>
+                        </div>
+                        <ul class="role-features">
+                            <li><i class="fas fa-check-circle"></i> Post jobs and review proposals</li>
+                            <li><i class="fas fa-check-circle"></i> Direct chat with top freelancers</li>
+                            <li><i class="fas fa-check-circle"></i> Secure milestone payments & contracts</li>
+                        </ul>
+                    </label>
+
+                    <!-- Option 2: Freelancer -->
+                    <label class="role-option" id="freelancerCard" for="roleFreelancer">
+                        <input type="radio" class="role-radio" name="userTypeId" id="roleFreelancer" value="2"
+                            onchange="onRoleChange()" />
+                        <div>
+                            <div class="role-icon-box">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <h2 class="role-heading">I'm a Freelancer, looking for work</h2>
+                            <p class="role-description">Showcase your portfolio, find great opportunities, and collaborate directly with clients.</p>
+                        </div>
+                        <ul class="role-features">
+                            <li><i class="fas fa-check-circle"></i> Search and submit proposals for jobs</li>
+                            <li><i class="fas fa-check-circle"></i> Build your verified talent profile</li>
+                            <li><i class="fas fa-check-circle"></i> Get paid securely for completed work</li>
+                        </ul>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn" disabled>
+                    Complete Registration <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+
+                <p class="footer-note">
+                    Already have an account under another email? <a th:href="@{/login}">Log in here</a>
+                </p>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        function onRoleChange() {
+            const clientRadio = document.getElementById('roleClient');
+            const freelancerRadio = document.getElementById('roleFreelancer');
+            const clientCard = document.getElementById('clientCard');
+            const freelancerCard = document.getElementById('freelancerCard');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (clientRadio.checked) {
+                clientCard.classList.add('selected');
+                freelancerCard.classList.remove('selected');
+                submitBtn.disabled = false;
+            } else if (freelancerRadio.checked) {
+                freelancerCard.classList.add('selected');
+                clientCard.classList.remove('selected');
+                submitBtn.disabled = false;
+            } else {
+                clientCard.classList.remove('selected');
+                freelancerCard.classList.remove('selected');
+                submitBtn.disabled = true;
+            }
+        }
+    </script>
+</body>
+
+</html>

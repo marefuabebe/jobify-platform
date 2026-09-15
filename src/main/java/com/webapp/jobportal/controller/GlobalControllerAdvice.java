@@ -41,28 +41,34 @@ public class GlobalControllerAdvice {
             if (user != null) {
                 // If it's a Recruiter or JobSeeker, put their PROFILE in the 'user' attribute
                 // because templates expect 'user.firstName', 'user.isVerified', etc.
-                if (user.getUserTypeId().getUserTypeId() == 1) { // Recruiter
-                    recruiterProfileService.getOne(user.getUserId()).ifPresent(profile -> {
-                        // Ensure isVerified is false if user is not approved
-                        if (!user.isApproved()) {
-                            profile.setIsVerified(false);
-                        }
-                        model.addAttribute("user", profile);
-                        model.addAttribute("userType", "Recruiter");
-                    });
-                } else if (user.getUserTypeId().getUserTypeId() == 2) { // JobSeeker
-                    jobSeekerProfileService.getOne(user.getUserId()).ifPresent(profile -> {
-                        // Ensure isVerified is false if user is not approved
-                        if (!user.isApproved()) {
-                            profile.setIsVerified(false);
-                        }
-                        model.addAttribute("user", profile);
-                        model.addAttribute("userType", "JobSeeker");
-                    });
+                if (user.getUserTypeId() != null) {
+                    if (user.getUserTypeId().getUserTypeId() == 1) { // Recruiter
+                        recruiterProfileService.getOne(user.getUserId()).ifPresent(profile -> {
+                            // Ensure isVerified is false if user is not approved
+                            if (!user.isApproved()) {
+                                profile.setIsVerified(false);
+                            }
+                            model.addAttribute("user", profile);
+                            model.addAttribute("userType", "Recruiter");
+                        });
+                    } else if (user.getUserTypeId().getUserTypeId() == 2) { // JobSeeker
+                        jobSeekerProfileService.getOne(user.getUserId()).ifPresent(profile -> {
+                            // Ensure isVerified is false if user is not approved
+                            if (!user.isApproved()) {
+                                profile.setIsVerified(false);
+                            }
+                            model.addAttribute("user", profile);
+                            model.addAttribute("userType", "JobSeeker");
+                        });
+                    } else {
+                        // Admin or other: just put base user
+                        model.addAttribute("user", user);
+                        model.addAttribute("userType", "Admin");
+                    }
                 } else {
-                    // Admin or other: just put base user
+                    // Pending role selection
                     model.addAttribute("user", user);
-                    model.addAttribute("userType", "Admin");
+                    model.addAttribute("userType", "Pending");
                 }
 
                 // Also add 'baseUser' if templates need the raw Users entity (e.g. for id or

@@ -29,10 +29,54 @@ public class CustomOAuth2User implements OAuth2User, Serializable {
 
     @Override
     public String getName() {
+        String name = oauth2User.getAttribute("name");
+        if (name != null && !name.trim().isEmpty()) {
+            return name;
+        }
+        String givenName = oauth2User.getAttribute("given_name");
+        if (givenName != null && !givenName.trim().isEmpty()) {
+            return givenName;
+        }
         return oauth2User.getAttribute("email");
     }
 
     public String getEmail() {
         return oauth2User.getAttribute("email");
+    }
+
+    public String getGivenName() {
+        String givenName = oauth2User.getAttribute("given_name");
+        if (givenName != null && !givenName.trim().isEmpty()) {
+            return givenName;
+        }
+        String fullName = oauth2User.getAttribute("name");
+        if (fullName != null && !fullName.trim().isEmpty()) {
+            String[] parts = fullName.trim().split("\\s+", 2);
+            return parts[0];
+        }
+        String email = getEmail();
+        if (email != null && email.contains("@")) {
+            return email.substring(0, email.indexOf("@"));
+        }
+        return "User";
+    }
+
+    public String getFamilyName() {
+        String familyName = oauth2User.getAttribute("family_name");
+        if (familyName != null && !familyName.trim().isEmpty()) {
+            return familyName;
+        }
+        String fullName = oauth2User.getAttribute("name");
+        if (fullName != null && !fullName.trim().isEmpty()) {
+            String[] parts = fullName.trim().split("\\s+", 2);
+            if (parts.length > 1) {
+                return parts[1];
+            }
+        }
+        return "";
+    }
+
+    public String getPicture() {
+        return oauth2User.getAttribute("picture");
     }
 }
