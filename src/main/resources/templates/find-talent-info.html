@@ -647,12 +647,12 @@
                                 alt="Profile">
                             <div th:unless="${freelancer.profile.profilePhoto != null}" class="freelancer-avatar">
                                 <span
-                                    th:text="${(freelancer.profile.firstName != null and !#strings.isEmpty(freelancer.profile.firstName)) ? #strings.substring(freelancer.profile.firstName,0,1) : 'U'}">U</span>
+                                    th:text="${(freelancer.profile.firstName != null and !#strings.isEmpty(freelancer.profile.firstName)) ? #strings.substring(freelancer.profile.firstName,0,1).toUpperCase() : 'U'}">U</span>
                             </div>
 
                             <div class="flex-grow-1 overflow-hidden">
                                 <h3 class="freelancer-name text-truncate mb-1"
-                                    th:text="${(freelancer.profile.firstName != null ? freelancer.profile.firstName : '') + ' ' + (freelancer.profile.lastName != null ? freelancer.profile.lastName : '')}">
+                                    th:text="${(freelancer.profile.firstName != null and !freelancer.profile.firstName.contains('@')) ? ((freelancer.profile.firstName != null ? freelancer.profile.firstName : '') + ' ' + (freelancer.profile.lastName != null ? freelancer.profile.lastName : '')) : (freelancer.profile.firstName != null ? #strings.substringBefore(freelancer.profile.firstName, '@') : 'Freelancer')}">
                                     Name</h3>
 
                                 <div class="freelancer-location">
@@ -661,7 +661,7 @@
                                         th:text="${freelancer.profile.city != null ? freelancer.profile.city : 'Remote'}">Location</span>
                                 </div>
 
-                                <div class="badge-verified">
+                                <div th:if="${freelancer.isVerified}" class="badge-verified">
                                     <i class="fas fa-check-circle"></i> Verified Pro
                                 </div>
                             </div>

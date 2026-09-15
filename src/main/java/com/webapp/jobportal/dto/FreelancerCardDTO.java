@@ -47,4 +47,12 @@ public class FreelancerCardDTO {
     public void setReviewCount(Long reviewCount) {
         this.reviewCount = reviewCount;
     }
+
+    public boolean isVerified() {
+        return profile != null && Boolean.TRUE.equals(profile.getIsVerified());
+    }
+
+    public Boolean getIsVerified() {
+        return isVerified();
+    }
 }
