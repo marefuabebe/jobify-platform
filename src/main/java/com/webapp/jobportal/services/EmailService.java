@@ -514,6 +514,8 @@ public class EmailService {
 
                 String htmlContent = buildHtmlEmail(subject, "User", content, "Reset Password", resetLink);
                 sendEmail(userEmail, subject, htmlContent, true);
+        }
+
         public void sendVerificationEmail(String userEmail, String userName, String verificationLink) {
                 String subject = "Verify your Jobify Account";
                 String content = "<p>Welcome to Jobify!</p>" +
