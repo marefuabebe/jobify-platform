@@ -73,50 +73,72 @@ public class JobSeekerProfileController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         List<Skills> skills = new ArrayList<>();
 
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-            try {
-                Users user = usersRepository.findByEmail(authentication.getName())
-                        .orElseThrow(() -> new UsernameNotFoundException("User not found."));
-                Optional<JobSeekerProfile> seekerProfile = jobSeekerProfileService.getOne(user.getUserId());
-                if (seekerProfile.isPresent()) {
-                    jobSeekerProfile = seekerProfile.get();
-                    if (jobSeekerProfile.getIsVerified() == null) {
-                        jobSeekerProfile.setIsVerified(false);
-                    }
-                    if (user.isApproved()) {
-                        jobSeekerProfile.setIsVerified(jobSeekerProfile.getIsVerified());
-                    } else {
-                        jobSeekerProfile.setIsVerified(false);
-                    }
-                    model.addAttribute("user", jobSeekerProfile);
-                    // Ensure skills list is initialized
-                    if (jobSeekerProfile.getSkills() != null && !jobSeekerProfile.getSkills().isEmpty()) {
-                        skills = jobSeekerProfile.getSkills();
-                    } else {
-                        skills.add(new Skills());
-                        jobSeekerProfile.setSkills(skills);
-                    }
-                } else {
-                    // Initialize a new profile for user without existing profile
-                    jobSeekerProfile.setUserId(user);
-                    model.addAttribute("user", jobSeekerProfile);
-                    jobSeekerProfile.setUserAccountId(user.getUserId());
-                    skills.add(new Skills());
-                    jobSeekerProfile.setSkills(skills);
-                }
-            } catch (Exception e) {
-                // If there's an error retrieving the profile, initialize with default values
-                System.err.println("Error retrieving job seeker profile: " + e.getMessage());
-                e.printStackTrace();
-                skills.add(new Skills());
-                jobSeekerProfile.setSkills(skills);
-            }
-        } else {
-            // For unauthenticated users, redirect to login
+        if (authentication == null || (authentication instanceof AnonymousAuthenticationToken)) {
             return "redirect:/login";
         }
 
-        // Ensure all profile properties have default values to prevent template errors
+        try {
+            Users user = usersRepository.findByEmail(authentication.getName())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+
+            model.addAttribute("currentUser", user);
+            model.addAttribute("baseUser", user);
+
+            Optional<JobSeekerProfile> seekerProfile = jobSeekerProfileService.getOneWithSkills(user.getUserId());
+            if (seekerProfile.isEmpty()) {
+                seekerProfile = jobSeekerProfileService.getOne(user.getUserId());
+            }
+
+            if (seekerProfile.isPresent()) {
+                jobSeekerProfile = seekerProfile.get();
+            } else {
+                jobSeekerProfile = new JobSeekerProfile(user);
+                jobSeekerProfile.setUserAccountId(user.getUserId());
+                jobSeekerProfile = jobSeekerProfileService.addNew(jobSeekerProfile);
+            }
+
+            if (jobSeekerProfile.getUserId() == null) {
+                jobSeekerProfile.setUserId(user);
+            }
+            if (jobSeekerProfile.getUserAccountId() == null) {
+                jobSeekerProfile.setUserAccountId(user.getUserId());
+            }
+
+            boolean isVerified = Boolean.TRUE.equals(jobSeekerProfile.getIsVerified()) && user.isApproved();
+            jobSeekerProfile.setIsVerified(isVerified);
+            model.addAttribute("isVerified", isVerified);
+            model.addAttribute("documentStatus", jobSeekerProfile.getDocumentStatus() != null ? jobSeekerProfile.getDocumentStatus() : "");
+
+            if (jobSeekerProfile.getSkills() != null && !jobSeekerProfile.getSkills().isEmpty()) {
+                skills = jobSeekerProfile.getSkills();
+            } else {
+                skills.add(new Skills());
+                jobSeekerProfile.setSkills(skills);
+            }
+
+            model.addAttribute("user", jobSeekerProfile);
+
+            // Safe notification model population
+            try {
+                model.addAttribute("notifications", notificationService.getRecentNotifications(user, 10));
+                model.addAttribute("unreadNotificationsCount", notificationService.getUnreadCount(user));
+            } catch (Exception ignored) {
+                model.addAttribute("notifications", java.util.Collections.emptyList());
+                model.addAttribute("unreadNotificationsCount", 0L);
+            }
+        } catch (Exception e) {
+            System.err.println("Error retrieving job seeker profile: " + e.getMessage());
+            e.printStackTrace();
+            skills.add(new Skills());
+            jobSeekerProfile.setSkills(skills);
+            model.addAttribute("user", jobSeekerProfile);
+            model.addAttribute("isVerified", false);
+            model.addAttribute("documentStatus", "");
+            model.addAttribute("notifications", java.util.Collections.emptyList());
+            model.addAttribute("unreadNotificationsCount", 0L);
+        }
+
+        // Ensure all profile properties have default non-null values to prevent template errors
         if (jobSeekerProfile.getFirstName() == null)
             jobSeekerProfile.setFirstName("");
         if (jobSeekerProfile.getLastName() == null)
@@ -333,15 +355,16 @@ public class JobSeekerProfileController {
             return "redirect:/job-seeker-profile/";
         }
 
-        // Send admin notification if verification document was uploaded
+        // Send admin & user notifications if verification document was uploaded
         if (verificationDoc != null && !verificationDoc.isEmpty()) {
             redirectAttributes.addFlashAttribute("verificationSuccess",
                     "Verification documents submitted successfully!");
             try {
-                emailService.sendAdminVerificationNotification(jobSeekerProfile.getUserId().getEmail(), "Freelancer");
-                notificationService.createAdminNotification(jobSeekerProfile.getUserId().getEmail(), "Freelancer");
+                emailService.sendAdminVerificationNotification(user.getEmail(), "Freelancer");
+                notificationService.createAdminVerificationNotification(user.getEmail(), "Freelancer", user.getUserId());
+                notificationService.createVerificationSubmittedNotification(user);
             } catch (Exception e) {
-                System.err.println("Failed to send admin notification: " + e.getMessage());
+                System.err.println("Failed to send verification notification: " + e.getMessage());
             }
         }
 

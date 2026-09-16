@@ -147,11 +147,31 @@ public class UsersService {
 
             if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("Client"))) {
                 RecruiterProfile recruiterProfile = recruiterProfileRepository.findById(userId)
-                        .orElse(new RecruiterProfile());
+                        .orElseGet(() -> {
+                            RecruiterProfile p = new RecruiterProfile(users);
+                            p.setUserAccountId(userId);
+                            return recruiterProfileRepository.save(p);
+                        });
+                if (recruiterProfile.getUserId() == null) {
+                    recruiterProfile.setUserId(users);
+                }
+                if (recruiterProfile.getUserAccountId() <= 0) {
+                    recruiterProfile.setUserAccountId(userId);
+                }
                 return recruiterProfile;
             } else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("Freelancer"))) {
                 JobSeekerProfile jobSeekerProfile = jobSeekerProfileRepository.findById(userId)
-                        .orElse(new JobSeekerProfile());
+                        .orElseGet(() -> {
+                            JobSeekerProfile p = new JobSeekerProfile(users);
+                            p.setUserAccountId(userId);
+                            return jobSeekerProfileRepository.save(p);
+                        });
+                if (jobSeekerProfile.getUserId() == null) {
+                    jobSeekerProfile.setUserId(users);
+                }
+                if (jobSeekerProfile.getUserAccountId() == null) {
+                    jobSeekerProfile.setUserAccountId(userId);
+                }
                 return jobSeekerProfile;
             }
         }

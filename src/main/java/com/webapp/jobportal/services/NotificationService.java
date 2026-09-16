@@ -116,6 +116,24 @@ public class NotificationService {
         createAdminNotification(title, message, "DISPUTE", dispute.getId());
     }
 
+    public void createVerificationSubmittedNotification(Users user) {
+        createNotification(
+                user,
+                "Verification Documents Submitted",
+                "Your identity documents have been submitted and are currently under review by our admin team.",
+                "INFO",
+                user.getUserId());
+    }
+
+    public void createVerificationReminderNotification(Users user) {
+        createNotification(
+                user,
+                "Action Required: Verify Your Identity",
+                "Please upload a valid government-issued ID in your profile to verify your account and unlock proposal submissions.",
+                "WARNING",
+                user.getUserId());
+    }
+
     public Notification getOne(Integer id) {
         return notificationRepository.findById(id).orElse(null);
     }

@@ -275,7 +275,7 @@
                         <div>
                             <div class="text-white fw-bold"
                                 th:text="${(user.firstName ?: '') + ' ' + (user.lastName ?: '')}">User Name</div>
-                            <div class="text-muted small" th:text="${user.userId.email}">email@example.com</div>
+                            <div class="text-muted small" th:text="${baseUser != null ? baseUser.email : (user != null and user.userId != null and user.userId instanceof T(com.webapp.jobportal.entity.Users) ? user.userId.email : (username != null ? username : ''))}">email@example.com</div>
                         </div>
                     </div>
                 </div>
@@ -420,7 +420,7 @@
             </div>
         </div>
         <input type="hidden" id="currentUserId" th:if="${user != null}"
-            th:value="${user.userId != null ? user.userId.userId : (user.userAccountId != null ? user.userAccountId : '')}" />
+            th:value="${baseUser != null ? baseUser.userId : (user.userAccountId != null ? user.userAccountId : (user.userId != null and user.userId instanceof T(com.webapp.jobportal.entity.Users) ? user.userId.userId : (user.userId != null ? user.userId : '')))}" />
     </nav>
     <!-- Scripts -->
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>

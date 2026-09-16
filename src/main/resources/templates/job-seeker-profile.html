@@ -29,11 +29,56 @@
 
     <div class="container py-5 flex-grow-1">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold mb-0">Edit Profile</h2>
+            <div>
+                <h2 class="fw-bold mb-1">Edit Profile</h2>
+                <p class="text-muted mb-0">Manage your freelancer credentials, portfolio, and identity verification</p>
+            </div>
             <a th:href="@{/freelancer-dashboard/}" class="btn btn-outline-primary rounded-pill px-4 btn-sm fw-bold">
-                <i class="fas fa-arrow-left me-2"></i> Dashboard
+                <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
             </a>
         </div>
+
+        <!-- Verification Warning Alert Banner at top of page -->
+        <div th:if="${!isVerified and (documentStatus == null or documentStatus == '' or documentStatus == 'REJECTED')}"
+            class="card border-0 rounded-4 shadow-sm mb-4"
+            style="background: linear-gradient(135deg, #fff5f5 0%, #fff8e1 100%); border-left: 5px solid #dc3545 !important;">
+            <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-danger text-white flex-shrink-0"
+                        style="width: 48px; height: 48px; font-size: 1.25rem;">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold text-danger mb-1">Identity Verification Required</h5>
+                        <p class="text-muted mb-0 small">
+                            You must upload a valid government-issued ID to get verified. <strong>Unverified accounts cannot submit job proposals or accept contracts.</strong>
+                        </p>
+                    </div>
+                </div>
+                <a href="#verification-section" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">
+                    <i class="fas fa-upload me-2"></i>Upload ID Document
+                </a>
+            </div>
+        </div>
+
+        <!-- Verification Under Review Banner -->
+        <div th:if="${!isVerified and documentStatus == 'UNDER_REVIEW'}"
+            class="card border-0 rounded-4 shadow-sm mb-4"
+            style="background: linear-gradient(135deg, #f0f7ff 0%, #e6f4ff 100%); border-left: 5px solid #0d6efd !important;">
+            <div class="card-body p-4 d-flex align-items-center gap-3">
+                <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary text-white flex-shrink-0"
+                    style="width: 48px; height: 48px; font-size: 1.25rem;">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold text-primary mb-1">Verification Documents Under Review</h5>
+                    <p class="text-muted mb-0 small">
+                        Your submitted documents are currently being reviewed by our administration team. This usually takes 24–48 hours. You will receive a notification once verified.
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <form th:action="@{/job-seeker-profile/addNew}" method="post" th:object="${profile}"
             enctype="multipart/form-data">
 
@@ -44,7 +89,7 @@
                         <h5 class="fw-bold mb-4 text-start">Profile Photo</h5>
                         <div class="position-relative d-inline-block mx-auto mb-3">
                             <img id="avatarPreview"
-                                th:src="${profile.photosImagePath != null ? profile.photosImagePath : 'https://ui-avatars.com/api/?name=' + user.firstName + '+' + user.lastName + '&background=0d6efd&color=fff'}"
+                                th:src="${profile.photosImagePath != null and !profile.photosImagePath.isEmpty() ? profile.photosImagePath : ('https://ui-avatars.com/api/?name=' + (user != null and user.firstName != null ? user.firstName : 'User') + '+' + (user != null and user.lastName != null ? user.lastName : '') + '&background=0d6efd&color=fff')}"
                                 class="rounded-circle img-thumbnail"
                                 style="width: 150px; height: 150px; object-fit: cover;" />
                             <label for="imageUpload"
@@ -56,26 +101,26 @@
                             </label>
                         </div>
 
-                        <h4 class="fw-bold mb-1" th:text="${(user.firstName ?: '') + ' ' + (user.lastName ?: '')}">Job
+                        <h4 class="fw-bold mb-1" th:text="${user != null ? ((user.firstName ?: '') + ' ' + (user.lastName ?: '')) : 'Job Seeker'}">Job
                             Seeker Name</h4>
                         <p class="text-primary fw-medium mb-1"
-                            th:text="${profile.title != null ? profile.title : 'No Title Set'}">Title</p>
+                            th:text="${profile.title != null and !profile.title.isEmpty() ? profile.title : 'No Title Set'}">Title</p>
 
                         <!-- Verification Status -->
                         <div class="mb-4">
                             <span
                                 class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2"
-                                th:if="${user.isVerified}">
+                                th:if="${isVerified}">
                                 <i class="fas fa-check-circle me-1"></i> Verified
                             </span>
                             <span
                                 class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-2"
-                                th:if="${!user.isVerified && user.documentStatus == 'UNDER_REVIEW'}">
+                                th:if="${!isVerified && (documentStatus == 'UNDER_REVIEW' or (user != null and user.documentStatus == 'UNDER_REVIEW'))}">
                                 <i class="fas fa-clock me-1"></i> Pending Review
                             </span>
                             <span
                                 class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-2"
-                                th:if="${!user.isVerified && user.documentStatus != 'UNDER_REVIEW'}">
+                                th:if="${!isVerified && (documentStatus != 'UNDER_REVIEW' and (user == null or user.documentStatus != 'UNDER_REVIEW'))}">
                                 <i class="fas fa-times-circle me-1"></i> Unverified
                             </span>
                         </div>
@@ -355,46 +400,59 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Section 5: Verification -->
-                    <div class="card border-0 shadow-sm rounded-4 mb-4 animate-up delay-300">
+                    </div>                    <!-- Section 5: Verification -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 animate-up delay-300" id="verification-section">
                         <div class="card-header bg-white border-bottom-0 pt-4 px-4">
-                            <h5 class="fw-bold text-dark mb-0"><i
-                                    class="fas fa-shield-alt text-primary me-2"></i>Identity Verification</h5>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h5 class="fw-bold text-dark mb-0"><i
+                                        class="fas fa-shield-alt text-primary me-2"></i>Identity Verification</h5>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2"
+                                    th:if="${isVerified}">
+                                    <i class="fas fa-check-circle me-1"></i> Verified
+                                </span>
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-2"
+                                    th:if="${!isVerified && (documentStatus == 'UNDER_REVIEW' or profile.documentStatus == 'UNDER_REVIEW')}">
+                                    <i class="fas fa-clock me-1"></i> Under Review
+                                </span>
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-2"
+                                    th:if="${!isVerified && documentStatus != 'UNDER_REVIEW' && profile.documentStatus != 'UNDER_REVIEW'}">
+                                    <i class="fas fa-exclamation-triangle me-1"></i> Unverified
+                                </span>
+                            </div>
                         </div>
                         <div class="card-body p-4">
                             <!-- Existing Doc -->
-                            <div class="mb-4" th:if="${profile.verificationDocument != null}">
+                            <div class="mb-4" th:if="${profile.verificationDocument != null and !profile.verificationDocument.isEmpty()}">
                                 <label class="form-label fw-semibold text-muted small text-uppercase">Submitted
                                     Document</label>
                                 <div class="d-flex align-items-center gap-3 p-3 border rounded bg-light">
                                     <i class="fas fa-file-contract text-primary fs-4"></i>
-                                    <span class="fw-medium text-dark"
+                                    <span class="fw-medium text-dark text-truncate"
                                         th:text="${profile.verificationDocument}">doc.jpg</span>
                                     <div class="ms-auto">
                                         <span class="badge bg-warning-subtle text-warning border border-warning-subtle"
                                             th:if="${profile.documentStatus == 'UNDER_REVIEW'}">Under Review</span>
                                         <span class="badge bg-success-subtle text-success border border-success-subtle"
-                                            th:if="${user.isVerified}">Verified</span>
+                                            th:if="${isVerified}">Verified</span>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="alert alert-info bg-primary-subtle border-primary-subtle text-primary d-flex align-items-center mb-4"
-                                role="alert" th:if="${!user.isVerified}">
+                                role="alert" th:if="${!isVerified}">
                                 <i class="fas fa-info-circle me-3 fs-5"></i>
                                 <div>
-                                    Upload a valid Government ID (Passport, Driver's License) to get the
+                                    Upload a valid government-issued ID (Passport, National ID, Driver's License) to unlock proposal submissions and get your
                                     <strong>Verified Badge</strong>.
                                 </div>
                             </div>
 
                             <div class="row g-4">
                                 <div class="col-12">
-                                    <label class="form-label fw-semibold">Upload ID Document</label>
+                                    <label class="form-label fw-semibold">Upload ID Document (Image or PDF)</label>
                                     <input type="file" class="form-control" name="verificationDoc"
                                         accept="image/*,application/pdf" />
+                                    <div class="form-text">Accepted formats: JPG, PNG, WebP, PDF (Max 10MB).</div>
                                 </div>
                             </div>
                         </div>

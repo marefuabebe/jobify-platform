@@ -31,6 +31,15 @@ public class GlobalControllerAdvice {
     }
 
     @ModelAttribute
+    public void addDefaultsToModel(Model model) {
+        model.addAttribute("unreadNotificationsCount", 0L);
+        model.addAttribute("notifications", java.util.Collections.emptyList());
+        model.addAttribute("unreadMessagesCount", 0);
+        model.addAttribute("isVerified", false);
+        model.addAttribute("documentStatus", "");
+    }
+
+    @ModelAttribute
     public void addUserToModel(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
@@ -44,26 +53,39 @@ public class GlobalControllerAdvice {
                 if (user.getUserTypeId() != null) {
                     if (user.getUserTypeId().getUserTypeId() == 1) { // Recruiter
                         recruiterProfileService.getOne(user.getUserId()).ifPresent(profile -> {
-                            // Ensure isVerified is false if user is not approved
-                            if (!user.isApproved()) {
-                                profile.setIsVerified(false);
+                            if (profile.getUserId() == null) {
+                                profile.setUserId(user);
                             }
+                            if (profile.getUserAccountId() <= 0) {
+                                profile.setUserAccountId(user.getUserId());
+                            }
+                            boolean verified = Boolean.TRUE.equals(profile.getIsVerified()) && user.isApproved();
+                            profile.setIsVerified(verified);
                             model.addAttribute("user", profile);
                             model.addAttribute("userType", "Recruiter");
+                            model.addAttribute("isVerified", verified);
+                            model.addAttribute("documentStatus", profile.getDocumentStatus() != null ? profile.getDocumentStatus() : "");
                         });
                     } else if (user.getUserTypeId().getUserTypeId() == 2) { // JobSeeker
                         jobSeekerProfileService.getOne(user.getUserId()).ifPresent(profile -> {
-                            // Ensure isVerified is false if user is not approved
-                            if (!user.isApproved()) {
-                                profile.setIsVerified(false);
+                            if (profile.getUserId() == null) {
+                                profile.setUserId(user);
                             }
+                            if (profile.getUserAccountId() == null) {
+                                profile.setUserAccountId(user.getUserId());
+                            }
+                            boolean verified = Boolean.TRUE.equals(profile.getIsVerified()) && user.isApproved();
+                            profile.setIsVerified(verified);
                             model.addAttribute("user", profile);
                             model.addAttribute("userType", "JobSeeker");
+                            model.addAttribute("isVerified", verified);
+                            model.addAttribute("documentStatus", profile.getDocumentStatus() != null ? profile.getDocumentStatus() : "");
                         });
                     } else {
                         // Admin or other: just put base user
                         model.addAttribute("user", user);
                         model.addAttribute("userType", "Admin");
+                        model.addAttribute("isVerified", true);
                     }
                 } else {
                     // Pending role selection
@@ -78,13 +100,18 @@ public class GlobalControllerAdvice {
                 // Add 'username' method attribute which seems to be used
                 model.addAttribute("username", currentUsername);
 
-                // Add Notifications globally
-                java.util.List<com.webapp.jobportal.entity.Notification> notifications = notificationService
-                        .getRecentNotifications(user, 10);
-                long unreadCount = notificationService.getUnreadCount(user);
+                // Add Notifications globally with defensive try-catch
+                try {
+                    java.util.List<com.webapp.jobportal.entity.Notification> notifications = notificationService
+                            .getRecentNotifications(user, 10);
+                    long unreadCount = notificationService.getUnreadCount(user);
 
-                model.addAttribute("notifications", notifications);
-                model.addAttribute("unreadNotificationsCount", unreadCount);
+                    model.addAttribute("notifications", notifications != null ? notifications : java.util.Collections.emptyList());
+                    model.addAttribute("unreadNotificationsCount", unreadCount);
+                } catch (Exception e) {
+                    model.addAttribute("notifications", java.util.Collections.emptyList());
+                    model.addAttribute("unreadNotificationsCount", 0L);
+                }
             }
         }
     }

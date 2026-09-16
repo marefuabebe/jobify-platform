@@ -138,7 +138,18 @@ public class NotificationController {
                 } else if ("PAYMENT".equals(type)) {
                     return "redirect:/client-dashboard/payments";
                 } else if ("VERIFICATION".equals(type)) {
-                    return "redirect:/admin/users/pending";
+                    Users notifUser = notification.getUserId();
+                    if (notifUser != null && notifUser.getUserTypeId() != null) {
+                        int roleId = notifUser.getUserTypeId().getUserTypeId();
+                        if (roleId == 3) {
+                            return "redirect:/admin/users/pending";
+                        } else if (roleId == 2) {
+                            return "redirect:/job-seeker-profile/#verification-section";
+                        } else if (roleId == 1) {
+                            return "redirect:/recruiter-profile/";
+                        }
+                    }
+                    return "redirect:/job-seeker-profile/#verification-section";
                 }
             }
 

@@ -80,20 +80,25 @@
             </div>
         </div>
 
-        <!-- Verification Warning -->
-        <div class="alert alert-warning rounded-4 shadow-sm p-4 mb-4 animate-up" th:if="${!isVerified}">
-            <div class="d-flex align-items-center gap-3">
-                <div class="bg-warning-subtle text-warning p-3 rounded-circle">
-                    <i class="fas fa-user-shield fa-2x"></i>
+        <!-- Verification Banner on Proposals Page -->
+        <div th:if="${!isVerified}" class="card border-0 rounded-4 shadow-sm mb-4"
+            style="background: linear-gradient(135deg, #fff5f5 0%, #fffbf0 100%); border-left: 6px solid #e53e3e !important;">
+            <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-danger text-white flex-shrink-0"
+                        style="width: 44px; height: 44px;">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold text-danger mb-1">Identity Verification Required to Submit New Proposals</h6>
+                        <p class="text-muted mb-0 small">
+                            You must upload your government ID and get verified before submitting any new proposals.
+                        </p>
+                    </div>
                 </div>
-                <div>
-                    <h5 class="fw-bold mb-1">Account Verification Required</h5>
-                    <p class="mb-0">You must verify your identity before you can submit and manage proposals.</p>
-                    <a th:href="@{/job-seeker-profile/}"
-                        class="btn btn-warning btn-sm mt-2 fw-bold text-dark rounded-pill px-3">
-                        Complete Verification Now
-                    </a>
-                </div>
+                <a th:href="@{/job-seeker-profile/#verification-section}" class="btn btn-danger btn-sm rounded-pill px-4 fw-bold">
+                    <i class="fas fa-shield-alt me-1"></i> Verify Now
+                </a>
             </div>
         </div>
 

@@ -532,14 +532,24 @@
                             <i class="fas fa-undo me-1"></i>Reset Filters
                         </a>
 
-                        <!-- Verification Promo relocated inside sidebar -->
-                        <div class="card mt-4 border-0 rounded-4 bg-primary text-white p-4 shadow-sm"
-                            th:if="${!isVerified}">
-                            <h6 class="fw-bold mb-2"><i class="fas fa-shield-check me-2"></i>Get Verified</h6>
-                            <p class="small opacity-75 mb-3">Boost your trust and apply for premium projects.</p>
-                            <a th:href="@{/job-seeker-profile/}"
-                                class="btn btn-light btn-sm w-100 fw-bold border-0 text-primary">
-                                Verify Identity
+                        <!-- Verification Sidebar Box -->
+                        <div class="card mt-4 border-0 rounded-4 bg-gradient p-4 shadow-sm text-white"
+                            th:if="${!isVerified}"
+                            style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="fas fa-shield-alt text-warning fa-lg"></i>
+                                <h6 class="fw-bold mb-0">Identity Verification</h6>
+                            </div>
+                            <p class="small opacity-90 mb-3" th:if="${documentStatus == 'UNDER_REVIEW'}">
+                                Your ID is under review by admin. We will notify you once approved.
+                            </p>
+                            <p class="small opacity-90 mb-3" th:unless="${documentStatus == 'UNDER_REVIEW'}">
+                                Verification is required to apply for jobs and submit proposals.
+                            </p>
+                            <a th:href="@{/job-seeker-profile/#verification-section}"
+                                class="btn btn-warning btn-sm w-100 fw-bold border-0 text-dark shadow-sm">
+                                <i class="fas fa-arrow-right me-1"></i>
+                                <span th:text="${documentStatus == 'UNDER_REVIEW' ? 'View Status' : 'Verify Account'}">Verify Account</span>
                             </a>
                         </div>
                     </div>
@@ -548,6 +558,76 @@
 
             <!-- Main Stream -->
             <div>
+                <!-- Primary Verification Alert Banner (High Visibility) -->
+                <!-- 1. Unverified State (No document uploaded or blank) -->
+                <div th:if="${!isVerified and (documentStatus == null or documentStatus == '' or documentStatus == 'REJECTED')}"
+                    class="card border-0 rounded-4 shadow-sm mb-4 animate-up"
+                    style="background: linear-gradient(135deg, #fff5f5 0%, #fffbf0 100%); border: 1px solid #fed7d7 !important; border-left: 6px solid #e53e3e !important;">
+                    <div class="card-body p-4">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center bg-danger text-white flex-shrink-0 shadow-sm"
+                                    style="width: 52px; height: 52px; font-size: 1.4rem;">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                                        <h5 class="fw-bold text-danger mb-0">Action Required: Verify Your Identity</h5>
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1 font-monospace small">
+                                            <i class="fas fa-lock me-1"></i>Proposals Restricted
+                                        </span>
+                                    </div>
+                                    <p class="text-secondary mb-0 small" style="max-width: 650px; line-height: 1.5;">
+                                        To maintain platform security, all freelancers must verify their account before applying for jobs or submitting proposals. Please upload a clear photo of your government-issued ID (Passport, National ID, or Driver's License).
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex-shrink-0 w-100 w-md-auto text-end">
+                                <a th:href="@{/job-seeker-profile/#verification-section}"
+                                    class="btn btn-danger rounded-pill px-4 py-2 fw-bold shadow-sm d-inline-flex align-items-center gap-2">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span>Verify Identity Now</span>
+                                    <i class="fas fa-arrow-right fa-xs"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Under Review State -->
+                <div th:if="${!isVerified and documentStatus == 'UNDER_REVIEW'}"
+                    class="card border-0 rounded-4 shadow-sm mb-4 animate-up"
+                    style="background: linear-gradient(135deg, #f0f7ff 0%, #e6f4ff 100%); border: 1px solid #bfdbfe !important; border-left: 6px solid #2563eb !important;">
+                    <div class="card-body p-4">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary text-white flex-shrink-0 shadow-sm"
+                                    style="width: 52px; height: 52px; font-size: 1.4rem;">
+                                    <i class="fas fa-hourglass-half"></i>
+                                </div>
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                                        <h5 class="fw-bold text-primary mb-0">Verification Under Admin Review</h5>
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 font-monospace small">
+                                            <i class="fas fa-clock me-1"></i>Pending Review
+                                        </span>
+                                    </div>
+                                    <p class="text-secondary mb-0 small" style="max-width: 650px; line-height: 1.5;">
+                                        Your government ID has been submitted successfully and is currently under review by our administration team. Reviews typically complete within 24–48 hours. You will receive an on-platform notification once approved.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex-shrink-0 w-100 w-md-auto text-end">
+                                <a th:href="@{/job-seeker-profile/#verification-section}"
+                                    class="btn btn-outline-primary rounded-pill px-4 py-2 fw-bold shadow-sm d-inline-flex align-items-center gap-2">
+                                    <i class="fas fa-eye"></i>
+                                    <span>Check Status</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Stats Row -->
                 <div class="row g-3 mb-4 animate-up delay-100 align-items-stretch">
                     <div class="col-lg-3 col-6 d-flex">

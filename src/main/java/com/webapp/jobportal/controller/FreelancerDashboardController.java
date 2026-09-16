@@ -231,6 +231,14 @@ public class FreelancerDashboardController {
             }
         }
 
+        boolean isVerified = Boolean.TRUE.equals(freelancerProfile.getIsVerified()) && currentUser.isApproved();
+        String documentStatus = freelancerProfile.getDocumentStatus() != null ? freelancerProfile.getDocumentStatus() : "";
+
+        // Dispatch verification reminder if unverified and no reminder sent yet
+        if (!isVerified) {
+            checkAndSendVerificationNotification(currentUser);
+        }
+
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("user", freelancerProfile);
         model.addAttribute("jobPost", jobPost);
@@ -238,8 +246,8 @@ public class FreelancerDashboardController {
         model.addAttribute("ongoingProjects", ongoingProjects);
         model.addAttribute("savedJobs", savedJobs);
         model.addAttribute("unreadMessagesCount", unreadMessages.size());
-        model.addAttribute("isVerified",
-                Boolean.TRUE.equals(freelancerProfile.getIsVerified()) && currentUser.isApproved());
+        model.addAttribute("isVerified", isVerified);
+        model.addAttribute("documentStatus", documentStatus);
 
         return "freelancer-dashboard";
     }
@@ -285,6 +293,7 @@ public class FreelancerDashboardController {
         model.addAttribute("proposals", appliedJobs);
         model.addAttribute("isVerified",
                 Boolean.TRUE.equals(freelancerProfile.getIsVerified()) && currentUser.isApproved());
+        model.addAttribute("documentStatus", freelancerProfile.getDocumentStatus() != null ? freelancerProfile.getDocumentStatus() : "");
         model.addAttribute("backUrl", "/freelancer-dashboard/");
 
         return "freelancer-proposals";
@@ -318,6 +327,7 @@ public class FreelancerDashboardController {
         model.addAttribute("ongoingProjects", ongoingProjects);
         model.addAttribute("isVerified",
                 Boolean.TRUE.equals(freelancerProfile.getIsVerified()) && currentUser.isApproved());
+        model.addAttribute("documentStatus", freelancerProfile.getDocumentStatus() != null ? freelancerProfile.getDocumentStatus() : "");
 
         return "freelancer-projects";
     }
@@ -410,6 +420,7 @@ public class FreelancerDashboardController {
         model.addAttribute("withdrawableBalance", withdrawableBalanceMap);
         model.addAttribute("isVerified",
                 Boolean.TRUE.equals(freelancerProfile.getIsVerified()) && currentUser.isApproved());
+        model.addAttribute("documentStatus", freelancerProfile.getDocumentStatus() != null ? freelancerProfile.getDocumentStatus() : "");
 
         return "freelancer-earnings";
     }
@@ -567,5 +578,19 @@ public class FreelancerDashboardController {
     @GetMapping("/stripe-refresh")
     public String stripeRefresh() {
         return "redirect:/freelancer-dashboard/create-stripe-account";
+    }
+
+    private void checkAndSendVerificationNotification(Users user) {
+        try {
+            List<Notification> userNotifications = notificationService.getUserNotifications(user);
+            boolean alreadyNotified = userNotifications != null && userNotifications.stream()
+                    .anyMatch(n -> "VERIFICATION".equalsIgnoreCase(n.getType()) || 
+                            (n.getTitle() != null && n.getTitle().contains("Verify Your Identity")));
+            if (!alreadyNotified) {
+                notificationService.createVerificationReminderNotification(user);
+            }
+        } catch (Exception e) {
+            System.err.println("Could not check/send verification notification: " + e.getMessage());
+        }
     }
 }
