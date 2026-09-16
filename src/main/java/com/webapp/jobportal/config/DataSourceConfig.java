@@ -83,9 +83,30 @@ public class DataSourceConfig {
 
         // 3. Attempt connecting to MySQL with cloud-friendly connection parameters
         try {
-            if (url != null && url.startsWith("jdbc:mysql:") && !url.contains("allowPublicKeyRetrieval")) {
-                String separator = url.contains("?") ? "&" : "?";
-                url = url + separator + "allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC";
+            if (url != null && url.startsWith("jdbc:mysql:")) {
+                boolean isRemoteHost = !url.contains("localhost") && !url.contains("127.0.0.1");
+                boolean hasExplicitSsl = url.contains("sslMode=") || url.contains("useSSL=");
+
+                StringBuilder params = new StringBuilder();
+                if (!url.contains("serverTimezone")) {
+                    params.append(url.contains("?") || params.length() > 0 ? "&" : "?").append("serverTimezone=UTC");
+                }
+
+                if (!hasExplicitSsl) {
+                    if (isRemoteHost) {
+                        // Cloud databases (Aiven, AWS RDS, PlanetScale, etc.) require SSL
+                        params.append(url.contains("?") || params.length() > 0 ? "&" : "?").append("sslMode=REQUIRED");
+                    } else {
+                        // Local MySQL without explicit SSL configuration
+                        params.append(url.contains("?") || params.length() > 0 ? "&" : "?").append("useSSL=false");
+                    }
+                }
+
+                if (!url.contains("allowPublicKeyRetrieval")) {
+                    params.append(url.contains("?") || params.length() > 0 ? "&" : "?").append("allowPublicKeyRetrieval=true");
+                }
+
+                url = url + params.toString();
             }
 
             HikariConfig config = new HikariConfig();
@@ -96,7 +117,7 @@ public class DataSourceConfig {
             config.setMaximumPoolSize(maxPoolSize);
             config.setMinimumIdle(minIdle);
             config.setConnectionTimeout(connectionTimeout);
-            config.setInitializationFailTimeout(8000); // Don't hang indefinitely on startup
+            config.setInitializationFailTimeout(20000); // Allow up to 20s for cloud TLS handshake
             config.setIdleTimeout(300000);
             config.setMaxLifetime(1800000);
             config.setPoolName("JobifyHikariPool");

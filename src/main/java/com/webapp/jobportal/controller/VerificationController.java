@@ -72,8 +72,9 @@ public class VerificationController {
             return "verify-email";
         }
 
-        // Activate the user
+        // Activate and approve the user
         user.setActive(true);
+        user.setApproved(true);
         usersRepository.save(user);
 
         // Delete the token so it cannot be reused
@@ -106,7 +107,8 @@ public class VerificationController {
         }
 
         String sanitizedEmail = email.trim();
-        Optional<Users> userOpt = usersRepository.findByEmail(sanitizedEmail);
+        Optional<Users> userOpt = usersRepository.findByEmailIgnoreCase(sanitizedEmail)
+                .or(() -> usersRepository.findByEmail(sanitizedEmail));
 
         if (userOpt.isEmpty()) {
             model.addAttribute("error", "We could not find an account with the email: " + sanitizedEmail);

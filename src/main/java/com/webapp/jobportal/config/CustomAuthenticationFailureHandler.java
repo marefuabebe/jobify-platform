@@ -55,7 +55,9 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
             boolean isUnverified = false;
             try {
                 if (username != null && !username.trim().isEmpty()) {
-                    Optional<Users> userOpt = usersRepository.findByEmail(username.trim());
+                    String cleanUsername = username.trim();
+                    Optional<Users> userOpt = usersRepository.findByEmailIgnoreCase(cleanUsername)
+                            .or(() -> usersRepository.findByEmail(cleanUsername));
                     if (userOpt.isPresent()) {
                         Users user = userOpt.get();
                         // If user is inactive, distinguish unverified from banned

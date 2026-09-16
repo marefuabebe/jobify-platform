@@ -73,9 +73,12 @@ public class UsersService {
     }
 
     public Users addNew(Users users, String appUrl) {
+        if (users.getEmail() != null) {
+            users.setEmail(users.getEmail().trim().toLowerCase());
+        }
         users.setActive(false);
         // Admin users are auto-approved, others need admin approval
-        int userTypeId = users.getUserTypeId().getUserTypeId();
+        int userTypeId = users.getUserTypeId() != null ? users.getUserTypeId().getUserTypeId() : 2;
         users.setApproved(userTypeId == 3); // Admin = 3
         users.setRegistrationDate(new Date(System.currentTimeMillis()));
         users.setPassword(passwordEncoder.encode(users.getPassword()));
@@ -136,8 +139,10 @@ public class UsersService {
 
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
             String username = authentication.getName();
-            Users users = usersRepository.findByEmail(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("Could not found " + "user"));
+            String cleanEmail = username != null ? username.trim() : "";
+            Users users = usersRepository.findByEmailIgnoreCase(cleanEmail)
+                    .or(() -> usersRepository.findByEmail(cleanEmail))
+                    .orElseThrow(() -> new UsernameNotFoundException("Could not find user: " + cleanEmail));
             int userId = users.getUserId();
 
             // Debug logging
@@ -184,8 +189,10 @@ public class UsersService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
             String username = authentication.getName();
-            Users user = usersRepository.findByEmail(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("Could not found " + "user"));
+            String cleanEmail = username != null ? username.trim() : "";
+            Users user = usersRepository.findByEmailIgnoreCase(cleanEmail)
+                    .or(() -> usersRepository.findByEmail(cleanEmail))
+                    .orElseThrow(() -> new UsernameNotFoundException("Could not find user: " + cleanEmail));
             return user;
         }
 
@@ -193,13 +200,16 @@ public class UsersService {
     }
 
     public Users findByEmail(String currentUsername) {
-        return usersRepository.findByEmail(currentUsername)
-                .orElseThrow(() -> new UsernameNotFoundException("User not " +
-                        "found"));
+        String cleanEmail = currentUsername != null ? currentUsername.trim() : "";
+        return usersRepository.findByEmailIgnoreCase(cleanEmail)
+                .or(() -> usersRepository.findByEmail(cleanEmail))
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + cleanEmail));
     }
 
     public Optional<Users> getUserByEmail(String email) {
-        return usersRepository.findByEmail(email);
+        String cleanEmail = email != null ? email.trim() : "";
+        return usersRepository.findByEmailIgnoreCase(cleanEmail)
+                .or(() -> usersRepository.findByEmail(cleanEmail));
     }
 
     public List<Users> getAllUsers() {
