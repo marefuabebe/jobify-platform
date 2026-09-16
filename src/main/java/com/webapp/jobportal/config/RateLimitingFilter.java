@@ -21,8 +21,8 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
 
     // Limits
-    private static final int LOGIN_CAPACITY = 5;
-    private static final int PAYMENT_CAPACITY = 10;
+    private static final int LOGIN_CAPACITY = 20;
+    private static final int PAYMENT_CAPACITY = 15;
     private static final Duration REFILL_DURATION = Duration.ofMinutes(1);
 
     @Override
@@ -31,14 +31,21 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
-        String ip = request.getRemoteAddr();
+        String method = request.getMethod();
 
-        if (path.startsWith("/login") || path.startsWith("/payment/")) {
-            Bucket bucket = buckets.computeIfAbsent(ip + ":" + getEndpointType(path), k -> createBucket(path));
+        // Only rate-limit POST submissions to /login (credential checks) and payment requests
+        boolean isLoginAttempt = "POST".equalsIgnoreCase(method) && ("/login".equals(path) || path.startsWith("/login?"));
+        boolean isPaymentRequest = path.startsWith("/payment/");
+
+        if (isLoginAttempt || isPaymentRequest) {
+            String ip = getClientIp(request);
+            String endpointType = isLoginAttempt ? "LOGIN" : "PAYMENT";
+            Bucket bucket = buckets.computeIfAbsent(ip + ":" + endpointType, k -> createBucket(isLoginAttempt));
 
             if (!bucket.tryConsume()) {
                 response.setStatus(429); // Too Many Requests
-                response.getWriter().write("Too many requests. Please try again later.");
+                response.setContentType("text/plain");
+                response.getWriter().write("Too many requests. Please try again in a minute.");
                 return;
             }
         }
@@ -46,14 +53,16 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private String getEndpointType(String path) {
-        if (path.startsWith("/login"))
-            return "LOGIN";
-        return "PAYMENT";
+    private String getClientIp(HttpServletRequest request) {
+        String xff = request.getHeader("X-Forwarded-For");
+        if (xff != null && !xff.trim().isEmpty()) {
+            return xff.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
 
-    private Bucket createBucket(String path) {
-        int capacity = path.startsWith("/login") ? LOGIN_CAPACITY : PAYMENT_CAPACITY;
+    private Bucket createBucket(boolean isLogin) {
+        int capacity = isLogin ? LOGIN_CAPACITY : PAYMENT_CAPACITY;
         return new Bucket(capacity, capacity, REFILL_DURATION);
     }
 
