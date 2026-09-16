@@ -36,12 +36,18 @@ public class WebSecurityConfig {
                         "/health",
                         "/global-search/**",
                         "/info/**",
+                        "/login",
+                        "/login/**",
                         "/register",
                         "/register/**",
                         "/forgot-password",
+                        "/forgot-password/**",
                         "/reset-password",
+                        "/reset-password/**",
                         "/verify-email",
+                        "/verify-email/**",
                         "/resend-verification",
+                        "/resend-verification/**",
                         "/webjars/**",
                         "/resources/**",
                         "/assets/**",
@@ -51,7 +57,7 @@ public class WebSecurityConfig {
                         "/*.css",
                         "/*.js",
                         "/*.js.map",
-                        "/fonts**", "/favicon.ico", "/resources/**", "/error", "/photos/**" };
+                        "/fonts**", "/favicon.ico", "/resources/**", "/error", "/error/**", "/photos/**" };
 
         private final String[] websocketHandshakeUrl = { "/ws/**" };
 
@@ -100,6 +106,32 @@ public class WebSecurityConfig {
                                         }
                                 }, org.springframework.security.web.csrf.CsrfFilter.class);
 
+                http.exceptionHandling(ex -> ex
+                                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
+                                                        .getContext().getAuthentication();
+                                        if (auth != null && auth.isAuthenticated()
+                                                        && !(auth instanceof org.springframework.security.authentication.AnonymousAuthenticationToken)) {
+                                                boolean hasAdmin = auth.getAuthorities().stream()
+                                                                .anyMatch(r -> r.getAuthority().equals("Admin"));
+                                                boolean hasFreelancer = auth.getAuthorities().stream()
+                                                                .anyMatch(r -> r.getAuthority().equals("Freelancer"));
+                                                boolean hasClient = auth.getAuthorities().stream()
+                                                                .anyMatch(r -> r.getAuthority().equals("Client"));
+                                                if (hasAdmin) {
+                                                        response.sendRedirect("/admin/dashboard?denied=true");
+                                                } else if (hasClient) {
+                                                        response.sendRedirect("/client-dashboard/?denied=true");
+                                                } else if (hasFreelancer) {
+                                                        response.sendRedirect("/freelancer-dashboard/?denied=true");
+                                                } else {
+                                                        response.sendRedirect("/?denied=true");
+                                                }
+                                        } else {
+                                                response.sendRedirect("/login?error=true");
+                                        }
+                                }));
+
                 http.formLogin(form -> form.loginPage("/login").permitAll()
                                 .successHandler(customAuthenticationSuccessHandler)
                                 .failureHandler(customAuthenticationFailureHandler))
@@ -141,10 +173,8 @@ public class WebSecurityConfig {
         @Bean
         public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
                 org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
-                configuration.setAllowedOrigins(java.util.Arrays.asList("http://localhost:8080", "https://jobify.com")); // Add
-                                                                                                                         // production
-                                                                                                                         // domain
-                configuration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                configuration.setAllowedOriginPatterns(java.util.Arrays.asList("*"));
+                configuration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
                 configuration.setAllowedHeaders(java.util.Arrays.asList("*"));
                 configuration.setAllowCredentials(true);
                 org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();

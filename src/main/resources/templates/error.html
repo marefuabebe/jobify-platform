@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - Jobify</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4B6CB7;
+            --primary-dark: #324C8C;
+            --secondary: #1a1d1f;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --bg-light: #f8fafc;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 1.5rem;
+            color: var(--text-dark);
+        }
+
+        .error-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            padding: 3.5rem 2.5rem;
+            max-width: 540px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .error-badge {
+            width: 84px;
+            height: 84px;
+            background: rgba(75, 108, 183, 0.1);
+            color: var(--primary);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .error-code {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .error-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .error-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary-action {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary-action:hover {
+            background: var(--primary-dark);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary-action {
+            background: #f1f5f9;
+            color: var(--text-dark);
+        }
+
+        .btn-secondary-action:hover {
+            background: #e2e8f0;
+            color: var(--text-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="error-card">
+        <div class="error-badge">
+            <i class="fas fa-shield-alt" th:if="${status == 403}"></i>
+            <i class="fas fa-search" th:if="${status == 404}"></i>
+            <i class="fas fa-exclamation-triangle" th:if="${status != 403 and status != 404}"></i>
+        </div>
+
+        <div class="error-code" th:text="${status != null ? status : 'Error'}">403</div>
+        <div class="error-title" th:if="${status == 403}">Access Restricted</div>
+        <div class="error-title" th:if="${status == 404}">Page Not Found</div>
+        <div class="error-title" th:if="${status != 403 and status != 404}">Something went wrong</div>
+
+        <p class="error-desc" th:if="${status == 403}">
+            You do not have permission to view this page or your session has expired. Please log in with an authorized account.
+        </p>
+        <p class="error-desc" th:if="${status == 404}">
+            The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
+        </p>
+        <p class="error-desc" th:if="${status != 403 and status != 404}" th:text="${message != null and message != '' ? message : 'An unexpected error occurred. Please return home or sign in again.'}">
+            An unexpected error occurred.
+        </p>
+
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+            <a href="/" class="btn-action btn-primary-action">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+            <a href="/login" class="btn-action btn-secondary-action">
+                <i class="fas fa-sign-in-alt"></i> Sign In
+            </a>
+        </div>
+    </div>
+</body>
+</html>

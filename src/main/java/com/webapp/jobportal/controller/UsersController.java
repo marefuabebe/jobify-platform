@@ -101,6 +101,19 @@ public class UsersController {
             @RequestParam(value = "unverified", required = false) String unverified,
             @RequestParam(value = "email", required = false) String email,
             Model model) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()
+                && !(authentication instanceof org.springframework.security.authentication.AnonymousAuthenticationToken)) {
+            boolean hasAdmin = authentication.getAuthorities().stream().anyMatch(r -> r.getAuthority().equals("Admin"));
+            boolean hasClient = authentication.getAuthorities().stream().anyMatch(r -> r.getAuthority().equals("Client"));
+            boolean hasFreelancer = authentication.getAuthorities().stream().anyMatch(r -> r.getAuthority().equals("Freelancer"));
+            if (hasAdmin) return "redirect:/admin/dashboard";
+            if (hasClient) return "redirect:/client-dashboard/";
+            if (hasFreelancer) return "redirect:/freelancer-dashboard/";
+            return "redirect:/";
+        }
+
         if (error != null) {
             model.addAttribute("loginError", true);
         }
