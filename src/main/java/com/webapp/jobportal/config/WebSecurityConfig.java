@@ -70,7 +70,10 @@ public class WebSecurityConfig {
         @Bean
         protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-                http.authenticationProvider(authenticationProvider());
+                DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+                authProvider.setPasswordEncoder(passwordEncoder());
+                authProvider.setUserDetailsService(customUserDetailsService);
+                http.authenticationProvider(authProvider);
 
                 http.authorizeHttpRequests(auth -> {
                         auth.requestMatchers(publicUrl).permitAll();
@@ -182,14 +185,6 @@ public class WebSecurityConfig {
                 return source;
         }
 
-        @Bean
-        public AuthenticationProvider authenticationProvider() {
-
-                DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-                authenticationProvider.setPasswordEncoder(passwordEncoder());
-                authenticationProvider.setUserDetailsService(customUserDetailsService);
-                return authenticationProvider;
-        }
 
         @Bean
         public PasswordEncoder passwordEncoder() {
