@@ -12,6 +12,7 @@ import java.util.Optional;
 
 public interface UsersRepository extends JpaRepository<Users, Integer> {
     Optional<Users> findByEmail(String email);
+    Optional<Users> findByEmailIgnoreCase(String email);
 
     @Query("SELECT u FROM Users u WHERE u.userTypeId.userTypeName = :userType AND u.isApproved = true AND u.isActive = true AND u.userId != :currentUserId")
     List<Users> findVerifiedUsersByType(@Param("userType") String userType,

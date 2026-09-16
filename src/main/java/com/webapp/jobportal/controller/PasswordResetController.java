@@ -43,7 +43,9 @@ public class PasswordResetController {
 
     @PostMapping("/forgot-password")
     public String processForgotPassword(@RequestParam("email") String email, HttpServletRequest request, Model model) {
-        Optional<Users> userOpt = usersRepository.findByEmail(email);
+        String cleanEmail = email != null ? email.trim() : "";
+        Optional<Users> userOpt = usersRepository.findByEmailIgnoreCase(cleanEmail)
+                .or(() -> usersRepository.findByEmail(cleanEmail));
         
         if (userOpt.isEmpty()) {
             model.addAttribute("error", "We could not find an account with that email address.");

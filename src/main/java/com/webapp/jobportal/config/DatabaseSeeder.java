@@ -53,30 +53,47 @@ public class DatabaseSeeder {
                     }
                 }
 
-                // 2. Seed Default Admin User if none exists
-                Optional<Users> adminUserOpt = usersRepository.findByEmail("marefu933@gmail.com");
-                if (adminUserOpt.isEmpty()) {
-                    logger.info("Seeding default Admin account (marefu933@gmail.com)...");
-                    Users adminUser = new Users();
-                    adminUser.setEmail("marefu933@gmail.com");
-                    adminUser.setPassword(passwordEncoder.encode("marefu@@3854"));
-                    adminUser.setActive(true);
-                    adminUser.setApproved(true);
-                    adminUser.setRegistrationDate(new Date());
+                // 2. Seed / Ensure Default Accounts
+                UsersType adminType = usersTypeRepository.findAll().stream()
+                        .filter(t -> "Admin".equalsIgnoreCase(t.getUserTypeName()))
+                        .findFirst()
+                        .or(() -> usersTypeRepository.findById(3))
+                        .orElse(null);
 
-                    // Dynamically find the Admin type
-                    UsersType adminType = usersTypeRepository.findAll().stream()
-                            .filter(t -> "Admin".equalsIgnoreCase(t.getUserTypeName()))
-                            .findFirst()
-                            .or(() -> usersTypeRepository.findById(3))
-                            .orElse(null);
+                String[] defaultAdminEmails = { "marefu933@gmail.com", "devmareab@gmail.com" };
+                for (String email : defaultAdminEmails) {
+                    Optional<Users> userOpt = usersRepository.findByEmailIgnoreCase(email)
+                            .or(() -> usersRepository.findByEmail(email));
+                    if (userOpt.isEmpty()) {
+                        logger.info("Seeding account: {}...", email);
+                        Users user = new Users();
+                        user.setEmail(email);
+                        user.setPassword(passwordEncoder.encode("marefu@@3854"));
+                        user.setActive(true);
+                        user.setApproved(true);
+                        user.setRegistrationDate(new Date());
 
-                    if (adminType != null) {
-                        adminUser.setUserTypeId(adminType);
-                        usersRepository.save(adminUser);
-                        logger.info("Default Admin account seeded successfully.");
+                        if (adminType != null) {
+                            user.setUserTypeId(adminType);
+                        }
+                        usersRepository.save(user);
+                        logger.info("Account {} seeded successfully.", email);
                     } else {
-                        logger.warn("Could not seed default Admin account: Admin UsersType not found.");
+                        // Ensure account is active and approved so user is never locked out
+                        Users user = userOpt.get();
+                        boolean updated = false;
+                        if (!user.isActive()) {
+                            user.setActive(true);
+                            updated = true;
+                        }
+                        if (!user.isApproved()) {
+                            user.setApproved(true);
+                            updated = true;
+                        }
+                        if (updated) {
+                            usersRepository.save(user);
+                            logger.info("Ensured active/approved status for {}", email);
+                        }
                     }
                 }
             } catch (Throwable t) {
