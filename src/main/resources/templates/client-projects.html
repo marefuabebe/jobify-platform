@@ -342,7 +342,7 @@
 <body class="d-flex flex-column min-vh-100" style="background-color: #f9faff;">
 
     <!-- Header -->
-    <th:block th:replace="fragments/client-header :: clientHeader('projects')"></th:block>
+    <th:block th:replace="~{fragments/client-header :: clientHeader('projects')}"></th:block>
 
     <div class="page-container">
 
@@ -515,7 +515,7 @@
     </div>
 
     <!-- Footer -->
-    <th:block th:replace="fragments/footer :: footer"></th:block>
+    <th:block th:replace="~{fragments/footer :: footer}"></th:block>
 
 
 </body>

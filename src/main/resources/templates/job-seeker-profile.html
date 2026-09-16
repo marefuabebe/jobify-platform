@@ -25,7 +25,7 @@
 <body class="bg-light d-flex flex-column min-vh-100">
 
     <!-- Header -->
-    <th:block th:replace="fragments/freelancer-header :: freelancerHeader('profile')"></th:block>
+    <th:block th:replace="~{fragments/freelancer-header :: freelancerHeader('profile')}"></th:block>
 
     <div class="container py-5 flex-grow-1">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -472,7 +472,7 @@
     </div>
 
     <!-- Footer -->
-    <th:block th:replace="fragments/footer :: footer"></th:block>
+    <th:block th:replace="~{fragments/footer :: footer}"></th:block>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

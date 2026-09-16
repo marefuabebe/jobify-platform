@@ -473,7 +473,7 @@
 <body class="d-flex flex-column min-vh-100" style="background-color: #f8fafc;">
 
     <!-- Header -->
-    <th:block th:replace="fragments/client-header :: clientHeader('proposals')"></th:block>
+    <th:block th:replace="~{fragments/client-header :: clientHeader('proposals')}"></th:block>
 
     <!-- Proposals Hero Banner -->
     <div class="proposals-banner">
@@ -717,7 +717,7 @@
     </div>
 
     <!-- Footer -->
-    <th:block th:replace="fragments/footer :: footer"></th:block>
+    <th:block th:replace="~{fragments/footer :: footer}"></th:block>
 
     <script>
         function filterProposalsList() {

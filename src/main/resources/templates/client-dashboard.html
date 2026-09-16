@@ -531,7 +531,7 @@
 <body class="d-flex flex-column min-vh-100">
 
     <!-- Header -->
-    <th:block th:replace="fragments/client-header :: clientHeader('dashboard')"></th:block>
+    <th:block th:replace="~{fragments/client-header :: clientHeader('dashboard')}"></th:block>
 
     <div class="container-fluid py-2" style="max-width: 1400px;">
 
@@ -761,7 +761,7 @@
     </div>
 
     <!-- Footer -->
-    <th:block th:replace="fragments/footer :: footer"></th:block>
+    <th:block th:replace="~{fragments/footer :: footer}"></th:block>
 
     <!-- Scripts -->
 

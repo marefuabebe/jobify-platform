@@ -531,7 +531,7 @@
                 <!-- Authenticated User -->
                 <div class="d-flex align-items-center" th:if="${user != null}">
                     <ul class="navbar-nav me-3">
-                        <th:block th:replace="fragments/notification-dropdown :: notificationDropdown"></th:block>
+                        <th:block th:replace="~{fragments/notification-dropdown :: notificationDropdown}"></th:block>
                     </ul>
                     <div class="dropdown">
                         <a class="d-flex align-items-center text-decoration-none dropdown-toggle text-white" href="#"

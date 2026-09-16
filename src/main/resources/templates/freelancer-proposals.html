@@ -57,7 +57,7 @@
 <body class="bg-light d-flex flex-column min-vh-100">
 
     <!-- Header -->
-    <th:block th:replace="fragments/freelancer-header :: freelancerHeader('proposals')"></th:block>
+    <th:block th:replace="~{fragments/freelancer-header :: freelancerHeader('proposals')}"></th:block>
 
     <div class="container py-5 flex-grow-1">
 
@@ -199,7 +199,7 @@
     </div>
 
     <!-- Footer -->
-    <th:block th:replace="fragments/footer :: footer"></th:block>
+    <th:block th:replace="~{fragments/footer :: footer}"></th:block>
 
     <!-- Scripts -->
 

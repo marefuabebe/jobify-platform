@@ -204,7 +204,7 @@
             <div class="d-flex align-items-center d-lg-none ms-auto me-3" th:if="${user != null}">
                 <!-- Notification Bell (Mobile) -->
                 <ul class="navbar-nav flex-row me-3">
-                    <th:block th:replace="fragments/notification-dropdown :: notificationDropdown"></th:block>
+                    <th:block th:replace="~{fragments/notification-dropdown :: notificationDropdown}"></th:block>
                 </ul>
 
                 <!-- Profile Dropdown (Mobile) -->
@@ -382,7 +382,7 @@
 
                     <ul class="navbar-nav align-items-center mb-0">
                         <!-- Notification Dropdown -->
-                        <th:block th:replace="fragments/notification-dropdown :: notificationDropdown"></th:block>
+                        <th:block th:replace="~{fragments/notification-dropdown :: notificationDropdown}"></th:block>
                     </ul>
 
                     <div class="dropdown">
@@ -617,7 +617,7 @@
     <div class="d-flex align-items-center d-lg-none ms-auto me-3" th:if="${user != null}">
         <!-- Notification Bell (Mobile) -->
         <ul class="navbar-nav flex-row me-3">
-            <th:block th:replace="fragments/notification-dropdown :: notificationDropdown"></th:block>
+            <th:block th:replace="~{fragments/notification-dropdown :: notificationDropdown}"></th:block>
         </ul>
 
         <!-- Profile Dropdown (Mobile) -->
@@ -782,7 +782,7 @@
         <div class="d-none d-lg-flex align-items-center ms-3" th:if="${user != null}">
             <ul class="navbar-nav align-items-center">
                 <!-- Notification Dropdown -->
-                <th:block th:replace="fragments/notification-dropdown :: notificationDropdown"></th:block>
+                <th:block th:replace="~{fragments/notification-dropdown :: notificationDropdown}"></th:block>
             </ul>
 
             <div class="dropdown ms-3">

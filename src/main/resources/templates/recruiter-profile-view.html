@@ -156,22 +156,22 @@
     <header>
         <!-- For authenticated Clients -->
         <div sec:authorize="hasAuthority('Client')">
-            <div th:replace="fragments/client-header :: clientHeader(activePage='profile')"></div>
+            <div th:replace="~{fragments/client-header :: clientHeader(activePage='profile')}"></div>
         </div>
 
         <!-- For authenticated Freelancers -->
         <div sec:authorize="hasAuthority('Freelancer')">
-            <div th:replace="fragments/freelancer-header :: freelancerHeader(activePage='profile')"></div>
+            <div th:replace="~{fragments/freelancer-header :: freelancerHeader(activePage='profile')}"></div>
         </div>
 
         <!-- For authenticated Admins -->
         <div sec:authorize="hasAuthority('Admin')">
-            <div th:replace="fragments/public-header :: header(activePage='profile')"></div>
+            <div th:replace="~{fragments/public-header :: header(activePage='profile')}"></div>
         </div>
 
         <!-- For anonymous users (Guests) -->
         <div sec:authorize="isAnonymous()">
-            <div th:replace="fragments/public-header :: header(activePage='profile')"></div>
+            <div th:replace="~{fragments/public-header :: header(activePage='profile')}"></div>
         </div>
     </header>
 

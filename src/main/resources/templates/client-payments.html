@@ -530,7 +530,7 @@
 <body>
 
     <!-- Unified Client Header -->
-    <th:block th:replace="fragments/client-header :: clientHeader('financials')"></th:block>
+    <th:block th:replace="~{fragments/client-header :: clientHeader('financials')}"></th:block>
 
     <!-- Page Header Banner -->
     <div class="page-header">
@@ -846,7 +846,7 @@
     </div>
 
     <!-- Unified Footer -->
-    <th:block th:replace="fragments/footer :: footer"></th:block>
+    <th:block th:replace="~{fragments/footer :: footer}"></th:block>
 
     <!-- Interactive Scripts -->
     <script>

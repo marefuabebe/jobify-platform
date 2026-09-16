@@ -196,7 +196,7 @@
 
 <body class="bg-light d-flex flex-column min-vh-100">
     <!-- Header -->
-    <th:block th:replace="fragments/freelancer-header :: freelancerHeader('profile')"></th:block>
+    <th:block th:replace="~{fragments/freelancer-header :: freelancerHeader('profile')}"></th:block>
 
     <div class="page-container">
         <div class="section-header animate-up">
@@ -313,7 +313,7 @@
     </div>
 
     <!-- Footer -->
-    <th:block th:replace="fragments/footer :: footer"></th:block>
+    <th:block th:replace="~{fragments/footer :: footer}"></th:block>
 
     <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
 </body>

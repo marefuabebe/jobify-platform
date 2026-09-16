@@ -512,7 +512,7 @@
 <body class="d-flex flex-column min-vh-100">
     <!-- Header -->
     <!-- Header -->
-    <th:block th:replace="fragments/client-header :: clientHeader(activePage='post-job')"></th:block>
+    <th:block th:replace="~{fragments/client-header :: clientHeader(activePage='post-job')}"></th:block>
 
     <!-- Main Content -->
     <div class="page-container" style="max-width: 1440px !important; margin: 0 auto;">
@@ -906,7 +906,7 @@
     </script>
 
     <!-- Footer -->
-    <th:block th:replace="fragments/footer :: footer"></th:block>
+    <th:block th:replace="~{fragments/footer :: footer}"></th:block>
 </body>
 
 </html>

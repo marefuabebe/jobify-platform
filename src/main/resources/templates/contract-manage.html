@@ -263,10 +263,10 @@
 
     <!-- Header -->
     <th:block sec:authorize="hasAuthority('Client')">
-        <th:block th:replace="fragments/client-header :: clientHeader('contracts')"></th:block>
+        <th:block th:replace="~{fragments/client-header :: clientHeader('contracts')}"></th:block>
     </th:block>
     <th:block sec:authorize="hasAuthority('Freelancer')">
-        <th:block th:replace="fragments/freelancer-header :: freelancerHeader('contracts')"></th:block>
+        <th:block th:replace="~{fragments/freelancer-header :: freelancerHeader('contracts')}"></th:block>
     </th:block>
 
     <!-- Page Header -->
@@ -466,7 +466,7 @@
     </div>
 
     <!-- Footer -->
-    <th:block th:replace="fragments/footer :: footer"></th:block>
+    <th:block th:replace="~{fragments/footer :: footer}"></th:block>
 
 
 </body>
