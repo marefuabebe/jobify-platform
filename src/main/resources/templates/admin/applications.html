@@ -5,483 +5,279 @@
     <meta charset="UTF-8">
     <title>Applications - Jobify Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/webjars/font-awesome/css/all.min.css}" rel="stylesheet">
     <link th:href="@{/css/admin-styles.css}" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        .applications-stat-card {
-            border-radius: var(--radius);
-            background: radial-gradient(circle at top left, rgba(13, 110, 253, 0.16), transparent 55%),
-                radial-gradient(circle at bottom right, rgba(5, 152, 98, 0.16), transparent 55%),
-                var(--bg-card);
-            border: 1px solid var(--border);
-            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.45);
-            transition: transform 0.18s ease, box-shadow 0.18s ease;
-        }
-
-        .applications-stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 22px 50px rgba(15, 23, 42, 0.55);
-        }
-
-        .applications-stat-value {
-            font-size: 2.1rem;
-            font-weight: 800;
-        }
-
-        .applications-search-input {
-            max-width: 280px;
+        .filter-chip {
+            padding: 0.45rem 1rem;
             border-radius: 999px;
-            padding-left: 2.3rem;
-            background-color: var(--bg-light);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--text-light);
+            background: var(--bg-light);
             border: 1px solid var(--border);
-            color: var(--text);
+            transition: all 0.2s ease;
         }
-
-        .applications-search-input::placeholder {
-            color: var(--text-light);
+        .filter-chip:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            background: rgba(var(--primary-rgb), 0.08);
         }
-
-        .applications-search-icon {
-            position: absolute;
-            left: 0.9rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-light);
-            pointer-events: none;
+        .filter-chip.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
         }
-
-        .status-badge {
-            border-radius: 999px;
-        }
-
-        .applications-row-hover tbody tr:hover {
-            background-color: rgba(15, 23, 42, 0.4);
+        .app-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            color: white;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            flex-shrink: 0;
         }
     </style>
 </head>
 
 <body th:classappend="${session.theme == 'dark' ? 'dark-theme' : 'light-theme'}">
 
-    <!-- Sidebar Fragment -->
-    <div th:replace="~{admin/fragments/sidebar :: sidebar('applications')}"></div>
+    <!-- Standard Admin Sidebar -->
+    <aside class="admin-sidebar" id="sidebar" th:replace="~{admin/fragments/sidebar :: sidebar(activeLink='applications')}">
+    </aside>
 
-    <!-- Sidebar Overlay -->
+    <!-- Mobile Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- Main Content -->
     <main class="admin-main">
-        <!-- Top Bar -->
-        <div class="top-bar">
-            <button class="btn btn-primary d-lg-none me-3" id="sidebarToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="page-title">
-                <div class="title-icon">
-                    <i class="fas fa-list"></i>
-                </div>
-                <div>
-                    <h1 class="h3 fw-bold mb-1">Job Applications</h1>
-                    <p class="text-muted mb-0">Manage and review job applications</p>
-                </div>
-            </div>
-
-            <div class="user-menu d-flex align-items-center gap-2">
-                <form th:action="@{/admin/theme/toggle}" method="post" class="d-inline">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm">
-                        <i class="fas me-1"
-                            th:classappend="${session.theme == 'dark' ? 'fa-sun' : 'fa-moon'}"></i>
-                        <span th:text="${session.theme == 'dark' ? 'Light' : 'Dark'}">Dark</span>
-                    </button>
-                </form>
-                <a href="/logout" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </div>
-        </div>
+        <!-- Reusable Admin Topbar -->
+        <header th:replace="~{admin/fragments/topbar :: topbar('Job Applications', 'Review candidate applications, hiring outcomes, and statuses', 'fas fa-file-invoice')}">
+        </header>
 
         <div class="container-fluid px-0">
 
-            <!-- SUMMARY -->
-            <div class="row mb-4 g-3">
-                <div class="col-md-3">
-                    <div class="card applications-stat-card p-4 text-center">
-                        <div class="applications-stat-value" th:text="${totalApplications}">0</div>
-                        <div class="stat-label text-uppercase small text-muted">Total Applications</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card applications-stat-card p-4 text-center">
-                        <div class="applications-stat-value" th:text="${applications.size()}">0</div>
-                        <div class="stat-label text-uppercase small text-muted">Showing</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card applications-stat-card p-4 text-center">
-                        <div class="applications-stat-value" th:text="${currentPage + 1}">1</div>
-                        <div class="stat-label text-uppercase small text-muted">Current Page</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card applications-stat-card p-4 text-center">
-                        <div class="applications-stat-value" th:text="${totalPages}">0</div>
-                        <div class="stat-label text-uppercase small text-muted">Total Pages</div>
-                    </div>
-                </div>
+            <!-- Alerts -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 12px;">
+                <i class="fas fa-check-circle me-2"></i><span th:text="${success}">Success</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 12px;">
+                <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}">Error</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
 
-            <!-- FILTER -->
-            <div class="card mb-4 border-0 shadow-sm" style="background: var(--bg-card); border-radius: var(--radius);">
-                <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3 p-3">
-                    <div class="d-flex align-items-center gap-3">
-                        <form method="get" th:action="@{/admin/applications}" class="d-flex align-items-center gap-2">
-                            <label class="fw-bold text-secondary mb-0"><i class="fas fa-filter me-1"></i>
-                                Status:</label>
-                            <select name="status"
-                                class="form-select form-select-sm border-0 bg-light fw-bold text-primary"
-                                style="width: 160px; cursor: pointer;" onchange="this.form.submit()">
-                                <option value="ALL" th:selected="${statusFilter == 'ALL'}">All Applications</option>
-                                <option value="PENDING" th:selected="${statusFilter == 'PENDING'}">Pending</option>
-                                <option value="HIRED" th:selected="${statusFilter == 'HIRED'}">Hired</option>
-                                <option value="REJECTED" th:selected="${statusFilter == 'REJECTED'}">Rejected</option>
-                            </select>
-                        </form>
-                    </div>
-
-                    <div class="d-flex align-items-center gap-3 ms-auto">
-                        <div class="position-relative">
-                            <i class="fas fa-search applications-search-icon"></i>
-                            <input id="applicationsSearch" type="text" class="form-control applications-search-input"
-                                placeholder="Search by job or applicant">
+            <!-- EXECUTIVE 4 KPI METRIC CARDS (Replaces technical pagination boxes) -->
+            <div class="row g-3 mb-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="metric-card accent-info d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="metric-value" th:text="${totalApplications}">0</div>
+                            <div class="metric-label">Total Applications</div>
                         </div>
-                        <a th:href="@{/admin/dashboard}" class="btn btn-outline-light btn-sm fw-bold text-secondary">
-                            <i class="fas fa-arrow-left me-1"></i> Dashboard
-                        </a>
+                        <div class="metric-icon-box bg-soft-info text-info">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="metric-card accent-warning d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="metric-value" th:text="${pendingApplications}">0</div>
+                            <div class="metric-label">Pending / In Review</div>
+                        </div>
+                        <div class="metric-icon-box bg-soft-warning text-warning">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="metric-card accent-success d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="metric-value" th:text="${hiredApplications}">0</div>
+                            <div class="metric-label">Hired Candidates</div>
+                        </div>
+                        <div class="metric-icon-box bg-soft-success text-success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="metric-card accent-danger d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="metric-value" th:text="${rejectedApplications}">0</div>
+                            <div class="metric-label">Rejected</div>
+                        </div>
+                        <div class="metric-icon-box bg-soft-danger text-danger">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- TABLE -->
-            <div class="card border-0 shadow-sm" style="background: var(--bg-card); border-radius: var(--radius);">
-                <div class="table-responsive">
+            <!-- Modern Filter Toolbar -->
+            <div class="admin-toolbar d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <span class="text-muted small fw-bold text-uppercase me-1"><i class="fas fa-filter me-1"></i> Filter:</span>
+                    <a th:href="@{/admin/applications(status='ALL')}" class="filter-chip"
+                        th:classappend="${statusFilter == 'ALL' or statusFilter == null ? 'active' : ''}">All Applications</a>
+                    <a th:href="@{/admin/applications(status='APPLIED')}" class="filter-chip"
+                        th:classappend="${statusFilter == 'APPLIED' ? 'active' : ''}">Pending Review</a>
+                    <a th:href="@{/admin/applications(status='HIRED')}" class="filter-chip"
+                        th:classappend="${statusFilter == 'HIRED' ? 'active' : ''}">Hired</a>
+                    <a th:href="@{/admin/applications(status='REJECTED')}" class="filter-chip"
+                        th:classappend="${statusFilter == 'REJECTED' ? 'active' : ''}">Rejected</a>
+                </div>
 
-                    <table class="table admin-table table-hover mb-0 applications-row-hover">
+                <div class="d-flex align-items-center gap-3 flex-grow-1" style="max-width: 320px;">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" id="appSearchInput" class="form-control bg-light border-0" placeholder="Search applicant or job..." onkeyup="filterAppTable()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Applications Table Card -->
+            <div class="card border-0 shadow-sm" style="background: var(--bg-card); border-radius: var(--radius); overflow: hidden;">
+                <div class="table-responsive">
+                    <table class="table admin-table align-middle mb-0" id="applicationsTable">
                         <thead class="bg-light">
                             <tr>
-                                <th class="ps-4">ID</th>
-                                <th>Job Title</th>
-                                <th>Applicant</th>
-                                <th>Email</th>
-                                <th>Applied Date</th>
-                                <th>Status</th>
-                                <th class="text-end pe-4">Actions</th>
+                                <th class="ps-4" style="min-width: 250px;">Applicant</th>
+                                <th style="min-width: 220px;">Job Title</th>
+                                <th style="min-width: 140px;">Applied Date</th>
+                                <th style="min-width: 130px;">Status</th>
+                                <th class="text-end pe-4" style="min-width: 150px;">Actions</th>
                             </tr>
                         </thead>
-
                         <tbody>
-
                             <tr th:if="${applications.isEmpty()}">
-                                <td colspan="7" class="text-center py-5 text-muted">
-                                    <i class="fas fa-inbox fa-3x mb-3 opacity-25"></i>
-                                    <p class="mb-0">No applications found matching criteria.</p>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <i class="fas fa-file-invoice fa-3x mb-3 opacity-25"></i>
+                                    <h5 class="fw-bold mb-1">No Applications Found</h5>
+                                    <p class="mb-0 small">No candidate applications currently match this filter criteria.</p>
                                 </td>
                             </tr>
-
-                            <tr th:each="app : ${applications}"
-                                th:attr="data-job=${(app.job != null and app.job.jobTitle != null) ? #strings.toLowerCase(app.job.jobTitle) : ''}, data-applicant=${app.userId != null ? #strings.toLowerCase((app.userId.firstName != null ? app.userId.firstName : '') + ' ' + (app.userId.lastName != null ? app.userId.lastName : '')) : ''}">
-                                <td class="ps-4 text-muted" th:text="'#' + ${app.id}">1</td>
-
-                                <!-- JOB -->
-                                <td>
-                                    <div class="fw-bold text-dark"
-                                        th:text="${app.job != null ? app.job.jobTitle : 'N/A'}">
-                                        Job</div>
-                                </td>
-
-                                <!-- APPLICANT -->
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-initial"
-                                            style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; margin-right: 1rem;">
-                                            <i class="fas fa-user"></i>
+                            <tr th:each="app : ${applications}" class="app-row">
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="app-avatar"
+                                            th:text="${app.userId?.jobSeekerProfile?.firstName != null ? #strings.substring(app.userId.jobSeekerProfile.firstName, 0, 1) : 'A'}">
+                                            A
                                         </div>
                                         <div>
-                                            <div class="fw-bold text-dark"
-                                                th:text="${app.userId != null ? ((app.userId.firstName != null ? app.userId.firstName : '') + ' ' + (app.userId.lastName != null ? app.userId.lastName : '')) : 'Unknown'}">
+                                            <div class="fw-bold text-dark app-name">
+                                                <span th:if="${app.userId?.jobSeekerProfile != null}"
+                                                    th:text="${app.userId.jobSeekerProfile.firstName + ' ' + (app.userId.jobSeekerProfile.lastName ?: '')}">Applicant Name</span>
+                                                <span th:unless="${app.userId?.jobSeekerProfile != null}">Unknown Applicant</span>
                                             </div>
+                                            <small class="text-muted app-email" th:text="${app.userId?.email}">email@example.com</small>
                                         </div>
                                     </div>
                                 </td>
-
-                                <!-- EMAIL -->
-                                <td class="text-secondary">
-                                    <span
-                                        th:if="${app.userId != null and app.userId.userId != null and app.userId.userId.email != null}"
-                                        th:text="${app.userId.userId.email}">
-                                    </span>
-                                    <span
-                                        th:unless="${app.userId != null and app.userId.userId != null and app.userId.userId.email != null}"
-                                        class="text-muted">N/A</span>
-                                </td>
-
-                                <!-- DATE -->
-                                <td class="text-secondary"
-                                    th:text="${app.applyDate != null ? #dates.format(app.applyDate,'MMM dd, yyyy') : 'N/A'}">
-                                    Date</td>
-
-                                <!-- STATUS -->
                                 <td>
-                                    <span th:if="${app.applicationStatus == 'PENDING'}"
-                                        class="badge rounded-pill bg-warning text-dark status-badge">
-                                        <i class="fas fa-clock me-1"></i> PENDING
-                                    </span>
-                                    <span th:if="${app.applicationStatus == 'HIRED'}"
-                                        class="badge rounded-pill bg-success status-badge">
-                                        <i class="fas fa-check-circle me-1"></i> HIRED
-                                    </span>
-                                    <span th:if="${app.applicationStatus == 'REJECTED'}"
-                                        class="badge rounded-pill bg-danger status-badge">
-                                        <i class="fas fa-times-circle me-1"></i> REJECTED
-                                    </span>
-                                    <span
-                                        th:unless="${app.applicationStatus == 'PENDING' or app.applicationStatus == 'HIRED' or app.applicationStatus == 'REJECTED'}"
-                                        class="badge rounded-pill bg-secondary status-badge"
-                                        th:text="${app.applicationStatus}">STATUS</span>
+                                    <div class="fw-bold text-dark app-job" th:text="${app.job?.jobTitle ?: 'Job Posting'}">Senior Developer</div>
+                                    <small class="text-muted">
+                                        <i class="fas fa-building me-1"></i><span th:text="${app.job?.jobCompanyId?.name ?: 'Company'}">Company</span>
+                                    </small>
                                 </td>
-
-                                <!-- ACTIONS -->
+                                <td class="text-muted">
+                                    <span th:if="${app.applyDate != null}"
+                                        th:text="${#dates.format(app.applyDate, 'MMM dd, yyyy')}">Jan 01, 2026</span>
+                                    <span th:unless="${app.applyDate != null}">-</span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-soft-warning rounded-pill px-3 py-1 fw-semibold"
+                                        th:if="${app.applicationStatus == null or app.applicationStatus == 'APPLIED' or app.applicationStatus == 'PENDING'}">
+                                        <i class="fas fa-clock me-1"></i> Under Review
+                                    </span>
+                                    <span class="badge badge-soft-success rounded-pill px-3 py-1 fw-semibold"
+                                        th:if="${app.applicationStatus == 'HIRED' or app.applicationStatus == 'ACCEPTED'}">
+                                        <i class="fas fa-check-circle me-1"></i> Hired
+                                    </span>
+                                    <span class="badge badge-soft-danger rounded-pill px-3 py-1 fw-semibold"
+                                        th:if="${app.applicationStatus == 'REJECTED'}">
+                                        <i class="fas fa-times-circle me-1"></i> Rejected
+                                    </span>
+                                    <span class="badge badge-soft-info rounded-pill px-3 py-1 fw-semibold"
+                                        th:if="${app.applicationStatus != null and app.applicationStatus != 'APPLIED' and app.applicationStatus != 'PENDING' and app.applicationStatus != 'HIRED' and app.applicationStatus != 'ACCEPTED' and app.applicationStatus != 'REJECTED'}"
+                                        th:text="${app.applicationStatus}">Status</span>
+                                </td>
                                 <td class="text-end pe-4">
-                                    <button class="btn btn-sm btn-icon btn-outline-primary view-details-btn"
-                                        title="View Details" th:data-id="${app.id}"
-                                        th:data-job-title="${app.job != null ? app.job.jobTitle : 'N/A'}"
-                                        th:data-applicant="${app.userId != null ? ((app.userId.firstName != null ? app.userId.firstName : '') + ' ' + (app.userId.lastName != null ? app.userId.lastName : '')) : 'Unknown'}"
-                                        th:data-email="${app.userId != null and app.userId.userId != null ? app.userId.userId.email : 'N/A'}"
-                                        th:data-date="${app.applyDate != null ? #dates.format(app.applyDate,'MMM dd, yyyy') : 'N/A'}"
-                                        th:data-status="${app.applicationStatus}"
-                                        th:data-cover-letter="${app.coverLetter}" th:data-rate="${app.proposedRate}"
-                                        th:data-understanding="${app.understanding}"
-                                        th:data-skills="${app.relevantSkills}"
-                                        th:data-time="${app.expectedCompletionTime}">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <div class="d-inline-block ms-1" th:if="${app.applicationStatus == 'PENDING'}">
-                                        <form th:action="@{/admin/applications/{id}/approve(id=${app.id})}"
-                                            method="post" style="display:inline;">
-                                            <button type="submit" class="btn btn-sm btn-icon btn-outline-success"
-                                                title="Approve">
-                                                <i class="fas fa-check"></i>
+                                    <div class="d-inline-flex align-items-center gap-1">
+                                        <form th:if="${app.applicationStatus != 'HIRED'}" th:action="@{/admin/applications/{id}/approve(id=${app.id})}" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-3" title="Mark as Hired">
+                                                <i class="fas fa-check me-1"></i> Hire
                                             </button>
                                         </form>
-                                        <form th:action="@{/admin/applications/{id}/reject(id=${app.id})}" method="post"
-                                            style="display:inline;">
-                                            <button type="submit" class="btn btn-sm btn-icon btn-outline-danger"
-                                                title="Reject">
-                                                <i class="fas fa-times"></i>
+                                        <form th:if="${app.applicationStatus != 'REJECTED'}" th:action="@{/admin/applications/{id}/reject(id=${app.id})}" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3" title="Reject Application">
+                                                <i class="fas fa-times me-1"></i> Reject
                                             </button>
                                         </form>
                                     </div>
                                 </td>
                             </tr>
-
                         </tbody>
                     </table>
                 </div>
 
-                <!-- PAGINATION -->
-                <div class="card-footer bg-transparent border-top border-light py-3" th:if="${totalPages > 1}">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="text-muted small">
-                            Showing <span th:text="${currentPage * pageSize + 1}">1</span> to
-                            <span
-                                th:text="${(currentPage + 1) * pageSize < totalApplications ? (currentPage + 1) * pageSize : totalApplications}">10</span>
-                            of <span th:text="${totalApplications}">0</span> applications
-                        </div>
-                        <nav aria-label="Applications pagination">
-                            <ul class="pagination pagination-sm mb-0">
-                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                                    <a class="page-link rounded-start-pill border-0 shadow-sm"
-                                        th:href="@{/admin/applications(page=${currentPage - 1}, status=${statusFilter})}">
-                                        <i class="fas fa-chevron-left me-1"></i> Previous
-                                    </a>
-                                </li>
-
-                                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                                    th:classappend="${i == currentPage} ? 'active'">
-                                    <a class="page-link border-0 shadow-sm mx-1 rounded-circle"
-                                        style="width: 30px; height: 30px; text-align: center; line-height: 18px;"
-                                        th:href="@{/admin/applications(page=${i}, status=${statusFilter})}"
-                                        th:text="${i + 1}">1</a>
-                                </li>
-
-                                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                                    <a class="page-link rounded-end-pill border-0 shadow-sm"
-                                        th:href="@{/admin/applications(page=${currentPage + 1}, status=${statusFilter})}">
-                                        Next <i class="fas fa-chevron-right ms-1"></i>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
+                <!-- Sleek Pagination Bar at Footer of Table -->
+                <div class="card-footer bg-transparent border-top p-3 d-flex flex-wrap justify-content-between align-items-center gap-3"
+                    th:if="${totalPages > 1}">
+                    <div class="text-muted small">
+                        Showing page <strong th:text="${currentPage + 1}">1</strong> of <strong th:text="${totalPages}">1</strong>
                     </div>
+                    <nav aria-label="Applications pagination">
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                                <a class="page-link rounded-pill px-3 me-1" th:href="@{/admin/applications(page=${currentPage - 1}, size=${pageSize}, status=${statusFilter})}">Previous</a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                th:classappend="${currentPage == i ? 'active' : ''}">
+                                <a class="page-link rounded-circle mx-1 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;"
+                                   th:href="@{/admin/applications(page=${i}, size=${pageSize}, status=${statusFilter})}"
+                                   th:text="${i + 1}">1</a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage + 1 >= totalPages ? 'disabled' : ''}">
+                                <a class="page-link rounded-pill px-3 ms-1" th:href="@{/admin/applications(page=${currentPage + 1}, size=${pageSize}, status=${statusFilter})}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
 
         </div>
     </main>
 
-    <!-- Short Admin Footer -->
-    <div th:replace="~{admin/fragments/footer :: adminFooter}"></div>
-
-    <!-- Application Details Modal -->
-    <div class="modal fade" id="applicationDetailsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content" style="background-color: var(--bg-card); color: var(--text);">
-                <div class="modal-header" style="border-bottom: 1px solid var(--border);">
-                    <h5 class="modal-title fw-bold">Application Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                        style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="detail-label"
-                                style="color: var(--text-light); font-size: 0.85rem; font-weight: 600;">Job Title</div>
-                            <div id="modalJobTitle" class="detail-value fs-5"></div>
-                        </div>
-                        <div class="col-md-6 text-end">
-                            <span id="modalStatusBadge" class="badge rounded-pill px-3 py-2"></span>
-                        </div>
-                    </div>
-
-                    <div class="p-3 bg-light rounded-3 mb-4" style="background-color: var(--bg-light) !important;">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="detail-label"
-                                    style="color: var(--text-light); font-size: 0.85rem; font-weight: 600;">Applicant
-                                </div>
-                                <div id="modalApplicant" class="detail-value mb-0"></div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="detail-label"
-                                    style="color: var(--text-light); font-size: 0.85rem; font-weight: 600;">Email</div>
-                                <div id="modalEmail" class="detail-value mb-0"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mb-2">
-                        <div class="col-md-6">
-                            <div class="detail-label"
-                                style="color: var(--text-light); font-size: 0.85rem; font-weight: 600;">Applied Date
-                            </div>
-                            <div id="modalDate" class="detail-value"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="detail-label"
-                                style="color: var(--text-light); font-size: 0.85rem; font-weight: 600;">Proposed Rate
-                            </div>
-                            <div id="modalRate" class="detail-value text-success fw-bold"></div>
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <div class="detail-label"
-                            style="color: var(--text-light); font-size: 0.85rem; font-weight: 600;">Cover Letter</div>
-                        <div id="modalCoverLetter" class="p-3 bg-white border rounded text-secondary"
-                            style="white-space: pre-line; background-color: var(--bg-body) !important; border-color: var(--border) !important; color: var(--text-light) !important;">
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <div class="detail-label"
-                            style="color: var(--text-light); font-size: 0.85rem; font-weight: 600;">Understanding of the
-                            Job</div>
-                        <div id="modalUnderstanding" class="p-3 bg-white border rounded text-secondary"
-                            style="white-space: pre-line; background-color: var(--bg-body) !important; border-color: var(--border) !important; color: var(--text-light) !important;">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="detail-label"
-                                style="color: var(--text-light); font-size: 0.85rem; font-weight: 600;">Relevant Skills
-                            </div>
-                            <div id="modalSkills" class="detail-value"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="detail-label"
-                                style="color: var(--text-light); font-size: 0.85rem; font-weight: 600;">Expected
-                                Completion</div>
-                            <div id="modalTime" class="detail-value"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer bg-light border-0" style="background-color: var(--bg-light) !important;">
-                    <button type="button" class="btn btn-secondary rounded-pill px-4"
-                        data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/js/admin-scripts.js}"></script>
-
     <script>
-        $(document).ready(function () {
-            $('.view-details-btn').click(function () {
-                var btn = $(this);
+        function filterAppTable() {
+            const input = document.getElementById('appSearchInput');
+            const filter = input.value.toLowerCase();
+            const rows = document.querySelectorAll('#applicationsTable tbody tr.app-row');
 
-                $('#modalJobTitle').text(btn.data('job-title'));
-                $('#modalApplicant').text(btn.data('applicant'));
-                $('#modalEmail').text(btn.data('email'));
-                $('#modalDate').text(btn.data('date'));
-
-                var status = btn.data('status');
-                var badgeClass = 'bg-secondary';
-                if (status === 'PENDING') badgeClass = 'bg-warning text-dark';
-                else if (status === 'HIRED') badgeClass = 'bg-success';
-                else if (status === 'REJECTED') badgeClass = 'bg-danger';
-
-                $('#modalStatusBadge').removeClass('bg-warning bg-success bg-danger bg-secondary text-dark').addClass(badgeClass).text(status);
-
-                $('#modalCoverLetter').text(btn.data('cover-letter') || 'N/A');
-                $('#modalRate').text(btn.data('rate') ? '$' + btn.data('rate') : 'N/A');
-                $('#modalUnderstanding').text(btn.data('understanding') || 'N/A');
-                $('#modalSkills').text(btn.data('skills') || 'N/A');
-                $('#modalTime').text(btn.data('time') || 'N/A');
-
-                var modal = new bootstrap.Modal(document.getElementById('applicationDetailsModal'));
-                modal.show();
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
             });
-
-            // Client-side search by job title / applicant
-            const searchInput = document.getElementById('applicationsSearch');
-            if (searchInput) {
-                const rows = Array.from(document.querySelectorAll('tbody tr[th\\:each], tbody tr[data-job]'));
-
-                function applySearch() {
-                    const q = (searchInput.value || '').trim().toLowerCase();
-                    rows.forEach(function (row) {
-                        const job = (row.getAttribute('data-job') || '').toLowerCase();
-                        const applicant = (row.getAttribute('data-applicant') || '').toLowerCase();
-                        if (!q || job.includes(q) || applicant.includes(q)) {
-                            row.style.display = '';
-                        } else {
-                            row.style.display = 'none';
-                        }
-                    });
-                }
-
-                searchInput.addEventListener('input', applySearch);
-            }
-        });
+        }
     </script>
-
 </body>
-
 </html>

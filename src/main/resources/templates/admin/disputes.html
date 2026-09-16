@@ -9,180 +9,180 @@
     <link th:href="@{/webjars/font-awesome/css/all.min.css}" rel="stylesheet">
     <link th:href="@{/css/admin-styles.css}" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body th:classappend="${session.theme == 'dark' ? 'dark-theme' : 'light-theme'}">
 
-    <!-- Sidebar Fragment -->
-    <div th:replace="~{admin/fragments/sidebar :: sidebar('disputes')}"></div>
+    <!-- Standard Admin Sidebar -->
+    <aside class="admin-sidebar" id="sidebar" th:replace="~{admin/fragments/sidebar :: sidebar(activeLink='disputes')}">
+    </aside>
 
-    <!-- Sidebar Overlay -->
+    <!-- Mobile Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- Main Content -->
     <main class="admin-main">
-        <!-- Top Bar -->
-        <div class="top-bar">
-            <button class="btn btn-primary d-lg-none me-3" id="sidebarToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="page-title">
-                <div class="title-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <div>
-                    <h1>Disputes Management</h1>
-                    <p class="text-muted mb-0">
-                        Handle reported issues and disputes.
-                    </p>
-                </div>
-            </div>
-
-            <div class="user-menu d-flex align-items-center gap-2">
-                <form th:action="@{/admin/theme/toggle}" method="post" class="d-inline">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm">
-                        <i class="fas me-1"
-                            th:classappend="${session.theme == 'dark' ? 'fa-sun' : 'fa-moon'}"></i>
-                        <span th:text="${session.theme == 'dark' ? 'Light' : 'Dark'}">Dark</span>
-                    </button>
-                </form>
-                <a href="/logout" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </div>
-        </div>
+        <!-- Reusable Admin Topbar -->
+        <header th:replace="~{admin/fragments/topbar :: topbar('Disputes Management', 'Mediate and resolve platform disputes between clients and freelancers', 'fas fa-exclamation-triangle')}">
+        </header>
 
         <div class="container-fluid px-0">
 
-            <!-- Notification Alerts -->
-            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
+            <!-- Alerts -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 12px;">
+                <i class="fas fa-check-circle me-2"></i><span th:text="${success}">Success</span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}"></span>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 12px;">
+                <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}">Error</span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
 
-            <!-- Disputes Content -->
-            <div class="card mb-4" style="background-color: var(--bg-card); border: 1px solid var(--border);">
-                <div class="card-header"
-                    style="background-color: var(--bg-card); border-bottom: 1px solid var(--border);">
-                    <h5 class="mb-0 fw-bold" style="color: var(--text);">Received Disputes</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div th:if="${disputes == null or disputes.isEmpty()}" class="text-center py-5">
-                        <div class="empty-state-icon"
-                            style="font-size: 5rem; color: var(--border); margin-bottom: 1.5rem;">
-                            <i class="fas fa-check-circle text-success opacity-50"></i>
+            <!-- Modern KPI Stats Grid -->
+            <div class="row g-3 mb-4">
+                <div class="col-xl-4 col-md-6">
+                    <div class="metric-card accent-danger d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="metric-value" th:text="${disputes != null ? disputes.size() : 0}">0</div>
+                            <div class="metric-label">Total Disputes Filed</div>
                         </div>
-                        <h4 class="fw-bold" style="color: var(--text);">No Active Disputes</h4>
-                        <p class="text-muted">Great news! There are currently no reported issues or disputes to handle.
+                        <div class="metric-icon-box bg-soft-danger text-danger">
+                            <i class="fas fa-gavel"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 col-md-6">
+                    <div class="metric-card accent-warning d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="metric-value" th:text="${disputes != null ? disputes.size() : 0}">0</div>
+                            <div class="metric-label">Awaiting Mediation</div>
+                        </div>
+                        <div class="metric-icon-box bg-soft-warning text-warning">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 col-md-12">
+                    <div class="metric-card accent-success d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="metric-value" style="font-size: 1.5rem; line-height: 1.5;">Escrow Protected</div>
+                            <div class="metric-label">Financial Safe Guard</div>
+                        </div>
+                        <div class="metric-icon-box bg-soft-success text-success">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Disputes Card -->
+            <div class="card border-0 shadow-sm" style="background: var(--bg-card); border-radius: var(--radius); overflow: hidden;">
+                <div class="card-header bg-transparent border-bottom px-4 py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-balance-scale text-warning me-2"></i>Dispute Inquiries</h5>
+                    <span class="badge badge-soft-warning rounded-pill px-3 py-1" th:text="${disputes != null ? disputes.size() : 0} + ' Cases'">0 Cases</span>
+                </div>
+
+                <div class="card-body p-0">
+                    <!-- Empty State -->
+                    <div th:if="${disputes == null or disputes.isEmpty()}" class="text-center py-5">
+                        <div class="mb-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle"
+                                 style="width: 72px; height: 72px; background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                                <i class="fas fa-check-circle fa-2x"></i>
+                            </div>
+                        </div>
+                        <h4 class="fw-bold mb-2">No Active Disputes</h4>
+                        <p class="text-muted mx-auto" style="max-width: 480px;">
+                            Excellent! There are currently no open conflicts, reported issues, or escrow disputes requiring administrator intervention.
                         </p>
                     </div>
 
+                    <!-- Populated Table -->
                     <div th:if="${disputes != null and !disputes.isEmpty()}" class="table-responsive">
-                        <table class="table admin-table table-hover align-middle mb-0">
+                        <table class="table admin-table align-middle mb-0">
                             <thead class="bg-light">
                                 <tr>
-                                    <th class="ps-3">ID</th>
-                                    <th>Type</th>
-                                    <th>Reported By</th>
-                                    <th>Job Title</th>
-                                    <th>Description</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
-                                    <th class="text-end pe-3">Actions</th>
+                                    <th class="ps-4" style="min-width: 80px;">ID</th>
+                                    <th style="min-width: 140px;">Type</th>
+                                    <th style="min-width: 220px;">Reporter</th>
+                                    <th style="min-width: 200px;">Job Context</th>
+                                    <th style="min-width: 130px;">Status</th>
+                                    <th style="min-width: 140px;">Date Filed</th>
+                                    <th class="text-end pe-4" style="min-width: 140px;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr th:each="dispute : ${disputes}">
-                                    <td class="ps-3 fw-bold text-muted" th:text="${dispute.id}"
-                                        style="white-space: nowrap;">1</td>
-                                    <td>
-                                        <span class="badge bg-light text-dark border"
-                                            style="white-space: nowrap; color: var(--text) !important; background-color: rgba(255, 255, 255, 0.1) !important; border-color: var(--border) !important;"
-                                            th:text="${dispute.type}">Type</span>
+                                    <td class="ps-4 fw-bold text-muted">
+                                        <span class="badge bg-light text-dark border font-monospace" th:text="'#' + ${dispute.id}">#1</span>
                                     </td>
                                     <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2 flex-shrink-0"
-                                                style="width: 24px; height: 24px; font-size: 10px;">
+                                        <span class="badge badge-soft-danger rounded-pill px-3 py-1 fw-semibold" th:text="${dispute.type}">Type</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="avatar-initial rounded-circle bg-light d-flex align-items-center justify-content-center text-muted"
+                                                style="width: 32px; height: 32px; font-size: 0.85rem;">
                                                 <i class="fas fa-user"></i>
                                             </div>
-                                            <div
-                                                style="max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                                <span
-                                                    th:text="${dispute.reporter != null ? dispute.reporter.email : 'Unknown'}">User</span>
+                                            <div>
+                                                <div class="fw-bold text-dark" th:text="${dispute.reporter != null ? dispute.reporter.email : 'Unknown'}">reporter@example.com</div>
+                                                <small class="text-muted" th:text="${#strings.abbreviate(dispute.description, 45)}">Description preview...</small>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
-                                        <div style="max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-                                            th:text="${dispute.job.jobTitle}">Job</div>
+                                        <div class="fw-bold text-dark" th:text="${dispute.job != null ? dispute.job.jobTitle : 'Direct Contract'}">Job Title</div>
+                                        <small class="text-muted" th:if="${dispute.against != null}">
+                                            Against: <span th:text="${dispute.against.email}">against@example.com</span>
+                                        </small>
                                     </td>
                                     <td>
-                                        <div class="text-muted"
-                                            style="max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-                                            th:text="${dispute.description}">
-                                            Description</div>
+                                        <span class="badge badge-soft-warning rounded-pill px-3 py-1 fw-semibold" th:text="${dispute.status}">PENDING</span>
                                     </td>
-                                    <td>
-                                        <span class="badge bg-warning text-dark"
-                                            style="white-space: nowrap; color: #1a202c !important;"
-                                            th:text="${dispute.status}">Pending</span>
+                                    <td class="text-muted small">
+                                        <span th:if="${dispute.postedDate != null}" th:text="${#dates.format(dispute.postedDate, 'MMM dd, yyyy')}">Date</span>
                                     </td>
-                                    <td class="text-muted small" style="white-space: nowrap;"
-                                        th:text="${#dates.format(dispute.postedDate, 'dd-MM-yy HH:mm')}">Date</td>
-                                    <td class="text-end pe-3" style="white-space: nowrap;">
-                                        <div class="dropdown">
-                                            <button class="btn btn-primary btn-sm shadow-sm dropdown-toggle"
-                                                type="button" data-bs-toggle="dropdown" aria-expanded="false"
-                                                style="border-radius: 20px; padding: 0.25rem 0.75rem; font-size: 0.8rem; font-weight: 500;">
-                                                Action
+                                    <td class="text-end pe-4">
+                                        <div class="dropdown d-inline-block">
+                                            <button class="btn btn-primary btn-pill btn-pill-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Mediate
                                             </button>
-                                            <ul class="dropdown-menu dropdown-menu-end">
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="border-radius: 12px;">
                                                 <li>
-                                                    <button class="dropdown-item" type="button" data-bs-toggle="modal"
-                                                        th:data-bs-target="'#modal-dispute-' + ${dispute.id}">
-                                                        <i class="fas fa-eye me-2 text-primary"></i>View Details
+                                                    <button class="dropdown-item py-2" type="button" data-bs-toggle="modal" th:data-bs-target="'#modal-dispute-' + ${dispute.id}">
+                                                        <i class="fas fa-eye me-2 text-primary"></i>View Full Case
                                                     </button>
                                                 </li>
+                                                <li><hr class="dropdown-divider"></li>
                                                 <li>
-                                                    <hr class="dropdown-divider">
-                                                </li>
-                                                <li>
-                                                    <form th:action="@{/admin/disputes/resolve}" method="post"
-                                                        style="display:inline;">
+                                                    <form th:action="@{/admin/disputes/resolve}" method="post">
                                                         <input type="hidden" name="id" th:value="${dispute.id}" />
                                                         <input type="hidden" name="action" value="release" />
-                                                        <button class="dropdown-item text-success" type="submit"
-                                                            onclick="return confirm('Release funds to Freelancer?');">
-                                                            <i class="fas fa-check-circle me-2"></i>Release to
-                                                            Freelancer
+                                                        <button class="dropdown-item py-2 text-success" type="submit" onclick="return confirm('Release escrow funds to Freelancer?');">
+                                                            <i class="fas fa-check-circle me-2"></i>Release to Freelancer
                                                         </button>
                                                     </form>
                                                 </li>
                                                 <li>
-                                                    <form th:action="@{/admin/disputes/resolve}" method="post"
-                                                        style="display:inline;">
+                                                    <form th:action="@{/admin/disputes/resolve}" method="post">
                                                         <input type="hidden" name="id" th:value="${dispute.id}" />
                                                         <input type="hidden" name="action" value="refund" />
-                                                        <button class="dropdown-item text-danger" type="submit"
-                                                            onclick="return confirm('Refund Client?');">
+                                                        <button class="dropdown-item py-2 text-danger" type="submit" onclick="return confirm('Refund escrow funds to Client?');">
                                                             <i class="fas fa-undo me-2"></i>Refund Client
                                                         </button>
                                                     </form>
                                                 </li>
                                                 <li>
-                                                    <form th:action="@{/admin/disputes/resolve}" method="post"
-                                                        style="display:inline;">
+                                                    <form th:action="@{/admin/disputes/resolve}" method="post">
                                                         <input type="hidden" name="id" th:value="${dispute.id}" />
                                                         <input type="hidden" name="action" value="dismiss" />
-                                                        <button class="dropdown-item text-secondary" type="submit"
-                                                            onclick="return confirm('Dismiss this dispute without moving funds?');">
-                                                            <i class="fas fa-times-circle me-2"></i>Dismiss
+                                                        <button class="dropdown-item py-2 text-secondary" type="submit" onclick="return confirm('Dismiss dispute without escrow changes?');">
+                                                            <i class="fas fa-times-circle me-2"></i>Dismiss Case
                                                         </button>
                                                     </form>
                                                 </li>
@@ -199,107 +199,52 @@
         </div>
     </main>
 
-    <!-- Short Admin Footer -->
-    <div th:replace="~{admin/fragments/footer :: adminFooter}"></div>
-
-    <!-- Dispute Details Modals -->
+    <!-- Dispute Case Modals -->
     <div th:if="${disputes != null}" th:each="dispute : ${disputes}">
         <div class="modal fade" th:id="'modal-dispute-' + ${dispute.id}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content"
-                    style="background-color: var(--bg-card); color: var(--text); border: 1px solid var(--border);">
-                    <div class="modal-header" style="border-bottom: 1px solid var(--border);">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden; background: var(--bg-card);">
+                    <div class="modal-header border-bottom px-4 py-3">
                         <h5 class="modal-title fw-bold">
-                            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
-                            Dispute Details #<span th:text="${dispute.id}"></span>
+                            <i class="fas fa-gavel text-danger me-2"></i>
+                            Dispute Case #<span th:text="${dispute.id}">1</span>
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                            style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body p-4">
                         <div class="row g-3 mb-4">
                             <div class="col-md-6">
-                                <label class="small text-muted text-uppercase fw-bold">Reported By</label>
-                                <div class="d-flex align-items-center mt-1">
-                                    <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
-                                        style="width: 32px; height: 32px;">
-                                        <i class="fas fa-user-edit"></i>
-                                    </div>
-                                    <span class="fw-bold"
-                                        th:text="${dispute.reporter != null ? dispute.reporter.email : 'Unknown'}">reporter@example.com</span>
+                                <label class="small text-muted text-uppercase fw-bold">Reporter (Complainant)</label>
+                                <div class="d-flex align-items-center mt-1 p-2 bg-light rounded-3">
+                                    <i class="fas fa-user-circle fa-2x text-primary me-2"></i>
+                                    <span class="fw-bold" th:text="${dispute.reporter != null ? dispute.reporter.email : 'Unknown'}">reporter@example.com</span>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <label class="small text-muted text-uppercase fw-bold">Against</label>
-                                <div class="d-flex align-items-center mt-1">
-                                    <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-2"
-                                        style="width: 32px; height: 32px;">
-                                        <i class="fas fa-user-times"></i>
-                                    </div>
-                                    <span class="fw-bold"
-                                        th:text="${dispute.against != null ? dispute.against.email : 'N/A'}">target@example.com</span>
+                                <label class="small text-muted text-uppercase fw-bold">Against (Reported Party)</label>
+                                <div class="d-flex align-items-center mt-1 p-2 bg-light rounded-3">
+                                    <i class="fas fa-user-circle fa-2x text-danger me-2"></i>
+                                    <span class="fw-bold" th:text="${dispute.against != null ? dispute.against.email : 'N/A'}">target@example.com</span>
                                 </div>
                             </div>
-                            <div class="col-md-6 mt-3">
-                                <label class="small text-muted text-uppercase fw-bold">Job Title</label>
-                                <div class="d-flex align-items-center mt-1">
-                                    <i class="fas fa-briefcase text-primary me-2"></i>
-                                    <span th:text="${dispute.job.jobTitle}">Job Title</span>
+                            <div class="col-md-6">
+                                <label class="small text-muted text-uppercase fw-bold">Related Job</label>
+                                <div class="mt-1 fw-semibold text-dark" th:text="${dispute.job != null ? dispute.job.jobTitle : 'N/A'}">Job Title</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small text-muted text-uppercase fw-bold">Dispute Classification</label>
+                                <div><span class="badge badge-soft-danger rounded-pill px-3 py-1" th:text="${dispute.type}">Type</span></div>
+                            </div>
+                            <div class="col-12">
+                                <label class="small text-muted text-uppercase fw-bold">Full Statement / Description</label>
+                                <div class="p-3 bg-light rounded-3 mt-1 text-muted" style="line-height: 1.6;" th:text="${dispute.description}">
+                                    Statement description details...
                                 </div>
                             </div>
-                            <div class="col-md-6 mt-3">
-                                <label class="small text-muted text-uppercase fw-bold">Dispute Type</label>
-                                <div class="mt-1">
-                                    <span class="badge bg-light text-dark border"
-                                        style="color: var(--text) !important; background-color: rgba(255, 255, 255, 0.1) !important; border-color: var(--border) !important;"
-                                        th:text="${dispute.type}">Type</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card bg-light border-0" style="background-color: var(--bg-light) !important;">
-                            <div class="card-body">
-                                <label class="small text-muted text-uppercase fw-bold mb-2">Description / Case
-                                    Text</label>
-                                <p class="mb-0" style="white-space: pre-line;" th:text="${dispute.description}">
-                                    Full description of the dispute goes here...
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="mt-3 text-end text-muted small">
-                            Submitted on <span
-                                th:text="${#dates.format(dispute.postedDate, 'dd MMMM yyyy, HH:mm')}">Date</span>
                         </div>
                     </div>
-                    <div class="modal-footer" style="border-top: 1px solid var(--border);">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-
-                        <form th:action="@{/admin/disputes/resolve}" method="post" class="d-inline">
-                            <input type="hidden" name="id" th:value="${dispute.id}" />
-                            <input type="hidden" name="action" value="release" />
-                            <button class="btn btn-success" type="submit"
-                                onclick="return confirm('Release funds to Freelancer?');">
-                                <i class="fas fa-check-circle me-1"></i> Release to Freelancer
-                            </button>
-                        </form>
-
-                        <form th:action="@{/admin/disputes/resolve}" method="post" class="d-inline">
-                            <input type="hidden" name="id" th:value="${dispute.id}" />
-                            <input type="hidden" name="action" value="refund" />
-                            <button class="btn btn-danger" type="submit" onclick="return confirm('Refund Client?');">
-                                <i class="fas fa-undo me-1"></i> Refund Client
-                            </button>
-                        </form>
-
-                        <form th:action="@{/admin/disputes/resolve}" method="post" class="d-inline">
-                            <input type="hidden" name="id" th:value="${dispute.id}" />
-                            <input type="hidden" name="action" value="dismiss" />
-                            <button class="btn btn-outline-secondary" type="submit"
-                                onclick="return confirm('Dismiss this dispute without moving funds?');">
-                                <i class="fas fa-times-circle me-1"></i> Dismiss
-                            </button>
-                        </form>
+                    <div class="modal-footer px-4 py-3 border-top">
+                        <button type="button" class="btn btn-secondary btn-pill" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -309,7 +254,5 @@
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/js/admin-scripts.js}"></script>
-
 </body>
-
 </html>

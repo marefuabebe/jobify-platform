@@ -4,299 +4,339 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Users - Admin Dashboard - Jobify</title>
+    <title>All Users - Jobify Admin</title>
     <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/webjars/font-awesome/css/all.min.css}" rel="stylesheet">
     <link th:href="@{/css/admin-styles.css}" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        .user-avatar-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #ffffff;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .action-btn-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-light);
+        }
+        .action-btn-circle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .action-btn-circle.btn-approve-user:hover {
+            background: #10b981;
+            color: #ffffff;
+            border-color: #10b981;
+        }
+        .action-btn-circle.btn-verify-user:hover {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+        .action-btn-circle.btn-activate-user:hover {
+            background: #3b82f6;
+            color: #ffffff;
+            border-color: #3b82f6;
+        }
+        .action-btn-circle.btn-ban-user:hover {
+            background: #f59e0b;
+            color: #ffffff;
+            border-color: #f59e0b;
+        }
+        .action-btn-circle.btn-delete-user:hover {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
+        }
+    </style>
 </head>
 
 <body th:classappend="${session.theme == 'dark' ? 'dark-theme' : 'light-theme'}">
-    <!-- Sidebar -->
+
+    <!-- Standard Admin Sidebar -->
     <aside class="admin-sidebar" id="sidebar" th:replace="~{admin/fragments/sidebar :: sidebar(activeLink='users')}">
-        <!-- Content replaced by fragment -->
     </aside>
 
-    <!-- Sidebar Overlay -->
+    <!-- Mobile Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- Main Content -->
     <main class="admin-main">
-        <!-- Top Bar -->
-        <div class="top-bar">
-            <button class="btn btn-primary d-lg-none me-3" id="sidebarToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="page-title">
-                <div class="title-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div>
-                    <h1 class="h3 fw-bold mb-1">All Users</h1>
-                    <p class="text-muted mb-0">Manage and monitor all platform users</p>
-                </div>
+        <!-- Reusable Admin Topbar -->
+        <header th:replace="~{admin/fragments/topbar :: topbar('All Users', 'Manage, verify, and monitor all platform accounts', 'fas fa-users')}">
+        </header>
+
+        <div class="container-fluid px-0">
+
+            <!-- Alerts -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 12px;">
+                <i class="fas fa-check-circle me-2"></i><span th:text="${success}">Success</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 12px;">
+                <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}">Error</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
 
-            <div class="user-menu d-flex align-items-center gap-2">
-                <form th:action="@{/admin/theme/toggle}" method="post" class="d-inline">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm">
-                        <i class="fas me-1"
-                            th:classappend="${session.theme == 'dark' ? 'fa-sun' : 'fa-moon'}"></i>
-                        <span th:text="${session.theme == 'dark' ? 'Light' : 'Dark'}">Dark</span>
-                    </button>
-                </form>
-
-                <!-- Notification Bell Dropdown -->
-                <div class="dropdown d-inline-block">
-                    <a href="#" class="btn btn-outline-secondary btn-sm position-relative d-flex align-items-center justify-content-center"
-                       id="adminNotificationDropdownUsers" data-bs-toggle="dropdown" aria-expanded="false"
-                       style="width: 34px; height: 34px; border-radius: 50%;">
-                        <i class="fas fa-bell"></i>
-                        <span th:if="${adminUnreadCount != null and adminUnreadCount > 0}"
-                              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                              style="font-size: 0.65rem;"
-                              th:text="${adminUnreadCount}">1</span>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0" aria-labelledby="adminNotificationDropdownUsers" style="width: 320px; max-height: 400px; overflow-y: auto; border-radius: 12px; z-index: 1050;">
-                        <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
-                            <h6 class="mb-0 fw-bold"><i class="fas fa-bell me-2 text-primary"></i>Notifications</h6>
-                            <span th:if="${adminUnreadCount != null and adminUnreadCount > 0}" class="badge bg-primary rounded-pill" th:text="${adminUnreadCount} + ' unread'">1 unread</span>
-                        </div>
-                        <div th:if="${adminRecentNotifications == null or adminRecentNotifications.isEmpty()}" class="p-4 text-center text-muted">
-                            <i class="fas fa-check-circle fa-2x mb-2 text-success opacity-50"></i>
-                            <p class="mb-0 small">No new notifications</p>
-                        </div>
-                        <div th:each="notif : ${adminRecentNotifications}" class="p-3 border-bottom text-dark" style="font-size: 0.85rem;" th:styleappend="${!notif.isRead ? 'background: rgba(75, 108, 183, 0.05);' : ''}">
-                            <div class="d-flex justify-content-between align-items-start mb-1">
-                                <strong th:text="${notif.title}">Title</strong>
-                                <small class="text-muted" th:text="${#dates.format(notif.createdAt, 'MMM d, HH:mm')}">Date</small>
-                            </div>
-                            <p class="mb-1 text-muted" th:text="${notif.message}">Message</p>
-                            <a th:if="${notif.type == 'VERIFICATION'}" href="/admin/verification-dashboard" class="small text-primary fw-bold text-decoration-none">Go to Verifications &rarr;</a>
-                            <a th:if="${notif.type == 'DISPUTE'}" href="/admin/disputes" class="small text-danger fw-bold text-decoration-none">Review Dispute &rarr;</a>
-                        </div>
-                        <div class="p-2 text-center bg-light">
-                            <a href="/notifications" class="small text-muted text-decoration-none">View All Notifications</a>
-                        </div>
+            <!-- Modern Toolbar / Search -->
+            <div class="admin-toolbar d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div class="d-flex align-items-center gap-3 flex-grow-1" style="max-width: 400px;">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" id="userSearchInput" class="form-control bg-light border-0" placeholder="Search by name, email, or role..." onkeyup="filterUsersTable()">
                     </div>
                 </div>
-                <a href="/logout" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </div>
-        </div>
-
-        <!-- Users Container -->
-        <div class="card border-0 shadow-sm" style="background: var(--bg-card); border-radius: var(--radius);">
-            <div class="table-responsive">
-                <table class="table admin-table table-hover mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="ps-4">User</th>
-                            <th>Type</th>
-                            <th>Email</th>
-                            <th>Registration</th>
-                            <th>Status</th>
-                            <th>Verification</th>
-                            <th class="text-end pe-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:if="${users.isEmpty()}">
-                            <td colspan="7" class="text-center py-5 text-muted">
-                                <i class="fas fa-users-slash fa-3x mb-3 opacity-25"></i>
-                                <p class="mb-0">No users found.</p>
-                            </td>
-                        </tr>
-                        <tr th:each="user : ${users}">
-                            <td class="ps-4">
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-initial me-3"
-                                        th:if="${user.userTypeId?.userTypeId == 1 and recruiterProfiles[user.userId] != null}"
-                                        style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;"
-                                        th:text="${!#strings.isEmpty(recruiterProfiles[user.userId].firstName) ? #strings.substring(recruiterProfiles[user.userId].firstName, 0, 1) : 'C'}">
-                                        C
-                                    </div>
-                                    <div class="avatar-initial me-3"
-                                        th:if="${user.userTypeId?.userTypeId == 2 and jobSeekerProfiles[user.userId] != null}"
-                                        style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--success) 0%, #047a4e 100%); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;"
-                                        th:text="${!#strings.isEmpty(jobSeekerProfiles[user.userId].firstName) ? #strings.substring(jobSeekerProfiles[user.userId].firstName, 0, 1) : 'F'}">
-                                        F
-                                    </div>
-                                    <div class="avatar-initial me-3"
-                                        th:if="${(user.userTypeId?.userTypeId == 1 and recruiterProfiles[user.userId] == null) or (user.userTypeId?.userTypeId == 2 and jobSeekerProfiles[user.userId] == null) or user.userTypeId == null}"
-                                        style="width: 40px; height: 40px; background: var(--bg-light); color: var(--text-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;">
-                                        ?
-                                    </div>
-
-                                    <div>
-                                        <h6 class="mb-0 fw-bold text-dark"
-                                            th:if="${user.userTypeId?.userTypeId == 1 and recruiterProfiles[user.userId] != null}">
-                                            <span th:text="${recruiterProfiles[user.userId].firstName}">First</span>
-                                            <span th:text="${recruiterProfiles[user.userId].lastName}">Last</span>
-                                        </h6>
-                                        <h6 class="mb-0 fw-bold text-dark"
-                                            th:if="${user.userTypeId?.userTypeId == 2 and jobSeekerProfiles[user.userId] != null}">
-                                            <span th:text="${jobSeekerProfiles[user.userId].firstName}">First</span>
-                                            <span th:text="${jobSeekerProfiles[user.userId].lastName}">Last</span>
-                                        </h6>
-                                        <h6 class="mb-0 fw-bold text-muted"
-                                            th:if="${(user.userTypeId?.userTypeId == 1 and recruiterProfiles[user.userId] == null) or (user.userTypeId?.userTypeId == 2 and jobSeekerProfiles[user.userId] == null) or user.userTypeId == null}">
-                                            No Profile
-                                        </h6>
-                                        <small class="text-muted" th:text="${user.email}">Email</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="badge bg-soft-info text-info rounded-pill px-3"
-                                    th:if="${user.userTypeId != null and user.userTypeId.userTypeId == 1}"
-                                    style="background: rgba(var(--info-rgb), 0.1); color: var(--info) !important;">Client</span>
-                                <span class="badge bg-soft-success text-success rounded-pill px-3"
-                                    th:if="${user.userTypeId != null and user.userTypeId.userTypeId == 2}"
-                                    style="background: rgba(var(--success-rgb), 0.1); color: var(--success) !important;">Freelancer</span>
-                                <span class="badge bg-soft-secondary text-secondary rounded-pill px-3"
-                                    th:if="${user.userTypeId == null}">Unknown</span>
-                            </td>
-                            <td class="text-muted" th:text="${user.email}">email@example.com</td>
-                            <td class="text-muted">
-                                <span th:if="${user.registrationDate != null}"
-                                    th:text="${#dates.format(user.registrationDate, 'MMM dd, yyyy')}">Jan 01,
-                                    2024</span>
-                                <span th:unless="${user.registrationDate != null}">-</span>
-                            </td>
-                            <td>
-                                <span class="badge rounded-pill"
-                                    th:classappend="${user.approved ? 'bg-success' : 'bg-warning'}"
-                                    th:text="${user.approved ? 'Active' : 'Pending'}">Status</span>
-                            </td>
-                            <td>
-                                <!-- Verification Badge Logic -->
-                                <span class="badge rounded-pill bg-success"
-                                    th:if="${(user.userTypeId?.userTypeId == 1 and recruiterProfiles[user.userId]?.isVerified == true) or (user.userTypeId?.userTypeId == 2 and jobSeekerProfiles[user.userId]?.isVerified == true)}">
-                                    <i class="fas fa-check-circle me-1"></i> Verified
-                                </span>
-                                <span class="badge rounded-pill bg-light text-dark border"
-                                    th:if="${(user.userTypeId?.userTypeId == 1 and recruiterProfiles[user.userId]?.isVerified != true) or (user.userTypeId?.userTypeId == 2 and jobSeekerProfiles[user.userId]?.isVerified != true)}">
-                                    Unverified
-                                </span>
-                            </td>
-                            <td class="text-end pe-4">
-                                <div class="d-flex justify-content-end gap-2">
-                                    <form th:action="@{/admin/users/delete}" method="post"
-                                        onsubmit="return confirm('Are you sure you want to delete this user?');"
-                                        style="display: inline;">
-                                        <input type="hidden" name="userId" th:value="${user.userId}" />
-                                        <button type="submit" class="btn btn-sm btn-icon btn-outline-danger"
-                                            title="Delete User">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
-
-                                    <form th:if="${!user.approved}" th:action="@{/admin/users/approve}" method="post"
-                                        style="display: inline;">
-                                        <input type="hidden" name="userId" th:value="${user.userId}" />
-                                        <button type="submit" class="btn btn-sm btn-icon btn-outline-success"
-                                            title="Approve User">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                    </form>
-
-                                    <!-- Verification Button for Profiles -->
-                                    <form
-                                        th:if="${(user.userTypeId?.userTypeId == 1 and recruiterProfiles[user.userId] != null and recruiterProfiles[user.userId].isVerified != true) or (user.userTypeId?.userTypeId == 2 and jobSeekerProfiles[user.userId] != null and jobSeekerProfiles[user.userId].isVerified != true)}"
-                                        th:action="@{/admin/users/verify}" method="post" style="display: inline;">
-                                        <input type="hidden" name="userId" th:value="${user.userId}" />
-                                        <button type="submit" class="btn btn-sm btn-icon btn-outline-primary"
-                                            title="Verify User Profile">
-                                            <i class="fas fa-shield-alt"></i>
-                                        </button>
-                                    </form>
-
-                                    <!-- Activate / Verify Email directly -->
-                                    <form th:if="${user.active == false}" th:action="@{/admin/users/activate}" method="post" style="display: inline;"
-                                        onsubmit="return confirm('Manually verify and activate this user account?');">
-                                        <input type="hidden" name="userId" th:value="${user.userId}" />
-                                        <button type="submit" class="btn btn-sm btn-icon btn-outline-info"
-                                            title="Activate Account & Verify Email">
-                                            <i class="fas fa-user-check"></i>
-                                        </button>
-                                    </form>
-
-                                    <form th:if="${user.active == true and user.userTypeId?.userTypeId != 3}"
-                                        th:action="@{/admin/users/ban}" method="post" style="display: inline;"
-                                        onsubmit="return confirmBan(this);">
-                                        <input type="hidden" name="userId" th:value="${user.userId}" />
-                                        <button type="submit" class="btn btn-sm btn-icon btn-outline-danger"
-                                            title="Ban User">
-                                            <i class="fas fa-ban"></i>
-                                        </button>
-                                    </form>
-
-                                    <!-- Unban User -->
-                                    <form th:if="${user.active == false}" th:action="@{/admin/users/unban}"
-                                        method="post" style="display: inline;"
-                                        onsubmit="return confirm('Are you sure you want to unban this user?');">
-                                        <input type="hidden" name="userId" th:value="${user.userId}" />
-                                        <button type="submit" class="btn btn-sm btn-icon btn-outline-success"
-                                            title="Unban User">
-                                            <i class="fas fa-unlock"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination -->
-            <div class="card-footer bg-transparent border-top border-light py-3" th:if="${totalPages > 1}">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="text-muted small">
-                        Showing <span th:text="${currentPage * pageSize + 1}">1</span> to
-                        <span
-                            th:text="${(currentPage + 1) * pageSize < totalUsers ? (currentPage + 1) * pageSize : totalUsers}">10</span>
-                        of <span th:text="${totalUsers}">0</span> users
-                    </div>
-                    <nav aria-label="Users pagination">
-                        <ul class="pagination pagination-sm mb-0">
-                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                                <a class="page-link rounded-start-pill border-0 shadow-sm"
-                                    th:href="@{/admin/users(page=${currentPage - 1}, size=${pageSize})}">
-                                    <i class="fas fa-chevron-left me-1"></i> Previous
-                                </a>
-                            </li>
-                            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                                th:classappend="${i == currentPage} ? 'active'">
-                                <a class="page-link border-0 shadow-sm mx-1 rounded-circle"
-                                    style="width: 30px; height: 30px; text-align: center; line-height: 18px;"
-                                    th:href="@{/admin/users(page=${i}, size=${pageSize})}" th:text="${i + 1}">1</a>
-                            </li>
-                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                                <a class="page-link rounded-end-pill border-0 shadow-sm"
-                                    th:href="@{/admin/users(page=${currentPage + 1}, size=${pageSize})}">
-                                    Next <i class="fas fa-chevron-right ms-1"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-muted small">Total: <strong class="text-dark" th:text="${users.size()}">0</strong> users</span>
                 </div>
             </div>
+
+            <!-- Users Table Card -->
+            <div class="card border-0 shadow-sm" style="background: var(--bg-card); border-radius: var(--radius); overflow: hidden;">
+                <div class="table-responsive">
+                    <table class="table admin-table align-middle mb-0" id="usersTable">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4" style="min-width: 260px;">User & Account</th>
+                                <th style="min-width: 130px;">Type</th>
+                                <th style="min-width: 140px;">Registered</th>
+                                <th style="min-width: 120px;">Status</th>
+                                <th style="min-width: 130px;">Verification</th>
+                                <th class="text-end pe-4" style="min-width: 160px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${users.isEmpty()}">
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="fas fa-users-slash fa-3x mb-3 opacity-25"></i>
+                                    <p class="mb-0 fw-semibold">No registered users found in the system.</p>
+                                </td>
+                            </tr>
+                            <tr th:each="user : ${users}" class="user-row">
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <!-- Avatar with dynamic gradient -->
+                                        <div class="user-avatar-circle"
+                                            th:if="${user.userTypeId?.userTypeId == 1 and recruiterProfiles[user.userId] != null}"
+                                            style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);"
+                                            th:text="${!#strings.isEmpty(recruiterProfiles[user.userId].firstName) ? #strings.substring(recruiterProfiles[user.userId].firstName, 0, 1) : 'C'}">
+                                            C
+                                        </div>
+                                        <div class="user-avatar-circle"
+                                            th:if="${user.userTypeId?.userTypeId == 2 and jobSeekerProfiles[user.userId] != null}"
+                                            style="background: linear-gradient(135deg, #10b981 0%, #047a4e 100%);"
+                                            th:text="${!#strings.isEmpty(jobSeekerProfiles[user.userId].firstName) ? #strings.substring(jobSeekerProfiles[user.userId].firstName, 0, 1) : 'F'}">
+                                            F
+                                        </div>
+                                        <div class="user-avatar-circle"
+                                            th:if="${(user.userTypeId?.userTypeId == 1 and recruiterProfiles[user.userId] == null) or (user.userTypeId?.userTypeId == 2 and jobSeekerProfiles[user.userId] == null) or user.userTypeId == null or user.userTypeId?.userTypeId == 3}"
+                                            style="background: linear-gradient(135deg, #64748b 0%, #475569 100%);">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+
+                                        <div>
+                                            <!-- User Name or Email -->
+                                            <div class="fw-bold text-dark user-name"
+                                                th:if="${user.userTypeId?.userTypeId == 1 and recruiterProfiles[user.userId] != null}">
+                                                <span th:text="${recruiterProfiles[user.userId].firstName + ' ' + (recruiterProfiles[user.userId].lastName ?: '')}">Name</span>
+                                            </div>
+                                            <div class="fw-bold text-dark user-name"
+                                                th:if="${user.userTypeId?.userTypeId == 2 and jobSeekerProfiles[user.userId] != null}">
+                                                <span th:text="${jobSeekerProfiles[user.userId].firstName + ' ' + (jobSeekerProfiles[user.userId].lastName ?: '')}">Name</span>
+                                            </div>
+                                            <div class="fw-bold text-muted user-name"
+                                                th:if="${(user.userTypeId?.userTypeId == 1 and recruiterProfiles[user.userId] == null) or (user.userTypeId?.userTypeId == 2 and jobSeekerProfiles[user.userId] == null) or user.userTypeId == null or user.userTypeId?.userTypeId == 3}">
+                                                <span th:text="${user.userTypeId?.userTypeId == 3 ? 'Platform Admin' : 'Incomplete Profile'}">Account</span>
+                                            </div>
+                                            <small class="text-muted user-email" th:text="${user.email}">user@example.com</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge-soft-info rounded-pill px-3 py-1 fw-semibold"
+                                        th:if="${user.userTypeId != null and user.userTypeId.userTypeId == 1}">Client</span>
+                                    <span class="badge badge-soft-success rounded-pill px-3 py-1 fw-semibold"
+                                        th:if="${user.userTypeId != null and user.userTypeId.userTypeId == 2}">Freelancer</span>
+                                    <span class="badge badge-soft-purple rounded-pill px-3 py-1 fw-semibold"
+                                        th:if="${user.userTypeId != null and user.userTypeId.userTypeId == 3}">Admin</span>
+                                    <span class="badge badge-soft-secondary rounded-pill px-3 py-1 fw-semibold"
+                                        th:if="${user.userTypeId == null}">Unknown</span>
+                                </td>
+                                <td class="text-muted">
+                                    <span th:if="${user.registrationDate != null}"
+                                        th:text="${#dates.format(user.registrationDate, 'MMM dd, yyyy')}">Jan 01, 2026</span>
+                                    <span th:unless="${user.registrationDate != null}">-</span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-soft-success rounded-pill px-3 py-1 fw-semibold"
+                                        th:if="${user.approved and user.active}">
+                                        <i class="fas fa-check-circle me-1"></i> Active
+                                    </span>
+                                    <span class="badge badge-soft-warning rounded-pill px-3 py-1 fw-semibold"
+                                        th:if="${!user.approved and user.active}">
+                                        <i class="fas fa-clock me-1"></i> Pending
+                                    </span>
+                                    <span class="badge badge-soft-danger rounded-pill px-3 py-1 fw-semibold"
+                                        th:if="${!user.active}">
+                                        <i class="fas fa-ban me-1"></i> Inactive / Banned
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-soft-success rounded-pill px-3 py-1 fw-semibold"
+                                        th:if="${(user.userTypeId?.userTypeId == 1 and recruiterProfiles[user.userId]?.isVerified == true) or (user.userTypeId?.userTypeId == 2 and jobSeekerProfiles[user.userId]?.isVerified == true)}">
+                                        <i class="fas fa-shield-alt me-1"></i> Verified
+                                    </span>
+                                    <span class="badge badge-soft-secondary rounded-pill px-3 py-1 fw-semibold"
+                                        th:if="${(user.userTypeId?.userTypeId == 1 and recruiterProfiles[user.userId]?.isVerified != true) or (user.userTypeId?.userTypeId == 2 and jobSeekerProfiles[user.userId]?.isVerified != true) or user.userTypeId == null or user.userTypeId?.userTypeId == 3}">
+                                        Unverified
+                                    </span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="d-inline-flex align-items-center gap-1">
+                                        <!-- Quick Approve -->
+                                        <form th:if="${!user.approved}" th:action="@{/admin/users/approve}" method="post" class="d-inline">
+                                            <input type="hidden" name="userId" th:value="${user.userId}" />
+                                            <button type="submit" class="action-btn-circle btn-approve-user" title="Approve Account">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
+
+                                        <!-- Quick Verify Profile -->
+                                        <form th:if="${(user.userTypeId?.userTypeId == 1 and recruiterProfiles[user.userId] != null and recruiterProfiles[user.userId].isVerified != true) or (user.userTypeId?.userTypeId == 2 and jobSeekerProfiles[user.userId] != null and jobSeekerProfiles[user.userId].isVerified != true)}"
+                                            th:action="@{/admin/users/verify}" method="post" class="d-inline">
+                                            <input type="hidden" name="userId" th:value="${user.userId}" />
+                                            <button type="submit" class="action-btn-circle btn-verify-user" title="Verify User Profile">
+                                                <i class="fas fa-shield-alt"></i>
+                                            </button>
+                                        </form>
+
+                                        <!-- Quick Activate / Verify Email directly -->
+                                        <form th:if="${user.active == false}" th:action="@{/admin/users/activate}" method="post" class="d-inline"
+                                            onsubmit="return confirm('Manually activate and verify this user account?');">
+                                            <input type="hidden" name="userId" th:value="${user.userId}" />
+                                            <button type="submit" class="action-btn-circle btn-activate-user" title="Activate Account">
+                                                <i class="fas fa-user-check"></i>
+                                            </button>
+                                        </form>
+
+                                        <!-- Ban User -->
+                                        <form th:if="${user.active == true and user.userTypeId?.userTypeId != 3}"
+                                            th:action="@{/admin/users/ban}" method="post" class="d-inline"
+                                            onsubmit="return confirmBan(this);">
+                                            <input type="hidden" name="userId" th:value="${user.userId}" />
+                                            <button type="submit" class="action-btn-circle btn-ban-user" title="Ban User">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </form>
+
+                                        <!-- Unban User -->
+                                        <form th:if="${user.active == false}" th:action="@{/admin/users/unban}"
+                                            method="post" class="d-inline"
+                                            onsubmit="return confirm('Are you sure you want to unban this user?');">
+                                            <input type="hidden" name="userId" th:value="${user.userId}" />
+                                            <button type="submit" class="action-btn-circle btn-approve-user" title="Unban User">
+                                                <i class="fas fa-unlock"></i>
+                                            </button>
+                                        </form>
+
+                                        <!-- Delete User -->
+                                        <form th:action="@{/admin/users/delete}" method="post"
+                                            onsubmit="return confirm('Are you sure you want to permanently delete this user? This cannot be undone.');"
+                                            class="d-inline">
+                                            <input type="hidden" name="userId" th:value="${user.userId}" />
+                                            <button type="submit" class="action-btn-circle btn-delete-user" title="Delete User">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </main>
 
-    <!-- Short Admin Footer -->
-    <div th:replace="~{admin/fragments/footer :: adminFooter}"></div>
+    <!-- Ban Modal -->
+    <div class="modal fade" id="banModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow" style="border-radius: 16px;">
+                <div class="modal-header border-bottom px-4 py-3">
+                    <h5 class="modal-title fw-bold text-danger"><i class="fas fa-ban me-2"></i>Ban User Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="text-muted">Please provide an official reason for banning this user. The reason will be recorded in moderation logs and emailed to the user.</p>
+                    <div class="mb-3">
+                        <label for="banReason" class="form-label fw-semibold">Reason for Ban</label>
+                        <textarea class="form-control" id="banReason" rows="3" placeholder="e.g. Terms of Service violation, fraudulent credentials, spamming..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer px-4 py-3 border-top">
+                    <button type="button" class="btn btn-secondary btn-pill" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger btn-pill" id="confirmBanBtn">Confirm Ban</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script th:src="@{/js/admin-scripts.js}"></script>
-</body>
+    <script>
+        let formToSubmit = null;
 
+        function confirmBan(form) {
+            formToSubmit = form;
+            const modal = new bootstrap.Modal(document.getElementById('banModal'));
+            modal.show();
+            return false;
+        }
+
+        document.getElementById('confirmBanBtn').addEventListener('click', function () {
+            if (formToSubmit) {
+                const reason = document.getElementById('banReason').value;
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'reason';
+                hiddenInput.value = reason;
+                formToSubmit.appendChild(hiddenInput);
+                formToSubmit.submit();
+            }
+        });
+
+        function filterUsersTable() {
+            const input = document.getElementById('userSearchInput');
+            const filter = input.value.toLowerCase();
+            const rows = document.querySelectorAll('#usersTable tbody tr.user-row');
+
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            });
+        }
+    </script>
+</body>
 </html>

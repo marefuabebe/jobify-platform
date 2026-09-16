@@ -9,129 +9,97 @@
     <link th:href="@{/webjars/font-awesome/css/all.min.css}" rel="stylesheet" />
     <link th:href="@{/css/admin-styles.css}" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body th:classappend="${session.theme == 'dark' ? 'dark-theme' : 'light-theme'}">
 
-    <!-- Sidebar Fragment -->
-    <div th:replace="~{admin/fragments/sidebar :: sidebar('moderation-logs')}"></div>
+    <!-- Standard Admin Sidebar -->
+    <aside class="admin-sidebar" id="sidebar" th:replace="~{admin/fragments/sidebar :: sidebar(activeLink='moderation-logs')}">
+    </aside>
 
-    <!-- Sidebar Overlay -->
+    <!-- Mobile Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- Main Content -->
     <main class="admin-main">
-        <!-- Top Bar -->
-        <div class="top-bar">
-            <button class="btn btn-primary d-lg-none me-3" id="sidebarToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="page-title">
-                <div class="title-icon">
-                    <i class="fas fa-history"></i>
-                </div>
-                <div>
-                    <h1 class="h3 fw-bold mb-1">Moderation Logs</h1>
-                    <p class="text-muted mb-0">Audit trail of all moderation actions</p>
-                </div>
-            </div>
-
-            <div class="user-menu d-flex align-items-center gap-2">
-                <form th:action="@{/admin/theme/toggle}" method="post" class="d-inline">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm">
-                        <i class="fas me-1"
-                            th:classappend="${session.theme == 'dark' ? 'fa-sun' : 'fa-moon'}"></i>
-                        <span th:text="${session.theme == 'dark' ? 'Light' : 'Dark'}">Dark</span>
-                    </button>
-                </form>
-                <a href="/logout" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </div>
-        </div>
+        <!-- Reusable Admin Topbar -->
+        <header th:replace="~{admin/fragments/topbar :: topbar('Moderation Logs', 'Immutable audit trail of all job moderation and administrative safety actions', 'fas fa-history')}">
+        </header>
 
         <div class="container-fluid px-0">
 
-            <!-- Filters -->
+            <!-- Modern Filter Toolbar -->
             <div class="card border-0 shadow-sm mb-4" style="background: var(--bg-card); border-radius: var(--radius);">
                 <div class="card-body p-4">
-                    <form th:action="@{/admin/moderation-logs}" method="get" class="row g-3">
-                        <div class="col-md-2">
-                            <label class="form-label small text-muted text-uppercase fw-bold">Status</label>
-                            <select name="status" class="form-select bg-light border-0">
-                                <option value="" th:selected="${statusFilter == null}">All</option>
-                                <option value="OPEN" th:selected="${statusFilter == 'OPEN'}">Open</option>
+                    <form th:action="@{/admin/moderation-logs}" method="get" class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted text-uppercase fw-bold">Status Action</label>
+                            <select name="status" class="form-select bg-light border-0" style="border-radius: 10px;">
+                                <option value="" th:selected="${statusFilter == null}">All Statuses</option>
+                                <option value="OPEN" th:selected="${statusFilter == 'OPEN'}">Open / Published</option>
                                 <option value="PAUSED" th:selected="${statusFilter == 'PAUSED'}">Paused</option>
-                                <option value="UNDER_REVIEW" th:selected="${statusFilter == 'UNDER_REVIEW'}">Under
-                                    Review</option>
+                                <option value="UNDER_REVIEW" th:selected="${statusFilter == 'UNDER_REVIEW'}">Under Review</option>
                                 <option value="REJECTED" th:selected="${statusFilter == 'REJECTED'}">Rejected</option>
-                                <option value="VIOLATION" th:selected="${statusFilter == 'VIOLATION'}">Violation
-                                </option>
+                                <option value="VIOLATION" th:selected="${statusFilter == 'VIOLATION'}">Terms Violation</option>
                             </select>
                         </div>
-                        <div class="col-md-2">
-                            <label class="form-label small text-muted text-uppercase fw-bold">Severity</label>
-                            <select name="severity" class="form-select bg-light border-0">
-                                <option value="" th:selected="${severityFilter == null}">All</option>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted text-uppercase fw-bold">Severity Level</label>
+                            <select name="severity" class="form-select bg-light border-0" style="border-radius: 10px;">
+                                <option value="" th:selected="${severityFilter == null}">All Severities</option>
                                 <option value="LOW" th:selected="${severityFilter == 'LOW'}">Low</option>
                                 <option value="MEDIUM" th:selected="${severityFilter == 'MEDIUM'}">Medium</option>
                                 <option value="HIGH" th:selected="${severityFilter == 'HIGH'}">High</option>
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label small text-muted text-uppercase fw-bold">Moderator</label>
-                            <select name="moderatorId" class="form-select bg-light border-0">
-                                <!-- Temporarily only show 'All' until moderators list is stabilized -->
-                                <option value="" th:selected="${moderatorFilter == null}">All</option>
-                            </select>
-                        </div>
-                        <!-- Dates -->
-                        <div class="col-md-2">
                             <label class="form-label small text-muted text-uppercase fw-bold">Start Date</label>
-                            <input type="date" name="startDate" class="form-control bg-light border-0"
+                            <input type="date" name="startDate" class="form-control bg-light border-0" style="border-radius: 10px;"
                                 th:value="${startDateFilter != null ? #dates.format(startDateFilter, 'yyyy-MM-dd') : ''}" />
                         </div>
                         <div class="col-md-2">
                             <label class="form-label small text-muted text-uppercase fw-bold">End Date</label>
-                            <input type="date" name="endDate" class="form-control bg-light border-0"
+                            <input type="date" name="endDate" class="form-control bg-light border-0" style="border-radius: 10px;"
                                 th:value="${endDateFilter != null ? #dates.format(endDateFilter, 'yyyy-MM-dd') : ''}" />
                         </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary w-100 fw-bold"><i
-                                    class="fas fa-filter me-2"></i> Filter</button>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100 btn-pill justify-content-center">
+                                <i class="fas fa-filter me-1"></i> Apply Filter
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Logs Table -->
-            <div class="card border-0 shadow-sm" style="background: var(--bg-card); border-radius: var(--radius);">
+            <!-- Logs Table Card -->
+            <div class="card border-0 shadow-sm" style="background: var(--bg-card); border-radius: var(--radius); overflow: hidden;">
                 <div class="table-responsive">
-                    <table class="table admin-table table-hover align-middle mb-0">
+                    <table class="table admin-table align-middle mb-0">
                         <thead class="bg-light">
                             <tr>
-                                <th class="ps-4">Timestamp</th>
-                                <th>Job Post</th>
-                                <th>Action</th>
-                                <th>Severity</th>
-                                <th>Moderator</th>
-                                <th class="pe-4">Reason</th>
+                                <th class="ps-4" style="min-width: 150px;">Timestamp</th>
+                                <th style="min-width: 220px;">Job Context</th>
+                                <th style="min-width: 180px;">Status Transition</th>
+                                <th style="min-width: 120px;">Severity</th>
+                                <th style="min-width: 160px;">Moderator</th>
+                                <th class="pe-4" style="min-width: 200px;">Reason & Notes</th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- Empty State -->
                             <tr th:if="${logs == null or #lists.isEmpty(logs)}">
                                 <td colspan="6" class="text-center py-5 text-muted">
-                                    <i class="fas fa-history fa-3x mb-3 opacity-25"></i>
-                                    <p class="mb-0">No moderation logs found.</p>
+                                    <i class="fas fa-clipboard-check fa-3x mb-3 opacity-25"></i>
+                                    <h5 class="fw-bold mb-1">No Moderation Logs Found</h5>
+                                    <p class="mb-0 small">No audit trail records matched the active filter criteria.</p>
                                 </td>
                             </tr>
 
                             <!-- Log Rows -->
                             <tr th:each="log : ${logs}">
-                                <!-- Timestamp -->
-                                <td class="ps-4" style="min-width: 140px;">
+                                <td class="ps-4">
                                     <div class="d-flex flex-column">
                                         <span class="fw-bold text-dark"
                                             th:text="${log.timestamp != null ? #dates.format(log.timestamp, 'MMM dd, yyyy') : '-'}">Date</span>
@@ -140,129 +108,104 @@
                                     </div>
                                 </td>
 
-                                <!-- Job Post -->
-                                <td style="max-width: 250px;">
-                                    <!-- Only show link if job exists -->
+                                <td>
                                     <div th:if="${log.job != null}">
                                         <a th:href="@{/job-details-apply/{id}(id=${log.job.jobPostId})}"
-                                            class="text-primary text-decoration-none fw-bold hover-bg p-1 rounded text-truncate d-block"
-                                            th:title="${log.job.jobTitle}" data-bs-toggle="tooltip"
+                                            class="text-primary text-decoration-none fw-bold d-block text-truncate"
+                                            style="max-width: 240px;"
+                                            th:title="${log.job.jobTitle}"
                                             th:text="${log.job.jobTitle}">Job Title</a>
+                                        <small class="text-muted" th:text="'ID #' + ${log.job.jobPostId}">ID #1</small>
                                     </div>
-                                    <!-- Fallback if job is null/deleted -->
                                     <div th:if="${log.job == null}">
-                                        <span class="text-muted fst-italic">Job Removed</span>
+                                        <span class="text-muted fst-italic">Removed Job Posting</span>
                                     </div>
                                 </td>
 
-                                <!-- Action -->
                                 <td>
                                     <div class="d-flex align-items-center gap-2">
-                                        <span class="badge bg-light text-secondary border"
+                                        <span class="badge bg-light text-muted border rounded-pill px-2 py-1"
                                             th:text="${log.oldStatus != null ? log.oldStatus : '-'}">Old</span>
                                         <i class="fas fa-arrow-right text-muted small opacity-50"></i>
-                                        <span class="badge rounded-pill"
-                                            th:classappend="${log.newStatus == 'VIOLATION' ? 'bg-danger' : (log.newStatus == 'REJECTED' ? 'bg-danger' : (log.newStatus == 'UNDER_REVIEW' ? 'bg-warning text-dark' : (log.newStatus == 'OPEN' ? 'bg-success' : 'bg-secondary')))}"
+                                        <span class="badge rounded-pill px-3 py-1 fw-semibold"
+                                            th:classappend="${log.newStatus == 'VIOLATION' or log.newStatus == 'REJECTED' ? 'badge-soft-danger' : (log.newStatus == 'UNDER_REVIEW' or log.newStatus == 'PAUSED' ? 'badge-soft-warning' : (log.newStatus == 'OPEN' ? 'badge-soft-success' : 'badge-soft-secondary'))}"
                                             th:text="${log.newStatus != null ? log.newStatus : '-'}">New</span>
                                     </div>
                                 </td>
 
-                                <!-- Severity -->
                                 <td>
-                                    <span class="badge rounded-pill" th:if="${log.severity != null}"
-                                        th:classappend="${log.severity == 'HIGH' ? 'bg-danger' : (log.severity == 'MEDIUM' ? 'bg-warning text-dark' : 'bg-info')}"
+                                    <span class="badge rounded-pill px-3 py-1 fw-semibold" th:if="${log.severity != null}"
+                                        th:classappend="${log.severity == 'HIGH' ? 'badge-soft-danger' : (log.severity == 'MEDIUM' ? 'badge-soft-warning' : 'badge-soft-info')}"
                                         th:text="${log.severity}">Severity</span>
                                     <span class="text-muted small" th:if="${log.severity == null}">-</span>
                                 </td>
 
-                                <!-- Moderator -->
                                 <td>
-                                    <!-- Check if actionBy (user) exists -->
-                                    <div th:if="${log.actionBy != null}" class="d-flex align-items-center gap-2"
-                                        th:title="${'ID: ' + log.actionBy.userId}" data-bs-toggle="tooltip">
-
-                                        <!-- Initials Avatar -->
+                                    <div th:if="${log.actionBy != null}" class="d-flex align-items-center gap-2">
                                         <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm"
                                             style="width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); font-size: 0.85rem;"
                                             th:text="${log.actionBy.email != null and !#strings.isEmpty(log.actionBy.email) ? #strings.substring(log.actionBy.email, 0, 1).toUpperCase() : 'U'}">
                                             S
                                         </div>
-
-                                        <!-- Name/Email -->
                                         <div class="d-flex flex-column">
-                                            <span class="small fw-bold text-dark"
-                                                th:text="${log.actionBy.email != null ? (log.actionBy.email.contains('@') ? #strings.substringBefore(log.actionBy.email, '@') : log.actionBy.email) : 'Unknown'}">Moderator</span>
+                                            <span class="small fw-bold text-dark text-truncate" style="max-width: 120px;"
+                                                th:text="${log.actionBy.email != null ? (log.actionBy.email.contains('@') ? #strings.substringBefore(log.actionBy.email, '@') : log.actionBy.email) : 'Admin'}">Moderator</span>
                                         </div>
                                     </div>
 
-                                    <!-- Fallback for System/Deleted User -->
                                     <div th:if="${log.actionBy == null}" class="d-flex align-items-center gap-2">
                                         <div class="rounded-circle d-flex align-items-center justify-content-center bg-secondary text-white fw-bold shadow-sm"
                                             style="width: 32px; height: 32px; font-size: 0.85rem;">
                                             S
                                         </div>
-                                        <span class="small fw-bold text-muted">System</span>
+                                        <span class="small fw-bold text-muted">System Automator</span>
                                     </div>
                                 </td>
 
-                                <!-- Reason -->
                                 <td class="pe-4">
-                                    <div class="text-muted small text-truncate" style="max-width: 300px;"
-                                        th:title="${log.reason}" data-bs-toggle="tooltip"
-                                        th:text="${log.reason != null ? log.reason : '-'}">Reason
+                                    <div class="text-muted small text-truncate" style="max-width: 280px;"
+                                        th:title="${log.reason}"
+                                        th:text="${log.reason != null ? log.reason : 'Automated or standard policy review.'}">Reason
                                     </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-            </div>
 
-            <!-- Pagination -->
-            <!-- Only show pagination if totalPages > 1 -->
-            <div class="d-flex justify-content-center mt-4" th:if="${totalPages != null and totalPages > 1}">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination"
-                        th:with="startStr=${startDateFilter != null ? #dates.format(startDateFilter, 'yyyy-MM-dd') : ''}, endStr=${endDateFilter != null ? #dates.format(endDateFilter, 'yyyy-MM-dd') : ''}">
-                        <!-- Previous -->
-                        <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
-                            <a class="page-link"
-                                th:href="@{/admin/moderation-logs(page=${currentPage - 1}, size=${pageSize}, status=${statusFilter}, severity=${severityFilter}, category=${categoryFilter}, moderatorId=${moderatorFilter}, startDate=${startStr}, endDate=${endStr})}"
-                                aria-label="Previous">
-                                <span aria-hidden="true">&#171;</span>
-                            </a>
-                        </li>
-
-                        <!-- Page Numbers -->
-                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                            th:classappend="${currentPage == i ? 'active' : ''}">
-                            <a class="page-link"
-                                th:href="@{/admin/moderation-logs(page=${i}, size=${pageSize}, status=${statusFilter}, severity=${severityFilter}, category=${categoryFilter}, moderatorId=${moderatorFilter}, startDate=${startStr}, endDate=${endStr})}"
-                                th:text="${i + 1}">1</a>
-                        </li>
-
-                        <!-- Next -->
-                        <li class="page-item" th:classappend="${currentPage + 1 >= totalPages ? 'disabled' : ''}">
-                            <a class="page-link"
-                                th:href="@{/admin/moderation-logs(page=${currentPage + 1}, size=${pageSize}, status=${statusFilter}, severity=${severityFilter}, category=${categoryFilter}, moderatorId=${moderatorFilter}, startDate=${startStr}, endDate=${endStr})}"
-                                aria-label="Next">
-                                <span aria-hidden="true">&#187;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+                <!-- Pagination in Card Footer -->
+                <div class="card-footer bg-transparent border-top p-3 d-flex flex-wrap justify-content-between align-items-center gap-3"
+                    th:if="${totalPages != null and totalPages > 1}"
+                    th:with="startStr=${startDateFilter != null ? #dates.format(startDateFilter, 'yyyy-MM-dd') : ''}, endStr=${endDateFilter != null ? #dates.format(endDateFilter, 'yyyy-MM-dd') : ''}">
+                    <div class="text-muted small">
+                        Showing page <strong th:text="${currentPage + 1}">1</strong> of <strong th:text="${totalPages}">1</strong>
+                    </div>
+                    <nav aria-label="Moderation logs pagination">
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                                <a class="page-link rounded-pill px-3 me-1"
+                                    th:href="@{/admin/moderation-logs(page=${currentPage - 1}, size=${pageSize}, status=${statusFilter}, severity=${severityFilter}, category=${categoryFilter}, moderatorId=${moderatorFilter}, startDate=${startStr}, endDate=${endStr})}">Previous</a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                th:classappend="${currentPage == i ? 'active' : ''}">
+                                <a class="page-link rounded-circle mx-1 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;"
+                                    th:href="@{/admin/moderation-logs(page=${i}, size=${pageSize}, status=${statusFilter}, severity=${severityFilter}, category=${categoryFilter}, moderatorId=${moderatorFilter}, startDate=${startStr}, endDate=${endStr})}"
+                                    th:text="${i + 1}">1</a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage + 1 >= totalPages ? 'disabled' : ''}">
+                                <a class="page-link rounded-pill px-3 ms-1"
+                                    th:href="@{/admin/moderation-logs(page=${currentPage + 1}, size=${pageSize}, status=${statusFilter}, severity=${severityFilter}, category=${categoryFilter}, moderatorId=${moderatorFilter}, startDate=${startStr}, endDate=${endStr})}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
             </div>
 
         </div>
     </main>
 
-    <!-- Short Admin Footer -->
-    <div th:replace="~{admin/fragments/footer :: adminFooter}"></div>
-
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/js/admin-scripts.js}"></script>
-
 </body>
-
 </html>

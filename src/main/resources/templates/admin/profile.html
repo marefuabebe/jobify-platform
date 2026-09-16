@@ -8,553 +8,235 @@
     <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/webjars/font-awesome/css/all.min.css}" rel="stylesheet">
     <link th:href="@{/css/admin-styles.css}" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-body);
-            color: var(--text);
-            min-height: 100vh;
-        }
-
-        /* Sidebar */
-        .admin-sidebar {
-            width: 250px;
-            background: var(--bg-body);
-            border-right: 1px solid var(--border);
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            padding: 1rem 0;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-        }
-
-        .sidebar-brand {
-            padding: 0 1.5rem 1.5rem;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 1rem;
-        }
-
-        .brand-logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            text-decoration: none;
-        }
-
-        .logo-circle {
-            width: 42px;
-            height: 42px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.2rem;
-        }
-
-        .brand-text h2 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--text);
-            margin: 0;
-        }
-
-        .brand-text span {
-            font-size: 0.8rem;
-            color: var(--text-light);
-        }
-
-        .sidebar-nav {
-            padding: 0 1rem;
-        }
-
-        .nav-item {
-            margin-bottom: 0.5rem;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.875rem 1rem;
-            color: var(--text-light);
-            text-decoration: none;
+        .profile-hero {
+            background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.95) 0%, #047a4e 100%);
             border-radius: var(--radius);
-            transition: var(--transition);
-            font-weight: 500;
-            font-size: 0.95rem;
-        }
-
-        .nav-link:hover {
-            background: rgba(5, 152, 98, 0.15);
-            color: var(--primary);
-        }
-
-        .nav-link.active {
-            background: rgba(5, 152, 98, 0.15);
-            color: var(--primary);
-            border-left: 3px solid var(--primary);
-            font-weight: 600;
-        }
-
-        .nav-icon {
-            width: 20px;
-            text-align: center;
-            font-size: 1rem;
-        }
-
-        /* Main */
-        .admin-main {
-            margin-left: 250px;
-            padding: 2rem;
-            min-height: 100vh;
-        }
-
-        .top-bar {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 1rem 1.5rem;
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--border);
-        }
-
-        .page-title {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .title-icon {
-            width: 40px;
-            height: 40px;
-            background: rgba(var(--primary-rgb), 0.1);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-        }
-
-        .page-title h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 0;
-            color: var(--text);
-        }
-
-        .logout-btn {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            font-weight: 500;
-            cursor: pointer;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .logout-btn:hover {
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
-        }
-
-        /* Profile Card */
-        .profile-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--border);
+            padding: 2.5rem 2rem 4rem;
+            position: relative;
+            color: #ffffff;
+            box-shadow: 0 8px 30px rgba(5, 152, 98, 0.2);
             overflow: hidden;
-            animation: fadeIn 0.6s ease-out;
         }
-
-        .profile-cover {
-            height: 150px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            position: relative;
-        }
-
-        .profile-content {
-            padding: 0 30px 40px;
-            position: relative;
-            margin-top: -60px;
-        }
-
-        .profile-avatar-container {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            margin: -60px auto 20px;
-            z-index: 10;
-        }
-
-        .profile-avatar-img {
-            width: 120px;
-            height: 120px;
+        .profile-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
             border-radius: 50%;
-            border: 5px solid var(--bg-card);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            object-fit: cover;
-            background: var(--bg-light);
         }
-
-        .edit-avatar-btn {
+        .profile-avatar-wrapper {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            position: relative;
+            margin-top: -55px;
+            margin-bottom: 1rem;
+            border: 4px solid var(--bg-card);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            background: var(--bg-card);
+        }
+        .profile-avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .profile-camera-btn {
             position: absolute;
             bottom: 0;
             right: 0;
-            width: 35px;
-            height: 35px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             background: var(--primary);
-            color: white;
-            border: none;
+            color: #ffffff;
+            border: 2px solid var(--bg-card);
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 0.85rem;
             cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            transition: transform 0.2s;
+            transition: all 0.2s ease;
         }
-
-        .edit-avatar-btn:hover {
+        .profile-camera-btn:hover {
             transform: scale(1.1);
             background: var(--primary-light);
         }
-
-        .role-badge {
-            background: rgba(5, 152, 98, 0.1);
-            color: var(--primary);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .info-item {
-            padding: 15px;
+        .info-pill-item {
             background: var(--bg-light);
-            border-radius: var(--radius);
             border: 1px solid var(--border);
-        }
-
-        .info-label {
-            font-size: 12px;
-            color: var(--text-light);
-            text-transform: uppercase;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .info-value {
-            font-weight: 500;
-            color: var(--text);
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 992px) {
-            .admin-sidebar {
-                left: -260px;
-                transition: left 0.3s ease;
-                width: 230px;
-            }
-
-            .admin-sidebar.active {
-                left: 0;
-            }
-
-            .admin-main {
-                margin-left: 0;
-                padding: 1.25rem 1rem 2rem;
-            }
-
-            .top-bar {
-                flex-direction: row;
-                gap: 0.75rem;
-            }
-
-            .page-title h1 {
-                font-size: 1.25rem;
-            }
-
-            .profile-container {
-                margin: 0 auto;
-                max-width: 100%;
-                border-radius: 18px;
-            }
-
-            .profile-content {
-                padding: 0 18px 28px;
-            }
-
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .top-bar {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .logout-btn {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .profile-content {
-                padding: 0 14px 24px;
-            }
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1rem;
         }
     </style>
 </head>
 
 <body th:classappend="${session.theme == 'dark' ? 'dark-theme' : 'light-theme'}">
-    <!-- Sidebar -->
-    <aside class="admin-sidebar" id="sidebar">
-        <div class="sidebar-brand">
-            <a href="/admin/dashboard" class="brand-logo">
-                <div class="logo-circle">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <div class="brand-text">
-                    <h2>Jobify</h2>
-                    <span>Admin Portal</span>
-                </div>
-            </a>
-        </div>
 
-        <nav class="sidebar-nav">
-            <div class="nav-item">
-                <a href="/admin/dashboard" class="nav-link">
-                    <i class="fas fa-tachometer-alt nav-icon"></i>
-                    <span>Dashboard</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/admin/users" class="nav-link">
-                    <i class="fas fa-users nav-icon"></i>
-                    <span>All Users</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/admin/jobs" class="nav-link">
-                    <i class="fas fa-briefcase nav-icon"></i>
-                    <span>All Jobs</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/admin/applications" class="nav-link">
-                    <i class="fas fa-list nav-icon"></i>
-                    <span>Applications</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/admin/profile" class="nav-link active">
-                    <i class="fas fa-user-shield nav-icon"></i>
-                    <span>My Profile</span>
-                </a>
-            </div>
-        </nav>
+    <!-- Standard Admin Sidebar -->
+    <aside class="admin-sidebar" id="sidebar" th:replace="~{admin/fragments/sidebar :: sidebar(activeLink='profile')}">
     </aside>
 
-    <!-- Sidebar Overlay for mobile -->
+    <!-- Mobile Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- Main -->
+    <!-- Main Content -->
     <main class="admin-main">
-        <div class="top-bar">
-            <div class="page-title">
-                <button class="btn btn-primary d-lg-none me-3" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="title-icon">
-                    <i class="fas fa-user-shield"></i>
-                </div>
-                <h1>Admin Profile</h1>
+        <!-- Reusable Admin Topbar -->
+        <header th:replace="~{admin/fragments/topbar :: topbar('Admin Profile', 'Manage administrator credentials, profile avatar, and security preferences', 'fas fa-user-shield')}">
+        </header>
+
+        <div class="container-fluid px-0">
+
+            <!-- Alerts -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 12px;">
+                <i class="fas fa-check-circle me-2"></i><span th:text="${success}">Success</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 12px;">
+                <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}">Error</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
 
-            <div class="d-flex align-items-center gap-2">
-                <form th:action="@{/admin/theme/toggle}" method="post" class="d-inline">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm">
-                        <i class="fas me-1"
-                            th:classappend="${session.theme == 'dark' ? 'fa-sun' : 'fa-moon'}"></i>
-                        <span th:text="${session.theme == 'dark' ? 'Light' : 'Dark'}">Dark</span>
-                    </button>
-                </form>
-                <a th:href="@{/logout}" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
+            <!-- Profile Hero Banner -->
+            <div class="profile-hero mb-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="badge bg-white text-dark rounded-pill px-3 py-1 fw-bold mb-2">Jobify Administration</span>
+                        <h2 class="fw-bold mb-1">Executive Administrator</h2>
+                        <p class="text-white-50 mb-0">System Superuser &amp; Platform Controller</p>
+                    </div>
+                    <div class="d-none d-md-block opacity-75">
+                        <i class="fas fa-shield-alt fa-4x"></i>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="profile-container">
-            <div class="profile-cover"></div>
-            <div class="profile-content">
-                <!-- Profile Picture -->
-                <div class="profile-avatar-container">
-                    <img th:if="${user.photos == null}" th:src="@{/images/user.png}" class="profile-avatar-img"
-                        alt="Profile Picture">
-                    <img th:if="${user.photos != null}" th:src="@{${user.photosImagePath}}" class="profile-avatar-img"
-                        alt="Profile Picture">
-                    <button class="edit-avatar-btn" onclick="document.getElementById('profilePicInput').click()">
-                        <i class="fas fa-camera"></i>
-                    </button>
-                    <form th:action="@{/admin/profile/pic}" method="post" enctype="multipart/form-data" id="avatarForm">
-                        <input type="file" name="image" id="profilePicInput" style="display: none;"
-                            accept="image/png, image/jpeg" onchange="document.getElementById('avatarForm').submit()">
-                    </form>
-                </div>
+            <!-- Profile Card -->
+            <div class="card border-0 shadow-sm mb-4" style="background: var(--bg-card); border-radius: var(--radius); overflow: hidden;">
+                <div class="card-body p-4 pt-0">
 
-                <!-- Notifications -->
-                <div th:if="${success}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
-                    <i class="fas fa-check-circle me-2"></i> <span th:text="${success}"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
-                    <i class="fas fa-exclamation-circle me-2"></i> <span th:text="${error}"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-
-                <div class="profile-details text-center">
-                    <h2 th:text="${user != null ? user.email : 'Admin User'}">Admin User</h2>
-                    <span class="role-badge">Super Admin</span>
-                    <p class="text-muted mt-2 mb-4">Manage your account settings and security preferences.</p>
-                </div>
-
-                <div class="row">
-                    <!-- Left Column: Personal Info -->
-                    <div class="col-md-6 mb-4">
-                        <div class="card h-100 border-0 shadow-sm bg-light-subtle">
-                            <div class="card-header bg-transparent border-0 pt-4 px-4">
-                                <h5 class="fw-bold mb-0 text-primary"><i class="fas fa-user-circle me-2"></i> Account
-                                    Information</h5>
+                    <div class="d-flex flex-wrap justify-content-between align-items-end mb-4">
+                        <div class="d-flex flex-column align-items-start">
+                            <div class="profile-avatar-wrapper">
+                                <img th:if="${user.photos == null}" th:src="@{/images/user.png}" class="profile-avatar-img" alt="Admin Avatar">
+                                <img th:if="${user.photos != null}" th:src="@{${user.photosImagePath}}" class="profile-avatar-img" alt="Admin Avatar">
+                                <button class="profile-camera-btn" onclick="document.getElementById('profilePicInput').click()" title="Change Avatar">
+                                    <i class="fas fa-camera"></i>
+                                </button>
+                                <form th:action="@{/admin/profile/pic}" method="post" enctype="multipart/form-data" id="avatarForm">
+                                    <input type="file" name="image" id="profilePicInput" style="display: none;"
+                                        accept="image/png, image/jpeg" onchange="document.getElementById('avatarForm').submit()">
+                                </form>
                             </div>
-                            <div class="card-body px-4">
-                                <div class="info-group mb-3">
-                                    <label class="small text-muted fw-bold">EMAIL ADDRESS</label>
-                                    <div class="d-flex align-items-center mt-1">
-                                        <div class="bg-white p-2 rounded shadow-sm border w-100">
-                                            <i class="fas fa-envelope text-primary me-2"></i>
+                            <h4 class="fw-bold mb-1" th:text="${user != null ? user.email : 'admin@jobify.com'}">admin@jobify.com</h4>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge badge-soft-success rounded-pill px-3 py-1 fw-semibold">
+                                    <i class="fas fa-check-circle me-1"></i> Active Superuser
+                                </span>
+                                <span class="text-muted small">ID #<span th:text="${user != null ? user.userId : '1'}">1</span></span>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 mt-md-0">
+                            <a href="/logout" class="btn btn-outline-danger btn-pill">
+                                <i class="fas fa-sign-out-alt me-1"></i> Sign Out
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <!-- Account Details -->
+                        <div class="col-lg-6">
+                            <div class="card h-100 border-0 shadow-sm" style="background: var(--bg-light); border-radius: 14px;">
+                                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                                    <h5 class="fw-bold mb-0 text-primary">
+                                        <i class="fas fa-user-circle me-2"></i> Account Information
+                                    </h5>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="info-pill-item">
+                                        <label class="small text-muted fw-bold text-uppercase d-block mb-1">Email Address</label>
+                                        <div class="d-flex align-items-center gap-2 text-dark fw-semibold">
+                                            <i class="fas fa-envelope text-primary"></i>
                                             <span th:text="${user.email}">admin@jobify.com</span>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="info-group mb-3">
-                                    <label class="small text-muted fw-bold">ACCOUNT STATUS</label>
-                                    <div class="d-flex align-items-center mt-1">
-                                        <div class="bg-white p-2 rounded shadow-sm border w-100">
-                                            <i class="fas fa-check-circle text-success me-2"></i>
-                                            <span class="fw-bold text-success">Active</span>
+
+                                    <div class="info-pill-item">
+                                        <label class="small text-muted fw-bold text-uppercase d-block mb-1">Assigned Role</label>
+                                        <div class="d-flex align-items-center gap-2 text-dark fw-semibold">
+                                            <i class="fas fa-user-shield text-success"></i>
+                                            <span>Full Administrator (Root Level)</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="info-pill-item mb-0">
+                                        <label class="small text-muted fw-bold text-uppercase d-block mb-1">System Permissions</label>
+                                        <div class="d-flex align-items-center gap-2 text-dark fw-semibold">
+                                            <i class="fas fa-lock-open text-warning"></i>
+                                            <span>Users, Verifications, Escrow, Moderation</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="info-group mb-3">
-                                    <label class="small text-muted fw-bold">SYSTEM ACCESS</label>
-                                    <div class="d-flex align-items-center mt-1">
-                                        <div class="bg-white p-2 rounded shadow-sm border w-100">
-                                            <i class="fas fa-key text-warning me-2"></i>
-                                            <span>Full Administrative Access</span>
+                            </div>
+                        </div>
+
+                        <!-- Password Update -->
+                        <div class="col-lg-6">
+                            <div class="card h-100 border-0 shadow-sm" style="background: var(--bg-light); border-radius: 14px;">
+                                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                                    <h5 class="fw-bold mb-0 text-danger">
+                                        <i class="fas fa-shield-alt me-2"></i> Update Password
+                                    </h5>
+                                </div>
+                                <div class="card-body p-4">
+                                    <form th:action="@{/admin/profile/password}" method="post">
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold text-muted text-uppercase">Current Password</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white border-0"><i class="fas fa-lock text-muted"></i></span>
+                                                <input type="password" name="currentPassword" class="form-control bg-white border-0" required
+                                                    placeholder="Enter your current password">
+                                            </div>
                                         </div>
-                                    </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold text-muted text-uppercase">New Password</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white border-0"><i class="fas fa-key text-muted"></i></span>
+                                                <input type="password" name="newPassword" class="form-control bg-white border-0" required
+                                                    placeholder="Enter at least 8 characters">
+                                            </div>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="form-label small fw-bold text-muted text-uppercase">Confirm New Password</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white border-0"><i class="fas fa-check text-muted"></i></span>
+                                                <input type="password" name="confirmPassword" class="form-control bg-white border-0" required
+                                                    placeholder="Re-enter new password">
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-pill w-100 justify-content-center">
+                                            <i class="fas fa-save me-1"></i> Save New Password
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Right Column: Security -->
-                    <div class="col-md-6 mb-4">
-                        <div class="card h-100 border-0 shadow-sm bg-light-subtle">
-                            <div class="card-header bg-transparent border-0 pt-4 px-4">
-                                <h5 class="fw-bold mb-0 text-danger"><i class="fas fa-lock me-2"></i> Security Settings
-                                </h5>
-                            </div>
-                            <div class="card-body px-4">
-                                <form th:action="@{/admin/profile/password}" method="post">
-                                    <div class="mb-3">
-                                        <label class="form-label small fw-bold text-muted">CURRENT PASSWORD</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-white border-end-0"><i
-                                                    class="fas fa-lock text-muted"></i></span>
-                                            <input type="password" name="currentPassword"
-                                                class="form-control border-start-0" required
-                                                placeholder="Enter current password">
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label small fw-bold text-muted">NEW PASSWORD</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-white border-end-0"><i
-                                                    class="fas fa-key text-muted"></i></span>
-                                            <input type="password" name="newPassword"
-                                                class="form-control border-start-0" required
-                                                placeholder="Enter new password">
-                                        </div>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label class="form-label small fw-bold text-muted">CONFIRM PASSWORD</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-white border-end-0"><i
-                                                    class="fas fa-check text-muted"></i></span>
-                                            <input type="password" name="confirmPassword"
-                                                class="form-control border-start-0" required
-                                                placeholder="Confirm new password">
-                                        </div>
-                                    </div>
-                                    <div class="d-grid">
-                                        <button type="submit" class="btn btn-primary fw-bold">
-                                            <i class="fas fa-save me-2"></i> Update Password
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
+
         </div>
     </main>
 
@@ -562,5 +244,4 @@
     <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/js/admin-scripts.js}"></script>
 </body>
-
 </html>

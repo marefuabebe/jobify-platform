@@ -10,279 +10,238 @@
     <link th:href="@{/css/admin-styles.css}" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
-        .border-left-warning {
-            border-left: 4px solid var(--warning) !important;
+        .analytics-chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+            transition: all 0.22s ease;
         }
-        .border-left-success {
-            border-left: 4px solid var(--success) !important;
+        .analytics-chart-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
         }
-        .border-left-danger {
-            border-left: 4px solid var(--danger) !important;
+        .chart-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
     </style>
 </head>
 
 <body th:classappend="${session.theme == 'dark' ? 'dark-theme' : 'light-theme'}">
-    <aside class="admin-sidebar" id="sidebar"
-        th:replace="~{admin/fragments/sidebar :: sidebar(activeLink='analytics')}"></aside>
+
+    <!-- Standard Admin Sidebar -->
+    <aside class="admin-sidebar" id="sidebar" th:replace="~{admin/fragments/sidebar :: sidebar(activeLink='analytics')}">
+    </aside>
+
+    <!-- Mobile Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- Main Content -->
     <main class="admin-main">
-        <!-- Top Bar -->
-        <div class="top-bar">
-            <div class="page-title">
-                <div class="title-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <h1>Platform Analytics</h1>
+        <!-- Reusable Admin Topbar -->
+        <header th:replace="~{admin/fragments/topbar :: topbar('Platform Analytics', 'Executive telemetry, platform growth indicators, and application funnel', 'fas fa-chart-line')}">
+        </header>
+
+        <div class="container-fluid px-0">
+
+            <!-- Section 1: User & Job Growth Indicators -->
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-rocket text-primary me-2"></i>Growth & Acquisition</h5>
+                <span class="text-muted small">Live Platform Telemetry</span>
             </div>
 
-            <div class="user-menu d-flex align-items-center gap-2">
-                <form th:action="@{/admin/theme/toggle}" method="post" class="d-inline">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm">
-                        <i class="fas me-1"
-                            th:classappend="${session.theme == 'dark' ? 'fa-sun' : 'fa-moon'}"></i>
-                        <span th:text="${session.theme == 'dark' ? 'Light' : 'Dark'}">Dark</span>
-                    </button>
-                </form>
-                <a href="/admin/profile" class="logout-btn"
-                    style="background: transparent; color: var(--text); padding: 0.35rem 1rem; gap: 0.75rem; border: 1px solid var(--border);">
-
-                    <img th:if="${user.photos != null}" th:src="@{${user.photosImagePath}}"
-                        style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border);">
-
-                    <i th:if="${user.photos == null}" class="fas fa-user-circle" style="font-size: 1.2rem;"></i>
-                    <span>Profile</span>
-                </a>
-                <a href="/logout" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </div>
-        </div>
-
-        <!-- Growth Metrics -->
-        <div class="row mb-4">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-chart-area"></i> Growth Metrics</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="metric-card accent-primary d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="metric-value" th:text="${analytics != null and analytics.usersLast7Days != null ? analytics.usersLast7Days : 0}">0</div>
+                            <div class="metric-label">Users (Last 7 Days)</div>
+                        </div>
+                        <div class="metric-icon-box bg-soft-primary text-primary">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-3 text-center">
-                                <h3 class="text-primary"
-                                    th:text="${analytics != null and analytics.usersLast7Days != null ? analytics.usersLast7Days : 0}">
-                                    0</h3>
-                                <p class="text-muted">New Users (7 Days)</p>
-                            </div>
-                            <div class="col-md-3 text-center">
-                                <h3 class="text-success"
-                                    th:text="${analytics != null and analytics.usersLast30Days != null ? analytics.usersLast30Days : 0}">
-                                    0</h3>
-                                <p class="text-muted">New Users (30 Days)</p>
-                            </div>
-                            <div class="col-md-3 text-center">
-                                <h3 class="text-info"
-                                    th:text="${analytics != null and analytics.jobsLast7Days != null ? analytics.jobsLast7Days : 0}">
-                                    0</h3>
-                                <p class="text-muted">New Jobs (7 Days)</p>
-                            </div>
-                            <div class="col-md-3 text-center">
-                                <h3 class="text-warning"
-                                    th:text="${analytics != null and analytics.jobsLast30Days != null ? analytics.jobsLast30Days : 0}">
-                                    0</h3>
-                                <p class="text-muted">New Jobs (30 Days)</p>
-                            </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="metric-card accent-success d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="metric-value" th:text="${analytics != null and analytics.usersLast30Days != null ? analytics.usersLast30Days : 0}">0</div>
+                            <div class="metric-label">Users (Last 30 Days)</div>
+                        </div>
+                        <div class="metric-icon-box bg-soft-success text-success">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="metric-card accent-info d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="metric-value" th:text="${analytics != null and analytics.jobsLast7Days != null ? analytics.jobsLast7Days : 0}">0</div>
+                            <div class="metric-label">Jobs (Last 7 Days)</div>
+                        </div>
+                        <div class="metric-icon-box bg-soft-info text-info">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="metric-card accent-warning d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="metric-value" th:text="${analytics != null and analytics.jobsLast30Days != null ? analytics.jobsLast30Days : 0}">0</div>
+                            <div class="metric-label">Jobs (Last 30 Days)</div>
+                        </div>
+                        <div class="metric-icon-box bg-soft-warning text-warning">
+                            <i class="fas fa-building"></i>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Application Statistics -->
-        <div class="row mb-4">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-file-alt"></i> Application Statistics</h5>
+            <!-- Section 2: Application Funnel Metrics -->
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-filter text-info me-2"></i>Applications & Hiring Funnel</h5>
+                <span class="text-muted small">Conversion Stats</span>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="metric-card accent-info d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="metric-value" th:text="${analytics != null and analytics.applicationsLast7Days != null ? analytics.applicationsLast7Days : 0}">0</div>
+                            <div class="metric-label">Applications (7 Days)</div>
+                        </div>
+                        <div class="metric-icon-box bg-soft-info text-info">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-3 text-center">
-                                <h3 class="text-info"
-                                    th:text="${analytics != null and analytics.applicationsLast7Days != null ? analytics.applicationsLast7Days : 0}">
-                                    0</h3>
-                                <p class="text-muted">Applications (7 Days)</p>
-                            </div>
-                            <div class="col-md-3 text-center">
-                                <h3 class="text-primary"
-                                    th:text="${analytics != null and analytics.applicationsLast30Days != null ? analytics.applicationsLast30Days : 0}">
-                                    0</h3>
-                                <p class="text-muted">Applications (30 Days)</p>
-                            </div>
-                            <div class="col-md-3 text-center">
-                                <h3 class="text-warning"
-                                    th:text="${analytics != null and analytics.pendingApplications != null ? analytics.pendingApplications : 0}">
-                                    0</h3>
-                                <p class="text-muted">Pending Applications</p>
-                            </div>
-                            <div class="col-md-3 text-center">
-                                <h3 class="text-success"
-                                    th:text="${analytics != null and analytics.hiredApplications != null ? analytics.hiredApplications : 0}">
-                                    0</h3>
-                                <p class="text-muted">Hired Applications</p>
-                            </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="metric-card accent-purple d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="metric-value" th:text="${analytics != null and analytics.applicationsLast30Days != null ? analytics.applicationsLast30Days : 0}">0</div>
+                            <div class="metric-label">Applications (30 Days)</div>
+                        </div>
+                        <div class="metric-icon-box bg-soft-purple text-purple">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="metric-card accent-warning d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="metric-value" th:text="${analytics != null and analytics.pendingApplications != null ? analytics.pendingApplications : 0}">0</div>
+                            <div class="metric-label">Pending In Review</div>
+                        </div>
+                        <div class="metric-icon-box bg-soft-warning text-warning">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="metric-card accent-success d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="metric-value" th:text="${analytics != null and analytics.hiredApplications != null ? analytics.hiredApplications : 0}">0</div>
+                            <div class="metric-label">Successful Hires</div>
+                        </div>
+                        <div class="metric-icon-box bg-soft-success text-success">
+                            <i class="fas fa-award"></i>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Status Breakdown -->
-        <div class="row mb-4">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-chart-pie"></i> Application Status Breakdown</h5>
+            <!-- Section 3: Interactive Charts -->
+            <div class="row g-4 mb-4">
+                <div class="col-lg-6">
+                    <div class="analytics-chart-card p-0">
+                        <div class="chart-header">
+                            <h6 class="mb-0 fw-bold"><i class="fas fa-user-friends text-primary me-2"></i>User Growth Trajectory</h6>
+                            <span class="badge badge-soft-primary rounded-pill">7D vs 30D</span>
+                        </div>
+                        <div class="p-3">
+                            <canvas id="userGrowthChart" height="180"></canvas>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="card border-left-warning">
-                                    <div class="card-body">
-                                        <h5><i class="fas fa-clock"></i> Pending</h5>
-                                        <h2 class="text-warning"
-                                            th:text="${analytics != null and analytics.pendingApplications != null ? analytics.pendingApplications : 0}">
-                                            0</h2>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card border-left-success">
-                                    <div class="card-body">
-                                        <h5><i class="fas fa-check-circle"></i> Hired</h5>
-                                        <h2 class="text-success"
-                                            th:text="${analytics != null and analytics.hiredApplications != null ? analytics.hiredApplications : 0}">
-                                            0</h2>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card border-left-danger">
-                                    <div class="card-body">
-                                        <h5><i class="fas fa-times-circle"></i> Rejected</h5>
-                                        <h2 class="text-danger"
-                                            th:text="${analytics != null and analytics.rejectedApplications != null ? analytics.rejectedApplications : 0}">
-                                            0</h2>
-                                    </div>
-                                </div>
-                            </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="analytics-chart-card p-0">
+                        <div class="chart-header">
+                            <h6 class="mb-0 fw-bold"><i class="fas fa-briefcase text-info me-2"></i>Job Postings Velocity</h6>
+                            <span class="badge badge-soft-info rounded-pill">Activity</span>
+                        </div>
+                        <div class="p-3">
+                            <canvas id="jobTrendChart" height="180"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="analytics-chart-card p-0">
+                        <div class="chart-header">
+                            <h6 class="mb-0 fw-bold"><i class="fas fa-chart-pie text-warning me-2"></i>Application Status Distribution</h6>
+                            <span class="badge badge-soft-warning rounded-pill">Status Ratio</span>
+                        </div>
+                        <div class="p-3">
+                            <canvas id="applicationStatusChart" height="180"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="analytics-chart-card p-0">
+                        <div class="chart-header">
+                            <h6 class="mb-0 fw-bold"><i class="fas fa-chart-area text-purple me-2"></i>Application Trend Velocity</h6>
+                            <span class="badge badge-soft-purple rounded-pill">Submissions</span>
+                        </div>
+                        <div class="p-3">
+                            <canvas id="applicationActivityChart" height="180"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Platform Activity Summary -->
-        <div class="row mb-4">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-chart-bar"></i> Platform Activity Summary</h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-muted">This analytics dashboard provides insights into platform growth, user
-                            engagement, and job market activity.</p>
-                        <div class="alert alert-info">
-                            <i class="fas fa-lightbulb"></i>
-                            <strong>Use this data to:</strong>
-                            <ul class="mb-0 mt-2">
-                                <li>Monitor platform growth trends</li>
-                                <li>Identify peak activity periods</li>
-                                <li>Make informed decisions about platform improvements</li>
-                                <li>Track conversion rates (applications to hires)</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Section -->
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-chart-line"></i> User Growth Trend</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="userGrowthChart" height="100"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-chart-bar"></i> Job Posting Trend</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="jobTrendChart" height="100"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-chart-pie"></i> Application Status Distribution</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="applicationStatusChart" height="100"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-chart-area"></i> Application Activity</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="applicationActivityChart" height="100"></canvas>
-                    </div>
-                </div>
-            </div>
         </div>
     </main>
 
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/admin-scripts.js}"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script th:inline="javascript">
         /*<![CDATA[*/
-        // Get data from server
-        var usersLast7Days = /*[[${analytics.usersLast7Days}]]*/ 0;
-        var usersLast30Days = /*[[${analytics.usersLast30Days}]]*/ 0;
-        var jobsLast7Days = /*[[${analytics.jobsLast7Days}]]*/ 0;
-        var jobsLast30Days = /*[[${analytics.jobsLast30Days}]]*/ 0;
-        var applicationsLast7Days = /*[[${analytics.applicationsLast7Days}]]*/ 0;
-        var applicationsLast30Days = /*[[${analytics.applicationsLast30Days}]]*/ 0;
-        var pendingApplications = /*[[${analytics.pendingApplications}]]*/ 0;
-        var hiredApplications = /*[[${analytics.hiredApplications}]]*/ 0;
-        var rejectedApplications = /*[[${analytics.rejectedApplications}]]*/ 0;
+        const isDark = document.body.classList.contains('dark-theme');
+        const gridColor = isDark ? 'rgba(148, 163, 184, 0.12)' : 'rgba(226, 232, 240, 0.8)';
+        const textColor = isDark ? '#94a3b8' : '#64748b';
 
-        // Light theme chart defaults
-        Chart.defaults.color = '#64748b';
-        Chart.defaults.borderColor = '#e3e8f0';
+        Chart.defaults.color = textColor;
+        Chart.defaults.borderColor = gridColor;
+
+        const usersLast7Days = /*[[${analytics != null ? analytics.usersLast7Days : 0}]]*/ 0;
+        const usersLast30Days = /*[[${analytics != null ? analytics.usersLast30Days : 0}]]*/ 0;
+        const jobsLast7Days = /*[[${analytics != null ? analytics.jobsLast7Days : 0}]]*/ 0;
+        const jobsLast30Days = /*[[${analytics != null ? analytics.jobsLast30Days : 0}]]*/ 0;
+        const applicationsLast7Days = /*[[${analytics != null ? analytics.applicationsLast7Days : 0}]]*/ 0;
+        const applicationsLast30Days = /*[[${analytics != null ? analytics.applicationsLast30Days : 0}]]*/ 0;
+        const pendingApplications = /*[[${analytics != null ? analytics.pendingApplications : 0}]]*/ 0;
+        const hiredApplications = /*[[${analytics != null ? analytics.hiredApplications : 0}]]*/ 0;
+        const rejectedApplications = /*[[${analytics != null ? analytics.rejectedApplications : 0}]]*/ 0;
 
         // User Growth Chart
-        const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
-        new Chart(userGrowthCtx, {
+        new Chart(document.getElementById('userGrowthChart').getContext('2d'), {
             type: 'line',
             data: {
                 labels: ['Last 7 Days', 'Last 30 Days'],
@@ -290,116 +249,91 @@
                     label: 'New Users',
                     data: [usersLast7Days, usersLast30Days],
                     borderColor: '#059862',
-                    backgroundColor: 'rgba(5, 152, 98, 0.2)',
-                    tension: 0.1
+                    backgroundColor: 'rgba(5, 152, 98, 0.12)',
+                    fill: true,
+                    tension: 0.35,
+                    borderWidth: 2.5
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
+                maintainAspectRatio: false,
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: '#e3e8f0'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            color: '#e3e8f0'
-                        }
-                    }
+                    y: { beginAtZero: true, grid: { color: gridColor } },
+                    x: { grid: { color: gridColor } }
                 }
             }
         });
 
         // Job Trend Chart
-        const jobTrendCtx = document.getElementById('jobTrendChart').getContext('2d');
-        new Chart(jobTrendCtx, {
+        new Chart(document.getElementById('jobTrendChart').getContext('2d'), {
             type: 'bar',
             data: {
                 labels: ['Last 7 Days', 'Last 30 Days'],
                 datasets: [{
-                    label: 'New Jobs',
+                    label: 'New Job Postings',
                     data: [jobsLast7Days, jobsLast30Days],
-                    backgroundColor: ['rgba(29, 155, 240, 0.6)', 'rgba(5, 152, 98, 0.6)']
+                    backgroundColor: ['rgba(59, 130, 246, 0.75)', 'rgba(5, 152, 98, 0.75)'],
+                    borderRadius: 8
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
+                maintainAspectRatio: false,
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: '#e3e8f0'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            color: '#e3e8f0'
-                        }
-                    }
+                    y: { beginAtZero: true, grid: { color: gridColor } },
+                    x: { grid: { color: gridColor } }
                 }
             }
         });
 
-        // Application Status Pie Chart
-        const applicationStatusCtx = document.getElementById('applicationStatusChart').getContext('2d');
-        new Chart(applicationStatusCtx, {
-            type: 'pie',
+        // Application Status Distribution
+        new Chart(document.getElementById('applicationStatusChart').getContext('2d'), {
+            type: 'doughnut',
             data: {
-                labels: ['Pending', 'Hired', 'Rejected'],
+                labels: ['Pending Review', 'Hired', 'Rejected'],
                 datasets: [{
                     data: [pendingApplications, hiredApplications, rejectedApplications],
                     backgroundColor: [
-                        'rgba(255, 180, 0, 0.6)',
-                        'rgba(5, 152, 98, 0.6)',
-                        'rgba(249, 24, 128, 0.6)'
+                        '#f59e0b',
+                        '#10b981',
+                        '#ef4444'
                     ],
-                    borderColor: '#ffffff'
+                    borderWidth: 0
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true
+                maintainAspectRatio: false,
+                cutout: '70%'
             }
         });
 
-        // Application Activity Chart
-        const applicationActivityCtx = document.getElementById('applicationActivityChart').getContext('2d');
-        new Chart(applicationActivityCtx, {
+        // Application Activity
+        new Chart(document.getElementById('applicationActivityChart').getContext('2d'), {
             type: 'line',
             data: {
                 labels: ['Last 7 Days', 'Last 30 Days'],
                 datasets: [{
-                    label: 'Applications',
+                    label: 'Candidate Applications',
                     data: [applicationsLast7Days, applicationsLast30Days],
                     borderColor: '#8b5cf6',
-                    backgroundColor: 'rgba(139, 92, 246, 0.2)',
-                    tension: 0.1
+                    backgroundColor: 'rgba(139, 92, 246, 0.15)',
+                    fill: true,
+                    tension: 0.35,
+                    borderWidth: 2.5
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
+                maintainAspectRatio: false,
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: '#e3e8f0'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            color: '#e3e8f0'
-                        }
-                    }
+                    y: { beginAtZero: true, grid: { color: gridColor } },
+                    x: { grid: { color: gridColor } }
                 }
             }
         });
         /*]]>*/
     </script>
 </body>
-
 </html>

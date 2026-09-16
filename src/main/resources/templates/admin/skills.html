@@ -9,203 +9,156 @@
     <link th:href="@{/webjars/font-awesome/css/all.min.css}" rel="stylesheet">
     <link th:href="@{/css/admin-styles.css}" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        .skills-hero-card {
-            background: radial-gradient(circle at top left, rgba(13, 110, 253, 0.18), transparent 55%),
-                radial-gradient(circle at bottom right, rgba(5, 152, 98, 0.18), transparent 55%),
-                var(--bg-card);
-            border-radius: var(--radius);
+        .skill-pill-card {
+            background: var(--bg-card);
             border: 1px solid var(--border);
-            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.45);
-        }
-
-        .skills-stat-value {
-            font-size: 2.4rem;
-            font-weight: 800;
-            letter-spacing: 0.05em;
-        }
-
-        .skills-search-input {
-            max-width: 320px;
-            border-radius: 999px;
-            padding-left: 2.4rem;
-            background-color: var(--bg-light);
-            border: 1px solid var(--border);
-            color: var(--text);
-        }
-
-        .skills-search-input::placeholder {
-            color: var(--text-light);
-        }
-
-        .skills-search-icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-light);
-            pointer-events: none;
-        }
-
-        .skill-chip {
-            background-color: var(--bg-light);
-            border-radius: 999px;
-            border: 1px solid transparent;
-            padding: 0.5rem 0.9rem;
-            display: inline-flex;
+            border-radius: 12px;
+            padding: 0.85rem 1.15rem;
+            display: flex;
             align-items: center;
-            gap: 0.4rem;
-            font-size: 0.9rem;
-            color: var(--text);
-            cursor: default;
-            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease,
-                background-color 0.18s ease;
+            justify-content: space-between;
+            transition: all 0.22s ease;
         }
-
-        .skill-chip:hover {
+        .skill-pill-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(13, 110, 253, 0.35);
-            border-color: rgba(13, 110, 253, 0.55);
-            background: linear-gradient(135deg, rgba(13, 110, 253, 0.16), rgba(5, 152, 98, 0.18));
-        }
-
-        .skill-chip-badge {
-            background: rgba(13, 110, 253, 0.12);
-            color: #0d6efd;
-            border-radius: 999px;
-            padding: 0.1rem 0.45rem;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-        }
-
-        .skills-empty-state {
-            border-radius: var(--radius);
-            border: 1px dashed var(--border);
+            border-color: var(--primary);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
         }
     </style>
 </head>
 
 <body th:classappend="${session.theme == 'dark' ? 'dark-theme' : 'light-theme'}">
 
-    <!-- Sidebar Fragment -->
-    <div th:replace="~{admin/fragments/sidebar :: sidebar('skills')}"></div>
+    <!-- Standard Admin Sidebar -->
+    <aside class="admin-sidebar" id="sidebar" th:replace="~{admin/fragments/sidebar :: sidebar(activeLink='skills')}">
+    </aside>
 
-    <!-- Sidebar Overlay -->
+    <!-- Mobile Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- Main Content -->
     <main class="admin-main">
-        <!-- Top Bar -->
-        <div class="top-bar">
-            <button class="btn btn-primary d-lg-none me-3" id="sidebarToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="page-title">
-                <div class="title-icon">
-                    <i class="fas fa-tags"></i>
-                </div>
-                <div>
-                    <h1 class="h3 fw-bold mb-1">Skills Management</h1>
-                    <p class="text-muted mb-0">Overview of skills across the platform</p>
-                </div>
-            </div>
-
-            <div class="user-menu d-flex align-items-center gap-2">
-                <form th:action="@{/admin/theme/toggle}" method="post" class="d-inline">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm">
-                        <i class="fas me-1"
-                            th:classappend="${session.theme == 'dark' ? 'fa-sun' : 'fa-moon'}"></i>
-                        <span th:text="${session.theme == 'dark' ? 'Light' : 'Dark'}">Dark</span>
-                    </button>
-                </form>
-                <a href="/logout" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </div>
-        </div>
+        <!-- Reusable Admin Topbar -->
+        <header th:replace="~{admin/fragments/topbar :: topbar('Skills Management', 'Analyze, track, and monitor skill competencies and platform talent demand', 'fas fa-tags')}">
+        </header>
 
         <div class="container-fluid px-0">
 
-            <!-- STATS + SEARCH -->
-            <div class="row mb-4 align-items-center g-3">
-                <div class="col-lg-5 col-md-6">
-                    <div class="card skills-hero-card p-4 d-flex flex-row align-items-center justify-content-between">
+            <!-- Stats & Overview Grid -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="metric-card accent-primary d-flex align-items-center justify-content-between">
                         <div>
-                            <div class="skills-stat-value" th:text="${totalSkills}">0</div>
-                            <div class="stat-label text-uppercase small text-muted fw-bold mt-1">Total Unique Skills
-                            </div>
-                            <div class="small text-muted mt-2">Use this list to understand demand and curate categories.
-                            </div>
+                            <div class="metric-value" th:text="${totalSkills}">0</div>
+                            <div class="metric-label">Total Unique Skills</div>
                         </div>
-                        <div class="icon-box bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center"
-                            style="width: 54px; height: 54px; background: rgba(var(--primary-rgb), 0.16);">
-                            <i class="fas fa-layer-group fa-lg"></i>
+                        <div class="metric-icon-box bg-soft-primary text-primary">
+                            <i class="fas fa-tags"></i>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6 ms-auto">
-                    <div class="position-relative">
-                        <i class="fas fa-search skills-search-icon"></i>
-                        <input id="skillsSearch" type="text" class="form-control skills-search-input"
-                            placeholder="Search skills (e.g. React, Figma, Java)">
+
+                <div class="col-md-4">
+                    <div class="metric-card accent-info d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="metric-value" th:text="${skills != null ? skills.size() : 0}">0</div>
+                            <div class="metric-label">Active Categories</div>
+                        </div>
+                        <div class="metric-icon-box bg-soft-info text-info">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
                     </div>
-                    <div class="small text-muted mt-1" id="skillsSearchMeta">Type to filter the skills list.</div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="metric-card accent-success d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="metric-value" style="font-size: 1.5rem; line-height: 1.5;">Auto-Curated</div>
+                            <div class="metric-label">Platform Dynamic Sync</div>
+                        </div>
+                        <div class="metric-icon-box bg-soft-success text-success">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- SKILLS CARD -->
-            <div class="card border-0 shadow-sm" style="background: var(--bg-card); border-radius: var(--radius);">
+            <!-- Modern Search & Filter Toolbar -->
+            <div class="admin-toolbar d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div class="d-flex align-items-center gap-3 flex-grow-1" style="max-width: 420px;">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0"><i class="fas fa-search text-muted"></i></span>
+                        <input id="skillsSearch" type="text" class="form-control bg-light border-0"
+                            placeholder="Filter skills by keyword (e.g. React, Java, Figma)...">
+                    </div>
+                </div>
+                <div class="text-muted small" id="skillsSearchMeta">
+                    Type keywords to filter the skills collection in real-time.
+                </div>
+            </div>
 
+            <!-- Skills Collection Card -->
+            <div class="card border-0 shadow-sm" style="background: var(--bg-card); border-radius: var(--radius);">
+                <div class="card-header bg-transparent border-bottom px-4 py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-cubes text-primary me-2"></i>Skills Catalog</h5>
+                    <span class="badge badge-soft-primary rounded-pill px-3 py-1" th:text="${totalSkills} + ' Skills Indexed'">0 Skills Indexed</span>
+                </div>
                 <div class="card-body p-4">
-                    <div th:if="${skills == null or skills.isEmpty()}" class="text-center py-5 skills-empty-state">
-                        <i class="fas fa-tags fa-3x mb-3 opacity-25"></i>
-                        <p class="text-muted mb-1">No skills found in the platform yet.</p>
-                        <p class="text-muted small mb-0">Skills will appear here automatically as freelancers add them
-                            to
-                            their profiles.</p>
+
+                    <!-- Empty State -->
+                    <div th:if="${skills == null or skills.isEmpty()}" class="text-center py-5">
+                        <div class="mb-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle"
+                                 style="width: 72px; height: 72px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary);">
+                                <i class="fas fa-tags fa-2x"></i>
+                            </div>
+                        </div>
+                        <h4 class="fw-bold mb-2">No Skills Registered Yet</h4>
+                        <p class="text-muted mx-auto" style="max-width: 460px;">
+                            Skills are automatically collected and indexed as freelancers build their profiles and tag their expertise in Jobify.
+                        </p>
                     </div>
 
+                    <!-- Populated Skills Grid -->
                     <div th:if="${skills != null and !skills.isEmpty()}">
-                        <div id="skillsGrid" class="row g-2 g-sm-3">
-                            <div th:each="entry : ${skills}" class="col-xl-3 col-lg-4 col-md-4 col-sm-6 mb-2"
+                        <div id="skillsGrid" class="row g-3">
+                            <div th:each="entry : ${skills}" class="col-xl-3 col-lg-4 col-md-6 skill-item"
                                 th:attr="data-skill=${#strings.toLowerCase(entry.key)}">
-                                <div class="skill-chip">
-                                    <i class="fas fa-hashtag text-primary opacity-75"></i>
-                                    <span th:text="${entry.key}">Skill</span>
-                                    <span class="skill-chip-badge ms-2" th:text="${entry.value}">0</span>
+                                <div class="skill-pill-card">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fas fa-hashtag text-primary"></i>
+                                        <span class="fw-bold text-dark" th:text="${entry.key}">Skill Name</span>
+                                    </div>
+                                    <span class="badge badge-soft-primary rounded-pill px-2 py-1" th:text="${entry.value} + ' users'">0 users</span>
                                 </div>
                             </div>
                         </div>
-                        <div id="skillsNoResults" class="alert alert-secondary mt-3 py-2 px-3 small d-none"
-                            role="alert">
-                            <i class="fas fa-info-circle me-1"></i>
-                            No skills match your search.
+
+                        <div id="skillsNoResults" class="alert alert-secondary mt-3 py-3 px-4 small d-none rounded-3" role="alert">
+                            <i class="fas fa-info-circle me-2"></i> No skills match your search query.
                         </div>
                     </div>
+
                 </div>
             </div>
 
         </div>
     </main>
 
-    <!-- Short Admin Footer -->
-    <div th:replace="~{admin/fragments/footer :: adminFooter}"></div>
-
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/js/admin-scripts.js}"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const input = document.getElementById('skillsSearch');
             const grid = document.getElementById('skillsGrid');
             if (!input || !grid) return;
 
-            const items = Array.from(grid.querySelectorAll('[data-skill]'));
+            const items = Array.from(grid.querySelectorAll('.skill-item'));
             const noResults = document.getElementById('skillsNoResults');
             const meta = document.getElementById('skillsSearchMeta');
 
@@ -225,7 +178,7 @@
                 }
                 if (meta) {
                     if (!q) {
-                        meta.textContent = 'Type to filter the skills list.';
+                        meta.textContent = 'Type keywords to filter the skills collection in real-time.';
                     } else {
                         meta.textContent = 'Showing ' + visibleCount + ' skill' + (visibleCount === 1 ? '' : 's') + ' matching "' + q + '".';
                     }
@@ -235,7 +188,5 @@
             input.addEventListener('input', applyFilter);
         });
     </script>
-
 </body>
-
 </html>

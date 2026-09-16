@@ -23,6 +23,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -843,25 +844,39 @@ public class AdminController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String status,
             Model model) {
-        List<JobSeekerApply> allApplications;
+        List<JobSeekerApply> rawAll = jobSeekerApplyService.getAllApplications();
+        long totalCount = rawAll.size();
+        long pendingCount = rawAll.stream()
+                .filter(a -> a.getApplicationStatus() == null || "APPLIED".equalsIgnoreCase(a.getApplicationStatus()) || "PENDING".equalsIgnoreCase(a.getApplicationStatus()))
+                .count();
+        long hiredCount = rawAll.stream()
+                .filter(a -> "HIRED".equalsIgnoreCase(a.getApplicationStatus()) || "ACCEPTED".equalsIgnoreCase(a.getApplicationStatus()))
+                .count();
+        long rejectedCount = rawAll.stream()
+                .filter(a -> "REJECTED".equalsIgnoreCase(a.getApplicationStatus()))
+                .count();
+
+        List<JobSeekerApply> filteredList;
         if (status != null && !status.isEmpty() && !"ALL".equalsIgnoreCase(status)) {
-            allApplications = jobSeekerApplyService.getAllApplications().stream()
+            filteredList = rawAll.stream()
                     .filter(app -> status.equalsIgnoreCase(app.getApplicationStatus()))
                     .collect(java.util.stream.Collectors.toList());
         } else {
-            allApplications = jobSeekerApplyService.getAllApplications();
+            filteredList = rawAll;
         }
 
         int start = page * size;
-        int end = Math.min(start + size, allApplications.size());
-        List<JobSeekerApply> applicationsPage = allApplications.subList(start, end);
+        int end = Math.min(start + size, filteredList.size());
+        List<JobSeekerApply> applicationsPage = (start <= filteredList.size()) ? filteredList.subList(start, end) : Collections.emptyList();
 
         model.addAttribute("applications", applicationsPage);
         model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", (int) Math.ceil((double) allApplications.size() / size));
-        model.addAttribute("totalApplications", allApplications.size());
+        model.addAttribute("totalPages", (int) Math.ceil((double) filteredList.size() / size));
+        model.addAttribute("totalApplications", totalCount);
+        model.addAttribute("pendingApplications", pendingCount);
+        model.addAttribute("hiredApplications", hiredCount);
+        model.addAttribute("rejectedApplications", rejectedCount);
         model.addAttribute("pageSize", size);
-        model.addAttribute("statusFilter", status != null ? status : "ALL");
         model.addAttribute("statusFilter", status != null ? status : "ALL");
         return "admin/applications";
     }

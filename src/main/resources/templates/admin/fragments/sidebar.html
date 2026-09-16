@@ -88,6 +88,13 @@
                     <span>Analytics</span>
                 </a>
             </div>
+            <div class="nav-item">
+                <a href="/admin/profile" class="nav-link"
+                    th:classappend="${activeLink == 'profile' ? 'active' : ''}">
+                    <i class="fas fa-user-shield nav-icon"></i>
+                    <span>Admin Profile</span>
+                </a>
+            </div>
         </nav>
 
         <div class="sidebar-footer-action">
