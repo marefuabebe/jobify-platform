@@ -205,7 +205,9 @@
                                 <div class="col-md-4 col-sm-6" th:if="${recruiterProfiles[recruiter.userId]?.verificationFront}">
                                     <div class="doc-tile">
                                         <div class="doc-thumb"
-                                            th:onclick="openDocument([[${recruiterProfiles[recruiter.userId].verificationFront.startsWith('http') ? recruiterProfiles[recruiter.userId].verificationFront : '/photos/recruiter/' + recruiter.userId + '/' + recruiterProfiles[recruiter.userId].verificationFront}]], 'Government ID (Front)')">
+                                            th:data-doc-url="${recruiterProfiles[recruiter.userId].verificationFront.startsWith('http') ? recruiterProfiles[recruiter.userId].verificationFront : '/photos/recruiter/' + recruiter.userId + '/' + recruiterProfiles[recruiter.userId].verificationFront}"
+                                            data-doc-title="Government ID (Front)"
+                                            onclick="openDocument(this.getAttribute('data-doc-url'), this.getAttribute('data-doc-title'))">
                                             <img th:src="${recruiterProfiles[recruiter.userId].verificationFront.startsWith('http') ? recruiterProfiles[recruiter.userId].verificationFront : '/photos/recruiter/' + recruiter.userId + '/' + recruiterProfiles[recruiter.userId].verificationFront}"
                                                  alt="Government ID Front">
                                             <div class="doc-thumb-zoom">
@@ -223,7 +225,9 @@
                                 <div class="col-md-4 col-sm-6" th:if="${recruiterProfiles[recruiter.userId]?.verificationBack}">
                                     <div class="doc-tile">
                                         <div class="doc-thumb"
-                                            th:onclick="openDocument([[${recruiterProfiles[recruiter.userId].verificationBack.startsWith('http') ? recruiterProfiles[recruiter.userId].verificationBack : '/photos/recruiter/' + recruiter.userId + '/' + recruiterProfiles[recruiter.userId].verificationBack}]], 'Government ID (Back)')">
+                                            th:data-doc-url="${recruiterProfiles[recruiter.userId].verificationBack.startsWith('http') ? recruiterProfiles[recruiter.userId].verificationBack : '/photos/recruiter/' + recruiter.userId + '/' + recruiterProfiles[recruiter.userId].verificationBack}"
+                                            data-doc-title="Government ID (Back)"
+                                            onclick="openDocument(this.getAttribute('data-doc-url'), this.getAttribute('data-doc-title'))">
                                             <img th:src="${recruiterProfiles[recruiter.userId].verificationBack.startsWith('http') ? recruiterProfiles[recruiter.userId].verificationBack : '/photos/recruiter/' + recruiter.userId + '/' + recruiterProfiles[recruiter.userId].verificationBack}"
                                                  alt="Government ID Back">
                                             <div class="doc-thumb-zoom">
@@ -242,7 +246,9 @@
                                     <div class="doc-tile">
                                         <div class="doc-thumb"
                                             th:if="${recruiterProfiles[recruiter.userId]?.businessLicense}"
-                                            th:onclick="openDocument([[${recruiterProfiles[recruiter.userId].businessLicense.startsWith('http') ? recruiterProfiles[recruiter.userId].businessLicense : '/photos/recruiter/' + recruiter.userId + '/' + recruiterProfiles[recruiter.userId].businessLicense}]], 'Business License')">
+                                            th:data-doc-url="${recruiterProfiles[recruiter.userId].businessLicense.startsWith('http') ? recruiterProfiles[recruiter.userId].businessLicense : '/photos/recruiter/' + recruiter.userId + '/' + recruiterProfiles[recruiter.userId].businessLicense}"
+                                            data-doc-title="Business License"
+                                            onclick="openDocument(this.getAttribute('data-doc-url'), this.getAttribute('data-doc-title'))">
                                             <img th:if="${!#strings.endsWith(#strings.toLowerCase(recruiterProfiles[recruiter.userId].businessLicense), '.pdf')}"
                                                  th:src="${recruiterProfiles[recruiter.userId].businessLicense.startsWith('http') ? recruiterProfiles[recruiter.userId].businessLicense : '/photos/recruiter/' + recruiter.userId + '/' + recruiterProfiles[recruiter.userId].businessLicense}"
                                                  alt="Business License">
@@ -362,7 +368,9 @@
                                     <div class="doc-tile">
                                         <div class="doc-thumb"
                                             th:if="${jobSeekerProfiles[jobSeeker.userId]?.verificationDocument}"
-                                            th:onclick="openDocument([[${jobSeekerProfiles[jobSeeker.userId].verificationDocument.startsWith('http') ? jobSeekerProfiles[jobSeeker.userId].verificationDocument : '/photos/candidate/' + jobSeeker.userId + '/' + jobSeekerProfiles[jobSeeker.userId].verificationDocument}]], 'ID Document')">
+                                            th:data-doc-url="${jobSeekerProfiles[jobSeeker.userId].verificationDocument.startsWith('http') ? jobSeekerProfiles[jobSeeker.userId].verificationDocument : '/photos/candidate/' + jobSeeker.userId + '/' + jobSeekerProfiles[jobSeeker.userId].verificationDocument}"
+                                            data-doc-title="ID Document"
+                                            onclick="openDocument(this.getAttribute('data-doc-url'), this.getAttribute('data-doc-title'))">
                                             <img th:src="${jobSeekerProfiles[jobSeeker.userId].verificationDocument.startsWith('http') ? jobSeekerProfiles[jobSeeker.userId].verificationDocument : '/photos/candidate/' + jobSeeker.userId + '/' + jobSeekerProfiles[jobSeeker.userId].verificationDocument}"
                                                  alt="Government ID Document">
                                             <div class="doc-thumb-zoom">
@@ -388,7 +396,9 @@
                                     <div class="doc-tile">
                                         <div class="doc-thumb"
                                             th:if="${jobSeekerProfiles[jobSeeker.userId]?.resume}"
-                                            th:onclick="openDocument([[${jobSeekerProfiles[jobSeeker.userId].resume.startsWith('http') ? jobSeekerProfiles[jobSeeker.userId].resume : '/photos/candidate/' + jobSeeker.userId + '/' + jobSeekerProfiles[jobSeeker.userId].resume}]], 'Freelancer Resume')">
+                                            th:data-doc-url="${jobSeekerProfiles[jobSeeker.userId].resume.startsWith('http') ? jobSeekerProfiles[jobSeeker.userId].resume : '/photos/candidate/' + jobSeeker.userId + '/' + jobSeekerProfiles[jobSeeker.userId].resume}"
+                                            data-doc-title="Freelancer Resume"
+                                            onclick="openDocument(this.getAttribute('data-doc-url'), this.getAttribute('data-doc-title'))">
                                             <i class="fas fa-file-pdf fa-3x text-danger"></i>
                                             <div class="doc-thumb-zoom">
                                                 <i class="fas fa-file-pdf"></i> View Resume
