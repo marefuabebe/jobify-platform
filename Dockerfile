@@ -13,9 +13,9 @@ FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 # Copy the built jar file from the build stage
 COPY --from=build /app/target/jobportal-0.0.1-SNAPSHOT.jar app.jar
-# Expose the default port Render expects
-EXPOSE 8080
+# Expose Render standard port (10000) and legacy Spring port (8080)
+EXPOSE 10000 8080
 
 # Run the application with dynamic PORT resolution, 0.0.0.0 interface binding, and 512MB RAM constraints
-ENTRYPOINT ["sh", "-c", "java -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Xss512k -Dserver.port=${PORT:-8080} -Dserver.address=0.0.0.0 -jar app.jar"]
+ENTRYPOINT ["sh", "-c", "java -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Xss512k -Dserver.port=${PORT:-10000} -Dserver.address=0.0.0.0 -jar app.jar"]
 
