@@ -30,6 +30,13 @@
                 </a>
             </div>
             <div class="nav-item">
+                <a href="/admin/verification-dashboard" class="nav-link"
+                    th:classappend="${activeLink == 'verifications' or activeLink == 'verification' ? 'active' : ''}">
+                    <i class="fas fa-user-check nav-icon"></i>
+                    <span>Verifications</span>
+                </a>
+            </div>
+            <div class="nav-item">
                 <a href="/admin/jobs" class="nav-link" th:classappend="${activeLink == 'jobs' ? 'active' : ''}">
                     <i class="fas fa-briefcase nav-icon"></i>
                     <span>All Jobs</span>

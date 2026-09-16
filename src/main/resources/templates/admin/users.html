@@ -40,7 +40,7 @@
                 </div>
             </div>
 
-            <div class="user-menu">
+            <div class="user-menu d-flex align-items-center gap-2">
                 <form th:action="@{/admin/theme/toggle}" method="post" class="d-inline">
                     <button type="submit" class="btn btn-outline-secondary btn-sm">
                         <i class="fas me-1"
@@ -48,6 +48,41 @@
                         <span th:text="${session.theme == 'dark' ? 'Light' : 'Dark'}">Dark</span>
                     </button>
                 </form>
+
+                <!-- Notification Bell Dropdown -->
+                <div class="dropdown d-inline-block">
+                    <a href="#" class="btn btn-outline-secondary btn-sm position-relative d-flex align-items-center justify-content-center"
+                       id="adminNotificationDropdownUsers" data-bs-toggle="dropdown" aria-expanded="false"
+                       style="width: 34px; height: 34px; border-radius: 50%;">
+                        <i class="fas fa-bell"></i>
+                        <span th:if="${adminUnreadCount != null and adminUnreadCount > 0}"
+                              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                              style="font-size: 0.65rem;"
+                              th:text="${adminUnreadCount}">1</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0" aria-labelledby="adminNotificationDropdownUsers" style="width: 320px; max-height: 400px; overflow-y: auto; border-radius: 12px; z-index: 1050;">
+                        <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
+                            <h6 class="mb-0 fw-bold"><i class="fas fa-bell me-2 text-primary"></i>Notifications</h6>
+                            <span th:if="${adminUnreadCount != null and adminUnreadCount > 0}" class="badge bg-primary rounded-pill" th:text="${adminUnreadCount} + ' unread'">1 unread</span>
+                        </div>
+                        <div th:if="${adminRecentNotifications == null or adminRecentNotifications.isEmpty()}" class="p-4 text-center text-muted">
+                            <i class="fas fa-check-circle fa-2x mb-2 text-success opacity-50"></i>
+                            <p class="mb-0 small">No new notifications</p>
+                        </div>
+                        <div th:each="notif : ${adminRecentNotifications}" class="p-3 border-bottom text-dark" style="font-size: 0.85rem;" th:styleappend="${!notif.isRead ? 'background: rgba(75, 108, 183, 0.05);' : ''}">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <strong th:text="${notif.title}">Title</strong>
+                                <small class="text-muted" th:text="${#dates.format(notif.createdAt, 'MMM d, HH:mm')}">Date</small>
+                            </div>
+                            <p class="mb-1 text-muted" th:text="${notif.message}">Message</p>
+                            <a th:if="${notif.type == 'VERIFICATION'}" href="/admin/verification-dashboard" class="small text-primary fw-bold text-decoration-none">Go to Verifications &rarr;</a>
+                            <a th:if="${notif.type == 'DISPUTE'}" href="/admin/disputes" class="small text-danger fw-bold text-decoration-none">Review Dispute &rarr;</a>
+                        </div>
+                        <div class="p-2 text-center bg-light">
+                            <a href="/notifications" class="small text-muted text-decoration-none">View All Notifications</a>
+                        </div>
+                    </div>
+                </div>
                 <a href="/logout" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>

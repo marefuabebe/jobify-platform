@@ -20,16 +20,22 @@ public class DisputeController {
     private final UsersService usersService;
     private final PaymentRepository paymentRepository;
     private final JobSeekerApplyService jobSeekerApplyService; // To update application status
+    private final NotificationService notificationService;
+    private final EmailService emailService;
 
     @Autowired
     public DisputeController(DisputeService disputeService, JobPostActivityService jobPostActivityService,
             UsersService usersService, PaymentRepository paymentRepository,
-            JobSeekerApplyService jobSeekerApplyService) {
+            JobSeekerApplyService jobSeekerApplyService,
+            NotificationService notificationService,
+            EmailService emailService) {
         this.disputeService = disputeService;
         this.jobPostActivityService = jobPostActivityService;
         this.usersService = usersService;
         this.paymentRepository = paymentRepository;
         this.jobSeekerApplyService = jobSeekerApplyService;
+        this.notificationService = notificationService;
+        this.emailService = emailService;
     }
 
     // 1. Submit Work (Freelancer)
@@ -102,7 +108,21 @@ public class DisputeController {
         dispute.setStatus("PENDING");
         dispute.setPostedDate(new Date());
 
-        disputeService.createDispute(dispute);
+        Dispute savedDispute = disputeService.createDispute(dispute);
+
+        // Notify Admin via In-App Notification and Email
+        try {
+            notificationService.createAdminDisputeNotification(savedDispute);
+            String clientEmail = (currentUser.getUserTypeId() != null && currentUser.getUserTypeId().getUserTypeId() == 1)
+                    ? currentUser.getEmail()
+                    : againstUser.getEmail();
+            String freelancerEmail = (currentUser.getUserTypeId() != null && currentUser.getUserTypeId().getUserTypeId() == 2)
+                    ? currentUser.getEmail()
+                    : againstUser.getEmail();
+            emailService.sendDisputeNotification("marefu933@gmail.com", job.getJobTitle(), clientEmail, freelancerEmail, description);
+        } catch (Exception e) {
+            System.err.println("Failed to send dispute notifications: " + e.getMessage());
+        }
 
         // Freeze Funds
         List<Payment> payments = paymentRepository.findByJob(job);

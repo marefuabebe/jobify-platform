@@ -33,6 +33,9 @@ public class EmailService {
         @Value("${jobify.email.proxy.url:}")
         private String proxyUrl;
 
+        @Value("${jobify.app.base-url:https://jobify-platform.onrender.com}")
+        private String appBaseUrl;
+
         public void sendEmail(String to, String subject, String text) {
                 sendEmail(to, subject, text, false);
         }
@@ -354,8 +357,9 @@ public class EmailService {
                                                 "<p class='info-box'>Please review the submitted documents for authenticity.</p>",
                                 userType, userEmail);
 
+                String baseUrl = (appBaseUrl != null && !appBaseUrl.trim().isEmpty()) ? appBaseUrl.trim() : "https://jobify-platform.onrender.com";
                 String htmlContent = buildHtmlEmail(subject, "Admin", content, "Review Documents",
-                                "http://localhost:8080/admin/users/pending");
+                                baseUrl + "/admin/verification-dashboard");
                 sendEmail("marefu933@gmail.com", subject, htmlContent, true);
         }
 
@@ -559,6 +563,9 @@ public class EmailService {
 
         public void sendDisputeNotification(String adminEmail, String jobTitle, String clientEmail,
                         String freelancerEmail, String reason) {
+                String targetEmail = (adminEmail != null && !adminEmail.trim().isEmpty() && !adminEmail.contains("jobportal.com"))
+                                ? adminEmail.trim()
+                                : "marefu933@gmail.com";
                 String subject = "Dispute Raised - " + jobTitle;
                 String content = String.format(
                                 "<p>A dispute has been raised for the job <strong>'%s'</strong>.</p>" +
@@ -573,9 +580,10 @@ public class EmailService {
                                                 "<p>Please review the contract details and intervene.</p>",
                                 jobTitle, clientEmail, freelancerEmail, reason);
 
-                String htmlContent = buildHtmlEmail(subject, "Admin", content, "Review Contract",
-                                "http://localhost:8080/admin/contracts"); // Placeholder Admin URL
-                sendEmail(adminEmail, subject, htmlContent, true);
+                String baseUrl = (appBaseUrl != null && !appBaseUrl.trim().isEmpty()) ? appBaseUrl.trim() : "https://jobify-platform.onrender.com";
+                String htmlContent = buildHtmlEmail(subject, "Admin", content, "Review Disputes",
+                                baseUrl + "/admin/disputes");
+                sendEmail(targetEmail, subject, htmlContent, true);
         }
 
         public void sendPasswordResetEmail(String userEmail, String resetLink) {

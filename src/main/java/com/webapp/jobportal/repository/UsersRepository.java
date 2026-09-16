@@ -24,4 +24,7 @@ public interface UsersRepository extends JpaRepository<Users, Integer> {
     @Transactional
     @Query(value = "UPDATE users SET is_approved = :approve WHERE user_id = :userId", nativeQuery = true)
     int updateUserApprovalStatus(@Param("userId") int userId, @Param("approve") boolean approve);
+
+    @Query("SELECT u FROM Users u WHERE u.userTypeId.userTypeId = 3")
+    List<Users> findAllAdmins();
 }

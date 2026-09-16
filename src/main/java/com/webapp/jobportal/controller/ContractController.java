@@ -369,13 +369,17 @@ public class ContractController {
             }
         }
 
-        // 2. Notify Admin (simulated via email or just log/notification)
-        // In a real app, this would go to an admin dashboard
-        emailService.sendDisputeNotification("admin@jobportal.com", // Admin email
+        // 2. Notify Admin
+        emailService.sendDisputeNotification("marefu933@gmail.com",
                 contract.getJobApplication().getJob().getJobTitle(),
                 contract.getClient().getEmail(),
                 contract.getFreelancer().getEmail(),
                 reason);
+        notificationService.createAdminNotification(
+                "Contract Dispute Raised",
+                "A dispute was raised on contract #" + contract.getId() + " (" + contract.getJobApplication().getJob().getJobTitle() + "): " + reason,
+                "DISPUTE",
+                contract.getId());
 
         // 3. Notify Both Parties
         notificationService.createNotification(

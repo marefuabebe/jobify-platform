@@ -15,12 +15,15 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final com.webapp.jobportal.repository.UsersRepository usersRepository;
 
     @Autowired
     public NotificationService(NotificationRepository notificationRepository,
-            SimpMessagingTemplate messagingTemplate) {
+            SimpMessagingTemplate messagingTemplate,
+            @org.springframework.context.annotation.Lazy com.webapp.jobportal.repository.UsersRepository usersRepository) {
         this.notificationRepository = notificationRepository;
         this.messagingTemplate = messagingTemplate;
+        this.usersRepository = usersRepository;
     }
 
     public Notification createNotification(Users user, String title, String message, String type, Integer relatedId) {
@@ -81,18 +84,36 @@ public class NotificationService {
         notificationRepository.deleteById(notificationId);
     }
 
-    public void createAdminNotification(String userEmail, String userType) {
-        // Create notification for admin user (assuming admin has userId = 1)
-        Users adminUser = new Users();
-        adminUser.setUserId(1); // Admin user ID
+    public void createAdminNotification(String title, String message, String type, Integer relatedId) {
+        List<Users> admins = usersRepository.findAllAdmins();
+        if (admins == null || admins.isEmpty()) {
+            usersRepository.findByEmail("marefu933@gmail.com").ifPresent(admin -> {
+                createNotification(admin, title, message, type, relatedId);
+            });
+            return;
+        }
 
-        createNotification(
-                adminUser,
-                "New User Verification Required",
-                "A new " + userType + " (" + userEmail
-                        + ") has uploaded verification documents and is ready for review.",
-                "VERIFICATION",
-                null);
+        for (Users admin : admins) {
+            createNotification(admin, title, message, type, relatedId);
+        }
+    }
+
+    public void createAdminNotification(String userEmail, String userType) {
+        createAdminVerificationNotification(userEmail, userType, null);
+    }
+
+    public void createAdminVerificationNotification(String userEmail, String userType, Integer userId) {
+        String title = "New " + userType + " Verification Required";
+        String message = "User " + userEmail + " has uploaded verification documents and is awaiting your review.";
+        createAdminNotification(title, message, "VERIFICATION", userId);
+    }
+
+    public void createAdminDisputeNotification(com.webapp.jobportal.entity.Dispute dispute) {
+        String title = "New Dispute Filed: #" + dispute.getId();
+        String reporterEmail = dispute.getReporter() != null ? dispute.getReporter().getEmail() : "User";
+        String jobTitle = dispute.getJob() != null ? dispute.getJob().getJobTitle() : "Job";
+        String message = "A dispute was filed by " + reporterEmail + " regarding '" + jobTitle + "': " + dispute.getDescription();
+        createAdminNotification(title, message, "DISPUTE", dispute.getId());
     }
 
     public Notification getOne(Integer id) {

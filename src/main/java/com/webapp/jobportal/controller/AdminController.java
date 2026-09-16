@@ -81,7 +81,16 @@ public class AdminController {
         this.cloudinaryService = cloudinaryService;
     }
 
-    // ... existing mappings ...
+    @ModelAttribute
+    public void populateAdminNotifications(Model model) {
+        try {
+            Users currentUser = usersService.getCurrentUser();
+            if (currentUser != null) {
+                model.addAttribute("adminUnreadCount", notificationService.getUnreadCount(currentUser));
+                model.addAttribute("adminRecentNotifications", notificationService.getRecentNotifications(currentUser, 6));
+            }
+        } catch (Exception ignored) {}
+    }
 
     @GetMapping("/disputes")
     public String disputes(Model model) {
@@ -380,6 +389,7 @@ public class AdminController {
             jobSeekerProfileService.getOne(u.getUserId()).ifPresent(p -> jobSeekerProfiles.put(u.getUserId(), p));
         }
         model.addAttribute("jobSeekerProfiles", jobSeekerProfiles);
+        model.addAttribute("activeLink", "verifications");
 
         return "admin/verification-dashboard";
     }
