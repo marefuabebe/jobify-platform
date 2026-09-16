@@ -33,6 +33,7 @@ public class WebSecurityConfig {
         }
 
         private final String[] publicUrl = { "/",
+                        "/health",
                         "/global-search/**",
                         "/info/**",
                         "/register",
